@@ -1,0 +1,100 @@
+<object class="GphlWorkflowConnection">
+
+    <!-- Directory locations
+    - file names below are set as file_name.format(directory_locations) -->
+    <directory_locations>
+        <!-- Wrapper scripts for GPhL programs - must be reachable from workflow and procesing -->
+        <GPHL_SETUP>/beamlines/bl13/controls/gphl/gphl_workflow</GPHL_SETUP>
+        <GPHL_RELEASE>/beamlines/bl13/controls/gphl</GPHL_RELEASE>
+    </directory_locations>
+
+    <!-- If set, run workflow through ssh with selected options -->
+    <!-- NB The  Host option is mandatory -->
+    <ssh_options>
+        <Host>ctbl1301</Host>
+        <!-- <IdentityFile>/home/rhfogh/.ssh/wf_test_id</IdentityFile> -->
+        <!-- <User>rhfogh</User> -->
+        <!-- <StrictHostKeyChecking>no</StrictHostKeyChecking> -->
+    </ssh_options>
+
+    <software_paths>
+        <!-- Location of Java binary to execute for workflow application -->
+        <java_binary>{GPHL_RELEASE}/jre/bin/java</java_binary>
+        <!--<java_binary>ssh -i /home/rhfogh/.ssh/wf_test_id -o StrictHostKeyChecking=no lonsdale java</java_binary>-->
+
+        <!-- Location of GPhL release, containing program binaries (or their wrapper scripts) -->
+        <GPHL_INSTALLATION>{GPHL_RELEASE}/gphl_release/autoPROC/bin/linux64</GPHL_INSTALLATION>
+
+        <!-- Gphl workflow Java classpath. -->
+        <!--Should point to all contents of workflow application directory-->
+        <gphl_java_classpath>{GPHL_SETUP}/workflow/wf16/*</gphl_java_classpath>
+
+        <!-- Directory with workflow config input, e.g. instrumentation.nml -->
+        <gphl_beamline_config>{GPHL_SETUP}/gphl_beamline_config</gphl_beamline_config>
+
+        <!-- Directory with workflow config input, e.g. instrumentation.nml -->
+        <!-- <gphl_test_samples>{GPHL_SETUP}/gphl_test_samples</gphl_test_samples> -->
+
+        <!-- Redirection of workflow runner (java) output for debug purposes. Optional -->
+        <!-- Path is relative to path_template.process_directory -->
+        <gphl_wf_redirected_out>gphl_java_wf_redirect.out</gphl_wf_redirected_out>
+
+        <!-- Location of installation used for processing queue (not reachable from BCS computer. -->
+        <!-- Passed as environmental variable GPHL_PROC_INSTALLATION. Optional -->
+        <!--<gphl_wf_processing_installation>/users/pkeller/GPhL-ESRF/exe</gphl_wf_processing_installation>-->
+    </software_paths>
+
+    <!-- Software paths that are passed to global phasing workflow as java properties -->
+    <software_properties>
+
+        <!-- Location of GPhL .license directory -->
+        <!-- defaults to GPHL_INSTALLATION-->
+        <!-- Only needed if you do NOT use the wrapper script : -->
+        <co.gphl.wf.bdg_licence_dir>{GPHL_RELEASE}/gphl_release</co.gphl.wf.bdg_licence_dir>
+
+        <!-- Location of executable XDS binary. Mandatory-->
+        <co.gphl.wf.xds.bin>/public/xtal/Xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>
+
+        <!-- <Location of individual binaries are optional. -->
+        <!-- They default to within GPHL_INSTALLATION -->
+
+        <!-- Location of stratcal binary -->
+        <!--<co.gphl.wf.stratcal.bin>{GPHL_SETUP}/scripts/stratcal_wrap.py</co.gphl.wf.stratcal.bin>-->
+        <!-- Location of stratcal-specific license directory - OPTIONAL ->
+        <co.gphl.wf.stratcal.bdg_licence_dir>/public/xtal/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
+        -->
+
+        <!-- Location of simcal binaries -->
+        <!-- <co.gphl.wf.simcal.bin>{GPHL_SETUP}/scripts/simcal</co.gphl.wf.simcal.bin>-->
+        <!-- Location of simcal-specific license directory - OPTIONAL ->
+        <co.gphl.wf.simcal_predict.bdg_licence_dir>/public/xtal/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
+        -->
+
+        <!-- Location of transcal binary -->
+        <!--<co.gphl.wf.transcal.bin>{GPHL_SETUP}/scripts/transcal</co.gphl.wf.transcal.bin>-->
+
+        <!-- Location of recen binary -->
+        <!--<co.gphl.wf.recen.bin>{GPHL_SETUP}/scripts/recen</co.gphl.wf.recen.bin>-->
+
+        <!-- Path of application that analyses diffractcal (aka rotational
+        calibration) data. In practice, this will almost always be a wrapper
+        script that sets up the environment properly. -->
+        <co.gphl.wf.diffractcal.bin>{GPHL_RELEASE}/slurm_cripts/gphl.diffractcal.sh</co.gphl.wf.diffractcal.bin>
+        
+        <co.gphl.wf.process.bin>{GPHL_RELEASE}/slurm_cripts/gphl.process.sh</co.gphl.wf.process.bin>
+
+    </software_properties>
+
+    <!-- Subdirectory under Session.get_process_directory() for GPhL persistence data-->
+    <gphl_subdir>GPHL</gphl_subdir>
+
+    <!-- Hosts and ports for py4j java-python gateway, all OPTIONAL-->
+    <!-- If not set will use py4j default values, which are as given below-->
+    <!-- NB python_host is set automatically to localhost or socket.gethostname()-->
+    <!-- NB java_host is not needed as all communication is effectively one-way -->
+    <!--<connection_parameters>-->
+        <!--<python_port>25334</python_port>-->
+        <!--<java_port>25333</java_port>-->
+    <!--</connection_parameters>-->
+
+</object>

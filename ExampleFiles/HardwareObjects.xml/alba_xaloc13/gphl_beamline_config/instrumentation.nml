@@ -4,8 +4,7 @@
 calibration_name= 'Initial'
 beamline_name= 'XALOC13'
 coord_sys_name= 'UNKNOWN'
-! Changed from RB input, but necessary to get images
-nominal_beam_dir= 0.0  -1.0  0.0
+nominal_beam_dir= 0.0  1.0  0.0
 
 beam_sd_deg= 0.03 0.03
 ! lambd_sd is a reasonable default (WP), but not specifically determined
@@ -15,7 +14,7 @@ pol_frac= 0.99
 
 det_name= "PILATUS6M"
 det_x_axis= 1.0  0.0  0.0
-det_y_axis= 0.0  0.0  1.0
+det_y_axis= 0.0  0.0  -1.0
 det_qx= 0.172000
 det_qy= 0.172000
 
@@ -26,7 +25,7 @@ det_org_y= 1307.0
 det_org_dist= 240.581970
 
 ! NB nothing given by Roeland Boer in this block
-det_gonio_axis_dirs=  0.0  0.0  1.0
+det_gonio_axis_dirs=  0.0  1.0  0.0
  ! Actual value is irrelevant, since axis is (nominally) parallel to beam
  ! and we don't refine its direction
 det_gonio_axis_datum_settings= 500
