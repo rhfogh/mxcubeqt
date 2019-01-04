@@ -4,7 +4,7 @@
 calibration_name= 'Initial'
 beamline_name= 'XALOC13'
 coord_sys_name= 'UNKNOWN'
-! Changed from RB input, but necessary to get iamges
+! Changed from RB input, but necessary to get images
 nominal_beam_dir= 0.0  -1.0  0.0
 
 beam_sd_deg= 0.03 0.03
@@ -54,7 +54,9 @@ gonio_centring_axis_dirs=  1.0,  0.0,  0.0,
                            0.0,  0.0,  1.0
 ! Actual limits on centring axes
 gonio_centring_axis_limits=  -1.5, 21.55, -2.2, 2.2, -2.55, 2.55
-gonio_centring_axis_names= 'omegax', 'centx', 'centy'
+! NB renamed version is WRONG for ALBA, butnecessary to fit with mock objects
+! gonio_centring_axis_names= 'omegax', 'centx', 'centy'
+gonio_centring_axis_names= 'phiy', 'sampx', 'sampy'
 ! At omega=0: centx antiparallel to beam, centy perpendicular.
 ! omegax parallel to omega
 
