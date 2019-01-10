@@ -8,12 +8,6 @@
         <GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>
     </directory_locations>
 
-    <!-- Redirection of workflow runner (java) output for debug purposes. Optional -->
-    <!-- If set, the tem-late will be used as template % timestamp -->
-    <!-- e.g. wf_2018-11-12T18:35:02.727815.out -->
-    <gphl_logfile_template>wf_%s.out</gphl_logfile_template>
-
-
     <!-- If set, run workflow through ssh with selected options -->
     <!-- NB The  Host option is mandatory -->
     <!--<ssh_options>-->
