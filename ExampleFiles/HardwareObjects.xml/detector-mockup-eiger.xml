@@ -3,10 +3,13 @@
   <humidityThreshold>20.0</humidityThreshold>
   <tolerance>0.2</tolerance>
   <type>eiger</type>
-  <model>16M</model>
+  <!--<model>9M</model>-->
+   <model>16M</model>
   <manufacturer>DECTRIS</manufacturer>
   <px>0.075</px>
   <py>0.075</py>
+  <!-- <width>3110</width> -->
+  <!-- <height>3269</height> -->
   <width>4150</width>
   <height>4271</height>
   <hasShutterless>True</hasShutterless>
