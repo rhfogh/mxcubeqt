@@ -6,7 +6,9 @@ beamline_name= 'PX2'
 coord_sys_name= 'UNKNOWN'
 nominal_beam_dir= 0.001744    0.000890    0.999998
 
-beam_sd_deg= 0.06179 0.06179
+! beam_sd_deg= 0.06179 0.06179
+! Trying to improve spot size:
+beam_sd_deg= 0.03 0.03
 ! lambd_sd is a reasonable default (WP), but not specifically determined
 lambda_sd= 0.0002
 pol_plane_n= 0.0 1.0 0.0

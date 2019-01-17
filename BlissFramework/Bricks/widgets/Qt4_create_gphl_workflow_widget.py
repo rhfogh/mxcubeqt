@@ -103,7 +103,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         xx.setCurrentIndex(xx.findText(name))
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
-        beam_energies = parameters.get('beam_energies', {})
         strategy_type = parameters.get('strategy_type')
         if strategy_type == 'transcal':
             self._gphl_acq_widget.hide()
@@ -115,9 +114,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
-            self._gphl_acq_param_widget.populate_widget(
-                beam_energies=beam_energies,
-            )
+            self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.show()
@@ -237,6 +234,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
+            wf.set_beam_energies(wf_parameters['beam_energies'])
         wf.set_expected_resolution(expected_resolution)
         
         tasks.append(wf)
