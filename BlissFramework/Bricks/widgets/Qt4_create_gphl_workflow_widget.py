@@ -223,9 +223,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 'expected_resolution'
             )
 
-            dd = self._gphl_acq_param_widget.get_energy_dict()
-            wf.set_beam_energies(dd)
-
             wf.set_space_group(
                 self._gphl_acq_param_widget.get_parameter_value('space_group')
             )
