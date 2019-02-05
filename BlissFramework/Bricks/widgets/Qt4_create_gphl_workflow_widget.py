@@ -32,16 +32,20 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         self.init_models()
 
+
+    def _initialize_graphics(self, workflow_hwobj):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = QtGui.QGroupBox('Workflow type', self)
 
         self._workflow_cbox = QtGui.QComboBox(self._workflow_type_widget)
         self._gphl_acq_widget = QtGui.QGroupBox('Acquisition', self)
         self._gphl_acq_param_widget =  GphlAcquisitionWidget(
-            self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
+            self._gphl_acq_widget, "gphl_acquisition_parameter_widget",
+            workflow_object=workflow_hwobj
         )
         self._gphl_diffractcal_widget =  GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget"
+            self._gphl_acq_widget, "gphl_diffractcal_widget",
+            workflow_object=workflow_hwobj
         )
 
         self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
@@ -73,7 +77,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self.workflow_selected
         )
 
-
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, 'GPhL Workflow Data')
         self.gphl_data_dialog.setModal(True)
@@ -81,17 +84,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
         #              self.data_acquired)
 
-    def initialise_workflows(self, workflow_hwobj):
+    def initialise_workflows(self, workflow_hwobj, beamline_setup_hwobj):
         self._workflow_hwobj = workflow_hwobj
-        self._workflow_cbox.clear()
         # self._gphl_parameters_widget.set_workflow(workflow_hwobj)
 
         if self._workflow_hwobj is not None:
+            workflow_hwobj.setup_workflow_object(beamline_setup_hwobj)
             workflow_names = list(workflow_hwobj.get_available_workflows())
+            self._initialize_graphics(workflow_hwobj)
+            self._workflow_cbox.clear()
             for workflow_name in workflow_names:
                 self._workflow_cbox.addItem(workflow_name)
             self.workflow_selected(workflow_names[0])
-
             workflow_hwobj.connect('gphlParametersNeeded',
                                    self.gphl_data_dialog.open_dialog)
 

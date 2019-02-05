@@ -11,6 +11,7 @@
  SEPMIN=	4
  CLUSTER_RADIUS= 2
  MAXIMUM_ERROR_OF_SPOT_POSITION= 2
+ LIB=/nfs/data/plugin.so
 
 ! Resolution exclusion to exclude ice rings:
 ! Source Clemens Vonrhein (autoPROC values)

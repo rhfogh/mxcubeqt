@@ -1,4 +1,5 @@
 <object class="GphlWorkflowConnection">
+<!-- NBNB REWRITE. Does not follow newest 2.3.0 branch code -->
 
     <!-- Directory locations
     - file names below are set as file_name.format(directory_locations) -->

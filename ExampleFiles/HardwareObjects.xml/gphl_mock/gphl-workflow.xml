@@ -1,8 +1,5 @@
 <object class="GphlWorkflow">
 
-    <!-- GPHL beamline configuration subdirectory
-         (relative to HardwareObjects config xml directories-->
-    <gphl_beamline_config>gphl_beamline_config</gphl_beamline_config>
     <!-- Directory for (optional) output of instrument calbration results-->
     <!-- combined with instcfgout parameter (see below); see also <newinstr> -->
     <!--<instcfgout_dir>/MXCuBE/mxcube</instcfgout_dir>-->
@@ -29,6 +26,16 @@
             <a>51.2487</a>
             <b>51.2487</b>
             <c>51.2487</c>
+            <alpha>90</alpha>
+            <beta>90</beta>
+            <gamma>90</gamma>
+        </test_crystal>
+        <test_crystal>
+            <name>HEWLysozyme</name>
+            <space_group>P43212</space_group>
+            <a>77.05</a>
+            <b>77.05</b>
+            <c>37.21</c>
             <alpha>90</alpha>
             <beta>90</beta>
             <gamma>90</gamma>
@@ -349,7 +356,7 @@
             <options>
                 <wfprefix>Dcalib1_</wfprefix>
                 <!-- Name of strategy from library to use -->
-                <strategy>DiffractCal_ex</strategy>
+                <strategy>DiffractCal</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Name for diffractometer calibration output -->

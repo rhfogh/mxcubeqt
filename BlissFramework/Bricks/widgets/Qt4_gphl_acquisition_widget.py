@@ -153,7 +153,8 @@ class GphlSetupWidget(QtGui.QWidget):
 
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
-    def __init__(self, parent=None, name='gphl_acquisition_widget'):
+    def __init__(self, parent=None, name='gphl_acquisition_widget',
+                 workflow_object=None):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -162,11 +163,8 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        bl_setup_hwobj = HardwareRepository.HardwareRepository().getHardwareObject(
-            'beamline-setup'
-        )
         xx = next(
-            bl_setup_hwobj.gphl_workflow_hwobj.getObjects("test_crystals")
+            workflow_object.getObjects("test_crystals")
         )
         for test_crystal in xx.getObjects("test_crystal"):
             dd = test_crystal.getProperties()
@@ -274,8 +272,9 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         ('Cubic        | 432', CrystalSystemData('Cubic', ('432',)))
     ))
 
-    def __init__(self, parent=None, name='gphl_acquisition_widget'):
-        GphlSetupWidget.__init__(self, parent=parent, name=name)
+    def __init__(self, parent=None, name='gphl_acquisition_widget',
+                 workflow_object=None):
+        GphlSetupWidget.__init__(self, parent=parent, name=name,)
 
          # Internal variables -------------------------------------------------
 

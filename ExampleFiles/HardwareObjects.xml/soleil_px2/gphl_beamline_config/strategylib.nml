@@ -21,6 +21,23 @@ id= 'bset01'
 lambda = 1.0
 /
 
+! ################### Long characteristation strategy
+
+&sdcp_strategy_list
+strategy_name= 'LongCharacterisation'
+type= 'geometric'
+allowed_widths= 0.02 0.03 0.04 0.05 0.06 0.08 0.1 0.12 0.15 0.2 0.3 0.4
+default_width_idx= 6
+/
+
+&stratcal_sweep_list
+goniostat_setting_id= 'gset01'
+detector_setting_id= 'dset01'
+beam_setting_id= 'bset01'
+length_deg= 180
+start_deg= 0.0
+/
+
 ! ################### Default characteristation strategy
 
 &sdcp_strategy_list
@@ -74,7 +91,7 @@ start_deg= 180.0
 
 &beam_setting_list
 id= 'dcalbset'
-lambda= 0.97625196850393714
+lambda= 1.0
 /
 
 !&sdcp_detector_setting_list

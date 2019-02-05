@@ -32,7 +32,7 @@ from widgets.Qt4_create_energy_scan_widget import CreateEnergyScanWidget
 from widgets.Qt4_create_xrf_spectrum_widget import CreateXRFSpectrumWidget
 from widgets.Qt4_create_gphl_workflow_widget import CreateGphlWorkflowWidget
 from widgets.Qt4_create_advanced_widget import CreateAdvancedWidget
-from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
+#from widgets.Qt4_create_xray_imaging_widget import CreateXrayImagingWidget
 
 
 class TaskToolBoxWidget(QWidget):
@@ -65,14 +65,16 @@ class TaskToolBoxWidget(QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if hasattr(parent.getHardwareObject('beamline-setup'),
-                   'gphl_workflow_hwobj'):
+        beamline_setup = parent.getHardwareObject('beamline-setup')
+        gphl_workflow_hwobj = beamline_setup.getObjectByRole('gphl_workflow')
+        if gphl_workflow_hwobj is None:
+            self.gphl_workflow_page = None
+            logging.getLogger("HWR").info("GPhL workflow is not available")
+        else:
             self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box,
                                                                "gphl_workflow")
-        else:
-            self.gphl_workflow_page = None
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
-        self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
+        #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
 
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
@@ -83,7 +85,7 @@ class TaskToolBoxWidget(QWidget):
             self.tool_box.addItem(self.gphl_workflow_page,
                                   "GPhL Workflows")
         self.tool_box.addItem(self.advanced_page, "Advanced")
-        self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
+        #self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
 
         self.button_box = QWidget(self)
         self.create_task_button = QPushButton("  Add to queue", self.button_box)
@@ -113,8 +115,9 @@ class TaskToolBoxWidget(QWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
-        #self.setSizePolicy(QSizePolicy.Expanding,
-        #                   QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,
+                           QSizePolicy.Expanding)
+
 
         # Qt signal/slot connections ------------------------------------------
         self.create_task_button.clicked.connect(self.create_task_button_click)
@@ -178,34 +181,32 @@ class TaskToolBoxWidget(QWidget):
                 if beamline_setup_hwobj.xrf_spectrum_hwobj is not None:
                     has_xrf_spectrum = True
 
-        if hasattr(beamline_setup_hwobj, 'xray_imaging_hwobj'):
-            if beamline_setup_hwobj.xray_imaging_hwobj is not None:
-                has_xray_imaging = True
+            if hasattr(beamline_setup_hwobj, 'xray_imaging_hwobj'):
+                if beamline_setup_hwobj.xray_imaging_hwobj is not None:
+                    has_xray_imaging = True
 
         if not has_energy_scan:
             self.tool_box.removeItem(self.tool_box.indexOf(self.energy_scan_page))
             self.energy_scan_page.hide()
-            logging.getLogger("HWR").info("Energy scan task not available")
+            logging.getLogger("GUI").warning("Energy scan task not available")
         if not has_xrf_spectrum:
             self.tool_box.removeItem(self.tool_box.indexOf(self.xrf_spectrum_page))
             self.xrf_spectrum_page.hide()
-            logging.getLogger("HWR").info("XRF spectrum task not available")
+            logging.getLogger("GUI").warning("XRF spectrum task not available")
         if not has_xray_imaging:
-            self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
-            self.xray_imaging_page.hide()
-            logging.getLogger("HWR").info("Xray Imaging task not available")
+            pass
+            #self.tool_box.removeItem(self.tool_box.indexOf(self.xray_imaging_page))
+            #self.xray_imaging_page.hide()
+            #logging.getLogger("GUI").warning("Xray Imaging task not available")
+        gphl_workflow_hwobj = None
+        if hasattr(beamline_setup_hwobj, 'gphl_workflow_hwobj'):
+            gphl_workflow_hwobj = beamline_setup_hwobj.gphl_workflow_hwobj
 
-        has_gphl_workflow = False
-        if hasattr(beamline_setup_hwobj, 'gphl_connection_hwobj'):
-            if beamline_setup_hwobj.gphl_connection_hwobj:
-                has_gphl_workflow = True
-
-        if has_gphl_workflow:
-            self.gphl_workflow_page.initialise_workflows(
-                beamline_setup_hwobj.gphl_workflow_hwobj
-            )
-        else:
+        if gphl_workflow_hwobj is None:
             logging.getLogger("HWR").info("GPhL workflow task not available")
+        else:
+            self.gphl_workflow_page.initialise_workflows(gphl_workflow_hwobj,
+                                                         beamline_setup_hwobj)
 
 
     def update_data_path_model(self):
