@@ -5,8 +5,9 @@
 calibration_name= 'Initial'
 beamline_name= 'PX2'
 coord_sys_name= 'UNKNOWN'
-! NB: Values from Claus Flensburg q-soleil-proxima2a.in (20190117):
-nominal_beam_dir= 0.001744    0.000890    0.999998
+! NB: Values from diffractcal 20190123:
+! nominal_beam_dir= 0.001744    0.000890    0.999998
+nominal_beam_dir= -2.538421068990627E-004 , 2.325000000000000E-003 , 0.999996954363454
 
 ! NB: Values in this block from Claus Flensburg q-soleil-proxima2a.in (20190117):
 ! beam_sd_deg= 0.06179 0.06179
@@ -23,15 +24,15 @@ min_zeta= 0.15
 min_lorentz= 0.01
 
 det_name= "EIGER9M"
-det_x_axis= 1.0 0.0 0.0
-det_y_axis= 0.0 1.0 0.0
+det_x_axis= -2.538421068990627E-004 , 2.325000000000000E-003 , 0.999996954363454
+det_y_axis= -2.961241461812387E-003 , 0.999995347558714 , -8.189148188135907E-005
 det_qx= 0.075
 det_qy= 0.075
 det_nx= 3110
 det_ny= 3269
-det_org_x= 1464.088
-det_org_y= 1730.444
-det_org_dist= 110
+det_org_x= 1476.79045809915
+det_org_y= 1725.50596653286
+det_org_dist= 199.613890515747
 
 ! Coordinate system used:
 !
@@ -60,11 +61,10 @@ det_gonio_axis_calibratable = 'False'
 det_filename_suffix= '.h5'
 
 gonio_name= "MiniKappa"
-! Axis directions are NOT refined - they arenominal ESRF values
+! Axis directions from short diffractcal 20190123
 ! Sign of compoonents of kappa axis confirmed
 gonio_axis_dirs= 1.0 0.0 0.0,
-   ! Added final '2' to first float in order to sum to 1.0000000 exactly
-   0.9131443849167312, -0.281940552428199, -0.294409336114748,
+   0.913199876899538 , -0.291896883437259 , -0.284362786366789
    1.0 0.0 0.0
 ! Limits on centring axes confirmed by SOLEIL
 gonio_axis_datum_settings= 0 0 0
