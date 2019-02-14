@@ -143,6 +143,7 @@
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
             <interleave_order>gs</interleave_order>
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
@@ -231,6 +232,7 @@
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
             <interleave_order>gs</interleave_order>
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
@@ -256,6 +258,7 @@
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
             <interleave_order>gs</interleave_order>
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
@@ -283,6 +286,7 @@
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
             <interleave_order>gs</interleave_order>
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>

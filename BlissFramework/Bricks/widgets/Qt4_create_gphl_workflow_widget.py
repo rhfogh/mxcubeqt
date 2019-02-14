@@ -105,6 +105,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx = self._workflow_cbox
         xx.setCurrentIndex(xx.findText(name))
+        self.init_models()
+        self._data_path_widget.update_data_model(self._path_template)
 
         parameters = self._workflow_hwobj.get_available_workflows()[name]
         strategy_type = parameters.get('strategy_type')
@@ -135,8 +137,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         wf_model = tree_item.get_model()
 
-        if not isinstance(tree_item, queue_item.SampleQueueItem):
+        if isinstance(tree_item, queue_item.SampleQueueItem):
+            self.init_models()
 
+        else:
             if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
                 if tree_item.get_model().is_executed():
                     self.setDisabled(True)

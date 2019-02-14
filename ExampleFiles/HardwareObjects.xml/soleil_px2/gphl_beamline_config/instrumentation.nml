@@ -33,6 +33,8 @@ det_ny= 3269
 det_org_x= 1476.79045809915
 det_org_y= 1725.50596653286
 det_org_dist= 199.613890515747
+! NB gain in nesessary for (at least) mock operation
+gain= 1.0
 
 ! Coordinate system used:
 !
