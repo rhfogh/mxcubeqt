@@ -737,7 +737,8 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)
- 
+
+        # Breaks in rhfogh mmock test mode
         confirm_dialog_default_conf = self.beamline_setup_hwobj.get_confirm_dialog_configuration()
         self.confirm_dialog.set_default_configuration(confirm_dialog_default_conf)
 
