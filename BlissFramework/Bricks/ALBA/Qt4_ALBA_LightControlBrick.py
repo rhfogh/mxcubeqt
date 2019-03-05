@@ -17,6 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 import logging
 
@@ -26,13 +28,15 @@ from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-__category__ = 'ALBA'
+__credits__ = ["ALBA Synchrotron"]
+__version__ = "2.3"
+__category__ = "General"
 
 # 
 # These state list is as in ALBAEpsActuator.py
 # 
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = \
-         (0,1,9,11,13,23)
+         (0, 1, 9, 11, 13, 23)
 
 STATES = {STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
           STATE_OUT: Qt4_widget_colors.LIGHT_GRAY,
@@ -40,6 +44,7 @@ STATES = {STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
           STATE_FAULT: Qt4_widget_colors.LIGHT_RED,
           STATE_ALARM: Qt4_widget_colors.LIGHT_RED,
           STATE_UNKNOWN: Qt4_widget_colors.LIGHT_GRAY}
+
 
 class Qt4_ALBA_LightControlBrick(BlissWidget):
     """
@@ -50,8 +55,8 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-        self.logger = logging.getLogger("GUI Alba Actuator")
-        self.logger.info("__init__()")
+        self.logger = logging.getLogger("GUI")
+        self.logger.info("ALBA_LightControlBrick.__init__()")
 
         self.on_color = Qt4_widget_colors.color_to_hexa(Qt4_widget_colors.LIGHT_GREEN)
         self.off_color = Qt4_widget_colors.color_to_hexa(Qt4_widget_colors.LIGHT_GRAY)
@@ -72,14 +77,14 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         self.widget = loadUi(os.path.join(os.path.dirname(__file__),
-             'widgets/ui_files/alba_lightcontrol.ui'))
+                                          'widgets/ui_files/alba_lightcontrol.ui'))
 
         QHBoxLayout(self)
   
         self.layout().addWidget(self.widget)
-        self.layout().setContentsMargins(0,0,0,0)
-        self.widget.layout().setContentsMargins(0,0,0,0)
-        self.widget.horizontalLayout.setContentsMargins(0,0,0,0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.widget.layout().setContentsMargins(0, 0, 0, 0)
+        self.widget.horizontalLayout.setContentsMargins(0, 0, 0, 0)
 
         self.widget.button.clicked.connect(self.do_switch)
         self.widget.slider.valueChanged.connect(self.do_set_level)
@@ -92,8 +97,6 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
 
         # Other --------------------------------------------------------------- 
         self.setToolTip("Control of light (set level and on/off switch.")
-
-        #self.update()
 
     def propertyChanged(self, property_name, old_value, new_value):
         """
@@ -113,7 +116,8 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
                 self.connect(self.light_ho, 'levelChanged', self.level_changed)
                 self.connect(self.light_ho, 'stateChanged', self.state_changed)
                 self.light_ho.update_values()
-                self.setToolTip("Control of %s (light level and on/off switch." % self.light_ho.getUserName())
+                self.setToolTip("Control of %s (light level and on/off switch."
+                                % self.light_ho.getUserName())
                 self.set_level_limits(self.light_ho.getLimits())
                 self.set_label(self.light_ho.getUserName())
             else:
@@ -129,7 +133,6 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        logging.getLogger("HWR").debug(" updating light control. state is %s" % self.state)
         if self.light_ho is not None:
             self.set_enabled()
             if self.state is "on":
@@ -150,20 +153,20 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
                 self.widget.slider.setValue(self.level) 
                 self.widget.slider.blockSignals(False)
                 self.widget.slider.setToolTip("Light Level: %s" % self.level) 
-        #else:
-        #    self.set_disabled()
 
     def set_disabled(self):
-        if self.light_ho is not None:
-            logging.getLogger("HWR").debug(" setting %s light_disabled" % self.light_ho.getUserName())
-        else:
-            logging.getLogger("HWR").debug(" setting light_disabled coz no hwo " )
+        # if self.light_ho is not None:
+        #     logging.getLogger("HWR").debug(" setting %s light_disabled"
+        #                                    % self.light_ho.getUserName())
+        # else:
+        #     logging.getLogger("HWR").debug(" setting light_disabled coz no hwo ")
         self.setEnabled(False)
         color = self.unknown_color
         self.widget.button.setStyleSheet("background-color: %s;" % color)
 
     def set_enabled(self):
-        logging.getLogger("HWR").debug(" setting %s light_enabled" % self.light_ho.getUserName())
+        # logging.getLogger("HWR").debug(" setting %s light_enabled"
+        #                                % self.light_ho.getUserName())
         self.setEnabled(True)
         self.widget.button.setEnabled(True)
         self.widget.slider.setEnabled(True)
@@ -182,7 +185,8 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
         self.update()
 
     def state_changed(self, state):
-        logging.getLogger("HWR").debug(" state changed for light control. state is %s" % self.state)
+        # logging.getLogger("HWR").debug(" state changed for light control. state is %s"
+        #                                % self.state)
         self.state = state
         self.update()
   
@@ -192,10 +196,10 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
     def set_level_limits(self, limits):
         self.level_limits = limits
         if None not in self.level_limits:
-           self.widget.slider.setMinimum(self.level_limits[0])
-           self.widget.slider.setMaximum(self.level_limits[1])
+            self.widget.slider.setMinimum(self.level_limits[0])
+            self.widget.slider.setMaximum(self.level_limits[1])
 
-    def do_set_level(self): # when slider is moved
+    def do_set_level(self):
         newvalue = self.widget.slider.value()
         self.light_ho.setLevel(newvalue)
 
@@ -206,4 +210,3 @@ class Qt4_ALBA_LightControlBrick(BlissWidget):
             self.light_ho.setOn()
         else:
             pass
-

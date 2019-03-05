@@ -20,20 +20,19 @@
 import os
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
-__category__ = 'ALBA'
+__credits__ = ["ALBA Synchrotron"]
+__version__ = "2.3"
+__category__ = "General"
 
-# 
 # These state list is as in ALBAEpsActuator.py
 # 
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = \
-         (0,1,9,11,13,23)
+         (0, 1, 9, 11, 13, 23)
 
 STATES = {STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
           STATE_OUT: Qt4_widget_colors.LIGHT_GRAY,
@@ -41,6 +40,7 @@ STATES = {STATE_IN: Qt4_widget_colors.LIGHT_GREEN,
           STATE_FAULT: Qt4_widget_colors.LIGHT_RED,
           STATE_ALARM: Qt4_widget_colors.LIGHT_RED,
           STATE_UNKNOWN: Qt4_widget_colors.LIGHT_GRAY}
+
 
 class Qt4_ALBA_ActuatorBrick(BlissWidget):
     """
@@ -51,8 +51,8 @@ class Qt4_ALBA_ActuatorBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-        self.logger = logging.getLogger("GUI Alba Actuator")
-        self.logger.info("__init__()")
+        self.logger = logging.getLogger("GUI")
+        self.logger.info("ALBA_ActuatorBrick.__init__()")
 
         # Hardware objects ----------------------------------------------------
         self.actuator_hwo = None
@@ -63,25 +63,24 @@ class Qt4_ALBA_ActuatorBrick(BlissWidget):
         self.addProperty('in_cmd_name', 'string', '')
         self.addProperty('out_cmd_name', 'string', '')
 
-
         # Graphic elements ----------------------------------------------------
-        self.widget = uic.loadUi(os.path.join(os.path.dirname(__file__),
-             'widgets/ui_files/alba_actuator.ui'))
+        self.widget = loadUi(os.path.join(os.path.dirname(__file__),
+                                          'widgets/ui_files/alba_actuator.ui'))
 
-        QtGui.QHBoxLayout(self)
+        QHBoxLayout(self)
   
         self.layout().addWidget(self.widget)
-        self.layout().setContentsMargins(0,0,0,0)
-        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.widget.layout().setContentsMargins(0, 0, 0, 0)
 
         self.widget.cmdInButton.clicked.connect(self.do_cmd_in)
         self.widget.cmdOutButton.clicked.connect(self.do_cmd_out)
 
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
-        self.setToolTip("Main information about machine current, " + \
+        self.setToolTip("Main information about machine current, "
                         "machine status and top-up remaining time.")
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -92,14 +91,16 @@ class Qt4_ALBA_ActuatorBrick(BlissWidget):
         """
         if property_name == 'mnemonic':
             if self.actuator_hwo is not None:
-                self.disconnect(self.actuator_hwo, QtCore.SIGNAL('stateChanged'), self.state_changed)
+                self.disconnect(self.actuator_hwo, SIGNAL('stateChanged'),
+                                self.state_changed)
 
             self.actuator_hwo = self.getHardwareObject(new_value)
             if self.actuator_hwo is not None:
                 self.setEnabled(True)
-                self.connect(self.actuator_hwo, QtCore.SIGNAL('stateChanged'), self.state_changed)
+                self.connect(self.actuator_hwo, SIGNAL('stateChanged'),
+                             self.state_changed)
                 self.actuator_hwo.update_values()
-                logging.getLogger("HWR").info("User Name is: %s" % self.actuator_hwo.getUserName())
+                self.logger.info("Actuator name: %s" % self.actuator_hwo.getUserName())
                 self.widget.actuatorBox.setTitle(self.actuator_hwo.getUserName())
             else:
                 self.setEnabled(False)
@@ -121,7 +122,8 @@ class Qt4_ALBA_ActuatorBrick(BlissWidget):
                 state = self.actuator_hwo.getState()
                 status = self.actuator_hwo.getStatus()
                 self.widget.stateLabel.setText(status)
-                Qt4_widget_colors.set_widget_color(self.widget.stateLabel, STATES[state])
+                Qt4_widget_colors.set_widget_color(self.widget.stateLabel,
+                                                   STATES[state])
 
                 self.widget.cmdInButton.setEnabled(False)
                 self.widget.cmdOutButton.setEnabled(False)
@@ -148,4 +150,3 @@ class Qt4_ALBA_ActuatorBrick(BlissWidget):
     def do_cmd_out(self):
         if self.actuator_hwo is not None:
             self.actuator_hwo.cmdOut()
-

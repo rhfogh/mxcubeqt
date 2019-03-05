@@ -17,33 +17,34 @@
 #  You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+from __future__ import print_function
+
 import logging
 
-from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import uic
+from QtImport import *
 
 from BlissFramework.Utils import Qt4_widget_colors
-from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 
 from widgets.QLed import QLed
 
-__category__ = 'ALBA'
+__credits__ = ["ALBA Synchrotron"]
+__version__ = "2.3"
+__category__ = "General"
 
 # 
 # These state list is as in ALBAEpsActuator.py
 # 
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = \
-         (0,1,9,11,13,23)
+         (0, 1, 9, 11, 13, 23)
 
-STATES = {STATE_IN: [Qt4_widget_colors.LIGHT_GREEN,"green", "OPENED"],
+STATES = {STATE_IN: [Qt4_widget_colors.LIGHT_GREEN, "green", "OPENED"],
           STATE_OUT: [Qt4_widget_colors.LIGHT_GRAY, "purple", "CLOSED"],
           STATE_MOVING: [Qt4_widget_colors.LIGHT_YELLOW, "yellow", "MOVING"],
           STATE_FAULT: [Qt4_widget_colors.LIGHT_RED, "red", "FAULT"],
           STATE_ALARM: [Qt4_widget_colors.LIGHT_RED, "red", "ALARM"],
           STATE_UNKNOWN: [Qt4_widget_colors.LIGHT_GRAY, "gray", "UNKNOWN"]}
+
 
 class Qt4_ALBA_ShuttersBrick(BlissWidget):
     """
@@ -54,7 +55,8 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         Descript. :
         """
         BlissWidget.__init__(self, *args)
-        self.logger = logging.getLogger("HWR").info("Creating GUI Alba Shutters State")
+        self.logger = logging.getLogger("GUI")
+        self.logger.info("ALBA_ShuttersBrick.__init__()")
 
         # Hardware objects ----------------------------------------------------
         self.fast_shut_ho = None
@@ -62,7 +64,8 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.photon_shut_ho = None
         self.fe_ho = None
 
-        self.default_led_size = 30 
+        self.default_led_size = 30
+        self.led_size = None
 
         # Properties ---------------------------------------------------------- 
         self.addProperty('fast_shutter', 'string', '')
@@ -72,9 +75,9 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.addProperty('led_size', 'string', '')
 
         # Graphic elements ----------------------------------------------------
-        self.shutter_box = QtGui.QGroupBox()
+        self.shutter_box = QGroupBox()
         self.shutter_box.setTitle("Beam on Sample")
-        self.leds_layout = QtGui.QHBoxLayout(self.shutter_box)
+        self.leds_layout = QHBoxLayout(self.shutter_box)
         
         self.fast_led = QLed.QLed()
         self.fast_led.setUserName("Fast Shutter")
@@ -93,72 +96,71 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
         self.leds_layout.addWidget(self.photon_led)
         self.leds_layout.addWidget(self.fe_led)
 
-        QtGui.QHBoxLayout(self)
+        QHBoxLayout(self)
     
         self.layout().addWidget(self.shutter_box)
-        self.layout().setContentsMargins(0,0,0,0)
-        self.leds_layout.setContentsMargins(2,2,2,2)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.leds_layout.setContentsMargins(2, 2, 2, 2)
 
         self.set_led_size(self.default_led_size)
         # SizePolicies --------------------------------------------------------
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.MinimumExpanding)
 
         # Other --------------------------------------------------------------- 
         self.setToolTip("Beam on Sample. Shutters status")
 
-        #self.slow_state_changed(True)
-        #self.fast_state_changed(False)
-        #self.frontend_state_changed(False)
-#
-#        self.fast_led.setShapeAndColor("circle","orange")
-#        self.fast_led.setMessage("in down position. X-Ray will go through")
         self.setEnabled(True)
 
     def propertyChanged(self, property_name, old_value, new_value):
-        """
-        Descript. :
-        Args.     :
-        Return.   : 
-        """
 
-        logging.getLogger("HWR").debug("setting %s property to %s" % (property_name, new_value))
+        # logging.getLogger("HWR").debug("setting %s property to %s" % (property_name,
+        #                                                               new_value))
 
         if property_name == 'fast_shutter':
             if self.fast_shut_ho is not None:
-                self.disconnect(self.fast_shut_ho, QtCore.SIGNAL('fastStateChanged'), self.fast_state_changed)
+                self.disconnect(self.fast_shut_ho, SIGNAL('fastStateChanged'),
+                                self.fast_state_changed)
 
             self.fast_shut_ho = self.getHardwareObject(new_value)
 
             if self.fast_shut_ho is not None:
-                logging.getLogger("HWR").debug("Connecting %s" % self.fast_shut_ho.getUserName())
-                self.connect(self.fast_shut_ho, QtCore.SIGNAL('fastStateChanged'), self.fast_state_changed)
+                # logging.getLogger("HWR").debug("Connecting %s"
+                #                                % self.fast_shut_ho.getUserName())
+                self.connect(self.fast_shut_ho, SIGNAL('fastStateChanged'),
+                             self.fast_state_changed)
 
         elif property_name == 'slow_shutter':
             if self.slow_shut_ho is not None:
-                self.disconnect(self.slow_shut_ho, QtCore.SIGNAL('stateChanged'), self.slow_state_changed)
+                self.disconnect(self.slow_shut_ho, SIGNAL('stateChanged'),
+                                self.slow_state_changed)
 
             self.slow_shut_ho = self.getHardwareObject(new_value)
 
             if self.slow_shut_ho is not None:
-                self.connect(self.slow_shut_ho, QtCore.SIGNAL('stateChanged'), self.slow_state_changed)
+                self.connect(self.slow_shut_ho, SIGNAL('stateChanged'),
+                             self.slow_state_changed)
 
         elif property_name == 'photon_shutter':
             if self.photon_shut_ho is not None:
-                self.disconnect(self.photon_shut_ho, QtCore.SIGNAL('stateChanged'), self.photon_state_changed)
+                self.disconnect(self.photon_shut_ho, SIGNAL('stateChanged'),
+                                self.photon_state_changed)
 
             self.photon_shut_ho = self.getHardwareObject(new_value)
 
             if self.photon_shut_ho is not None:
-                self.connect(self.photon_shut_ho, QtCore.SIGNAL('stateChanged'), self.photon_state_changed)
+                self.connect(self.photon_shut_ho, SIGNAL('stateChanged'),
+                             self.photon_state_changed)
 
         elif property_name == 'frontend':
             if self.fe_ho is not None:
-                self.disconnect(self.fe_ho, QtCore.SIGNAL('stateChanged'), self.frontend_state_changed)
+                self.disconnect(self.fe_ho, SIGNAL('stateChanged'),
+                                self.frontend_state_changed)
 
             self.fe_ho = self.getHardwareObject(new_value)
 
             if self.fe_ho is not None:
-                self.connect(self.fe_ho, QtCore.SIGNAL('stateChanged'), self.frontend_state_changed)
+                self.connect(self.fe_ho, SIGNAL('stateChanged'),
+                             self.frontend_state_changed)
 
         elif property_name == 'led_size':
             if new_value != '':
@@ -167,35 +169,35 @@ class Qt4_ALBA_ShuttersBrick(BlissWidget):
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
     def set_led_size(self, newsize):
+
         self.led_size = newsize
+        self.fast_led.setFixedSize(self.led_size, self.led_size)
+        self.slow_led.setFixedSize(self.led_size, self.led_size)
+        self.photon_led.setFixedSize(self.led_size, self.led_size)
+        self.fe_led.setFixedSize(self.led_size, self.led_size)
 
-        self.fast_led.setFixedSize(self.led_size,self.led_size)
-        self.slow_led.setFixedSize(self.led_size,self.led_size)
-        self.photon_led.setFixedSize(self.led_size,self.led_size)
-        self.fe_led.setFixedSize(self.led_size,self.led_size)
-
-    def fast_state_changed(self,value):
+    def fast_state_changed(self, value):
         led = self.fast_led
-        logging.getLogger("HWR").debug("Fast shutter state changed.  It is %s" % value)
+        # logging.getLogger("HWR").debug("Fast shutter state changed.  It is %s" % value)
         self._update_led(led, value)
         
-    def slow_state_changed(self,value):
+    def slow_state_changed(self, value):
         led = self.slow_led
         self._update_led(led, value)
 
-    def photon_state_changed(self,value):
+    def photon_state_changed(self, value):
         led = self.photon_led
         self._update_led(led, value)
 
-    def frontend_state_changed(self,value):
+    def frontend_state_changed(self, value):
         led = self.fe_led
         self._update_led(led, value)
 
     def _update_led(self, led, value):
-        color,colorname, message = STATES[value]
-        led.setColor(colorname)
+        color, color_name, message = STATES[value]
+        led.setColor(color_name)
         led.setMessage(message)
-        #led.setState(value)
+
 
 def test_brick(brick):
     """ Run test by running from command line test_mxcube <name of this file> """
