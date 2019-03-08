@@ -43,6 +43,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
         BlissWidget.__init__(self, *args)
         
         self.addProperty("mnemonic", "string", "")
+        self.addProperty("cats", "string", "")
+
         self.defineSlot('setExpertMode',())
 
         self.expert_mode = False
@@ -62,6 +64,9 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.widget.btLid3Open.clicked.connect(self.lid3_open)
         self.widget.btLid3Close.clicked.connect(self.lid3_close)
         self.widget.btRegulationOn.clicked.connect(self.regulation_set_on)                     
+        self.widget.btRegulationOff.clicked.connect(self.regulation_set_off)                     
+
+        self.widget.barcodeCheck.stateChanged.connect(self.barcode_checked)                     
 
         self.widget.btOpenTool.clicked.connect(self.tool_open)                     
         self.widget.btCloseTool.clicked.connect(self.tool_close)                     
@@ -78,14 +83,20 @@ class Qt4_CatsMaintBrick(BlissWidget):
         #self.widget.btRestart.clicked.connect(self.restart)                     
         self.widget.btResetPutGet.clicked.connect(self.reset_put_get)                     
         self.widget.btResetMotion.clicked.connect(self.reset_motion)                     
+        self.widget.btRecoverFailure.clicked.connect(self.recover_failure)                     
         self.widget.btMemClear.clicked.connect(self.clear_memory)                     
-        self.widget.btClear.clicked.connect(self.clear_memory)                     
+        # self.widget.btClear.clicked.connect(self.clear_memory)                     
         self.widget.btMore.clicked.connect(self.command_prompt)
+
 
         self.widget.btAbort.clicked.connect(self.abort)                     
         # self.widget.btPanic.clicked.connect(self.panic)                     
 
+        self.widget.btResetPutGet.setText("Fix fail PUT")
+        self.widget.btRecoverFailure.setText("Fix fail GET")
+
         self.device = None
+        self.cats_device = None
         self.state = None
 
         self.path_running = None
@@ -133,13 +144,20 @@ class Qt4_CatsMaintBrick(BlissWidget):
                 self.connect(self.device, 'lid2StateChanged', self.update_lid2_state)
                 self.connect(self.device, 'lid3StateChanged', self.update_lid3_state)
                 self.connect(self.device, 'toolStateChanged', self.update_tool_state)
+                self.connect(self.device, 'barcodeChanged', self.update_barcode)
                 self.connect(self.device,
                              SampleChanger.STATUS_CHANGED_EVENT,
                              self.update_status)
                 self.connect(self.device,
                              SampleChanger.STATE_CHANGED_EVENT,
                              self.update_state)
-
+        # TODO: review, barcode is defined cats not cats maintenance.
+        elif property == 'cats':
+            if self.cats_device is not None:
+                self.disconnect(self.cats_device, 'barcodeChanged', self.update_barcode)
+            self.cats_device = self.getHardwareObject(newValue)                                    
+            if self.device is not None:
+                self.connect(self.cats_device, 'barcodeChanged', self.update_barcode)
 
     def setExpertMode(self, mode):
         if mode:
@@ -190,8 +208,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
             barcode = value
         else: 
             barcode = "----"
-        logging.getLogger().debug("CATS update barcode : " + str(barcode))
-        self.widget.lblMessage.setText(str(value))
+        logging.getLogger("HWR").debug("CATS update barcode : " + str(barcode))
+        self.widget.barcodeLabel.setText(str(value))
 
     def update_path_running(self, value):
         self.path_running = value
@@ -227,8 +245,10 @@ class Qt4_CatsMaintBrick(BlissWidget):
     def update_tool_state(self, value):
         self.tool_state = value
         if self.device is not None and not self.path_running:
-            self.widget.btOpenTool.setEnabled(not value)
-            self.widget.btCloseTool.setEnabled(value)
+            self.widget.btOpenTool.setEnabled(True)
+            self.widget.btCloseTool.setEnabled(True)
+            #self.widget.btOpenTool.setEnabled(not value)
+            #self.widget.btCloseTool.setEnabled(value)
         else:
             self.widget.btOpenTool.setEnabled(False)
             self.widget.btCloseTool.setEnabled(False)
@@ -260,18 +280,25 @@ class Qt4_CatsMaintBrick(BlissWidget):
                 self.widget.btSafe.hide()
                 self.widget.btSafe.hide()
                 self.widget.btClear.hide()
+                # self.widget.btMemClear.hide()
+                self.widget.btRegulationOff.hide()
             else:
                 self.widget.boxTools.show()
-                self.widget.btMore.show()
-                self.widget.btBarcodeRead.show()
+                self.widget.btMore.hide()
+                #self.widget.btBarcodeRead.show()
                 self.widget.btBack.show()
                 self.widget.btSafe.show()
-                self.widget.btClear.show()
-                self.widget.btMemClear.show()
+                # self.widget.btClear.show()
+                # self.widget.btMemClear.show()
+                self.widget.btRegulationOff.show()
 
             # Open for users
-            self.widget.btPowerOn.setEnabled(ready and not powered)
-            self.widget.btPowerOff.setEnabled(ready and powered)
+            #self.widget.btPowerOn.setEnabled(ready and not powered)
+            #self.widget.btPowerOff.setEnabled(ready and powered)
+
+            # Just for ALBA. Not for general commit
+            self.widget.btPowerOn.setEnabled(not powered)
+            self.widget.btPowerOff.setEnabled(powered)
 
             if ready: 
                 color = str(Qt4_widget_colors.LIGHT_GRAY.name())
@@ -291,6 +318,9 @@ class Qt4_CatsMaintBrick(BlissWidget):
 
             regulOn = self.regulation_on and True or False
             self.widget.btRegulationOn.setEnabled(ready and not regulOn)
+            self.widget.btRegulationOff.setEnabled(ready and regulOn)
+
+            self.widget.btResetPutGet.setEnabled(ready)
 
             self.update_lid1_state(self.lid1_state)
             self.update_lid2_state(self.lid2_state)
@@ -407,6 +437,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
             if self.device is not None:
                 self.device._doHome()
         except:
+            import traceback
+            logging.getLogger("HWR").debug("home failed. %s" % traceback.format_exc())
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def resetError(self):
@@ -474,6 +506,13 @@ class Qt4_CatsMaintBrick(BlissWidget):
         except:
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
+    def recover_failure(self):
+        try:
+            if self.device is not None:
+                self.device._doRecoverFailure()
+        except:
+            QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
+
     def reset_motion(self):
         try:
             if self.device is not None:
@@ -484,8 +523,10 @@ class Qt4_CatsMaintBrick(BlissWidget):
     def reset_put_get(self):
         try:
             if self.device is not None:
-                self.device._doResetPutGet()
+                self.device._doReset()
         except:
+            import traceback
+            logging.getLogger("HWR").info("error running reset put get: %s" % traceback.format_exc())
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
     def clear(self):
@@ -502,6 +543,13 @@ class Qt4_CatsMaintBrick(BlissWidget):
         except:
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
+    def barcode_checked(self, value):
+        val_bool = value != 0 and True or False
+        logging.getLogger("GUI").info("barcode option checked %s" % val_bool)
+        #self.device.setReadBarcode(val_bool)
+        # TODO: review if this is correct
+        self.cats_device.setReadBarcode(val_bool)
+        
     def command_prompt(self, index):
         self.command_dialog = CatsCommandDialog(self)
         self.command_dialog.set_cats_device(self.device)

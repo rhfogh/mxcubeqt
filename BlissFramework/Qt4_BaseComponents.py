@@ -1103,7 +1103,7 @@ class BlissWidget(Connectable.Connectable, QFrame):
         if splash_screen:
             splash_screen.set_message(\
                 "Loading hardware object defined in %s.xml" %
-                hardware_object_name)        
+                hardware_object_name)
 
         if not hardware_object_name in self.__loaded_hardware_objects:
             self.__loaded_hardware_objects.append(hardware_object_name)

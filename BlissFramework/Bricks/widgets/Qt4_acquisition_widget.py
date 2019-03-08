@@ -146,11 +146,14 @@ class AcquisitionWidget(QWidget):
         self.osc_range_per_frame_validator = QDoubleValidator(\
              0, 10000, 4, self.acq_widget_layout.osc_range_ledit)
         self.osc_total_range_validator = QDoubleValidator(\
-             0, 10000, 4, self.acq_widget_layout.osc_total_range_ledit)
+             -0.0001, 10000, 4, self.acq_widget_layout.osc_total_range_ledit)
         self.kappa_validator = QDoubleValidator(\
-             0, 360, 4, self.acq_widget_layout.kappa_ledit)
-        self.kappa_phi_validator = QDoubleValidator(\
-             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+             -0.01, 360, 4, self.acq_widget_layout.kappa_ledit)
+        # self.kappa_phi_validator = QDoubleValidator( \
+        #     0, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
+        # The contrrol spin box accepts -360-360, and values < 0 invalidate Collect-Now
+        self.kappa_phi_validator = QDoubleValidator( \
+            -360, 360, 4, self.acq_widget_layout.kappa_phi_ledit)
         self.energy_validator = QDoubleValidator(\
              4, 25, 4, self.acq_widget_layout.energy_ledit)
         self.resolution_validator = QDoubleValidator(\
@@ -273,14 +276,16 @@ class AcquisitionWidget(QWidget):
 
     def update_exp_time_limits(self):
         try:
-           exp_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
-           max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
-           top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
-           limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1]) 
+            exp_time_limits = self._beamline_setup_hwobj.detector_hwobj.get_exposure_time_limits()
+            max_osc_speed = self._diffractometer_hwobj.get_osc_max_speed()
+            if max_osc_speed:
+                top_limit = float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
+                limits = (max(exp_time_limits[0], top_limit), exp_time_limits[1])
 
-           self.update_detector_exp_time_limits(limits)
+                self.update_detector_exp_time_limits(limits)
         except:
-           pass
+            # This will break because it is sometimes called too early.
+            pass
 
     def update_kappa(self, new_value):
         """

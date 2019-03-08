@@ -25,6 +25,8 @@ from BlissFramework import Qt4_Icons
 from sample_changer import SC3
 from Qt4_sample_changer_helper import *
 
+import logging
+
 
 __credits__ = ["MXCuBE colaboration"]
 __version__ = "2.3"
@@ -82,18 +84,18 @@ class VialView(QWidget):
         return self.vial_code
 
     def set_selected(self, state):
+        logging.getLogger().debug("VialView %s, selected %s" % (self.vial_index, state))
+
         if state is True:
             Qt4_widget_colors.set_widget_color(self, \
                 Qt4_widget_colors.LIGHT_GREEN)
         else:
             self.setStyleSheet("background-color: rgba(255,255,255,0);")
-            #Qt4_widget_colors.set_widget_color(self, \
-            #    Qt4_widget_colors.BUTTON_ORIGINAL)
 
     def mousePressEvent(self, event):
         """Mouse single clicked event"""
         QWidget.mousePressEvent(self,event)
-        
+
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
         self.singleClickSignal.emit(self.vial_index)
@@ -115,10 +117,9 @@ class VialNumberView(QLabel):
     def mousePressEvent(self, event):
         """Mouse single clicked event"""
         QWidget.mousePressEvent(self,event)
-        
+
     def mouseReleaseEvent(self, event):
         """Mouse single clicked event"""
-        ogging.getLogger("HWR").debug("mouse released on vial number view")
         self.singleClickSignal.emit(self.vial_index)
         QLabel.mouseReleaseEvent(self,event)
 
@@ -138,13 +139,15 @@ class VialNumberView(QLabel):
 
 
 class SampleBox(QWidget):
-    
+
     singleClickSignal = pyqtSignal(int)
-    
+
     def __init__(self, *args):
         QWidget.__init__(self, *args)
         self.selected = False
         self.setMouseTracking(True)
+        Qt4_widget_colors.set_widget_color(self, \
+            Qt4_widget_colors.BUTTON_ORIGINAL)
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
@@ -152,16 +155,15 @@ class SampleBox(QWidget):
     def set_vial_index(self, basket_index, vial_index):
         self.basket_index = basket_index
         self.vial_index = vial_index
-        
+
     def set_selected(self, state):
         self.selected = state
         if self.selected:
             Qt4_widget_colors.set_widget_color(self, \
                 Qt4_widget_colors.LIGHT_GREEN)
         else:
-            self.setStyleSheet("background-color: rgba(255,255,255,0);")
-            #Qt4_widget_colors.set_widget_color(self, \
-            #    Qt4_widget_colors.BUTTON_ORIGINAL)
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.BUTTON_ORIGINAL)
 
     def mouseMoveEvent(self, event):
         QWidget.mouseMoveEvent(self, event)
@@ -175,7 +177,7 @@ class SampleBox(QWidget):
         """Mouse single clicked event"""
         self.singleClickSignal.emit(self.vial_index)
         QWidget.mouseReleaseEvent(self,event)
-        
+
     def enterEvent(self, event):
         QWidget.enterEvent(self, event)
         if not self.selected:
@@ -184,10 +186,13 @@ class SampleBox(QWidget):
 
     def leaveEvent(self, event):
         QWidget.leaveEvent(self, event)
-        if not self.selected:
-            # set transparent color
-            self.setStyleSheet("background-color: rgba(255,255,255,0);")
-        
+        if self.selected:
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.LIGHT_GREEN)
+        else:
+            Qt4_widget_colors.set_widget_color(self, \
+                Qt4_widget_colors.BUTTON_ORIGINAL)
+
 class SamplesView(QWidget):
 
     CURRENT_VIAL_COLOR = Qt.gray
@@ -195,10 +200,10 @@ class SamplesView(QWidget):
     selectSampleSignal = pyqtSignal(int, int)
 
     def __init__(self, parent, basket_index, no_samples=10, max_per_row=None):
-        
+
         if max_per_row is None:
             max_per_row = no_samples
-            
+
         QWidget.__init__(self, parent)
 
         self.basket_index = basket_index
@@ -213,7 +218,7 @@ class SamplesView(QWidget):
         _main_hlayout = QGridLayout(self)
         _main_hlayout.setSpacing(0)
         _main_hlayout.setContentsMargins(2, 20, 2, 2)
-        
+
         rowno = 0; colno = 0
         for index in range(self.no_samples):
             sample_box = SampleBox(self)
@@ -231,8 +236,9 @@ class SamplesView(QWidget):
             _main_hlayout.addWidget(sample_box, rowno, colno)
             colno += 1
             if colno >= max_per_row:
-               rowno += 1
-               colno = 0
+                rowno += 1
+                colno = 0
+
             self.sample_boxes.append(sample_box)
             sample_box.set_vial_index(basket_index, index)
 
@@ -244,6 +250,12 @@ class SamplesView(QWidget):
 
         self.setSizePolicy(QSizePolicy.MinimumExpanding,
                            QSizePolicy.Fixed)
+
+    def set_number_of_samples(self, no_samples):
+        for samp_box in self.sample_boxes[no_samples:]:
+            samp_box.hide()
+        for samp_box in self.sample_boxes[:no_samples]:
+            samp_box.show()
 
     def load_sample(self, vial_index):
         """Loads sample"""
@@ -307,10 +319,10 @@ class BasketView(QWidget):
         self.vials_per_basket = vials_per_basket
         self.basket_label = basket_label
 
-        self.contents_widget = QGroupBox("%s %s" % (self.basket_label, basket_index+1), self)
+        self.contents_widget = QGroupBox("%s %s" % (self.basket_label, basket_index + 1), self)
         obj_name = "basket_%d" % (basket_index+1)
         self.contents_widget.setObjectName(obj_name)
-        self.contents_widget.setStyleSheet("#%s {border: 1px solid gray;border-radius: 5px;}" % obj_name)
+        self.contents_widget.setStyleSheet("#%s {border: 1px solid gray; border-radius: 5px;}" % obj_name)
         self.contents_widget.setCheckable(True)
         self.samples_view = SamplesView(self.contents_widget, basket_index, self.vials_per_basket, max_per_row)
 
@@ -341,6 +353,9 @@ class BasketView(QWidget):
 
     def set_matrices(self, vial_states):
         self.samples_view.set_matrices(vial_states)
+
+    def set_number_of_samples(self, no_samples):
+        self.samples_view.set_number_of_samples(no_samples)
 
     """
     def setLoadedVial(self,vial_index=None):
@@ -407,6 +422,7 @@ class CurrentView(QWidget):
     def selectionTextChanged(self, txt):
         if self.standard_color is None:
             self.standard_color = Qt4_widget_colors.WHITE
+
         if txt == str(self.currentSelection):
             if self.standard_color is not None:
                 self.selected_spinbox.editor().setPaletteBackgroundColor(self.standard_color)
@@ -985,31 +1001,14 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         elif property_name == 'basketLabel':
             self.basket_label = new_value
             if self.basket_count is not None and self.basket_label is not None:
-                 self.build_basket_view()
-                 
+                self.build_basket_view()
+
         elif property_name == 'basketCount':
             self.basket_count = new_value
             
             if self.basket_count is not None and self.basket_label is not None:
-                 self.build_basket_view()
-            #parts = self.basket_count.split(":")
-            #self.basket_count = int(parts[0])
-            #self.basket_per_column = self.basket_per_column_default
+                self.build_basket_view()
 
-            #if len(parts) > 1:
-                #self.basket_per_column = int(parts[1])
-
-            #for basket_index in range(self.basket_count):
-                #temp_basket = BasketView(self.sc_contents_gbox, basket_index, self.vials_per_basket, self.vials_per_row, self.basket_label)
-                #temp_basket.loadSampleSignal.connect(self.load_this_sample)
-                #temp_basket.selectSampleSignal.connect(self.user_select_this_sample)
-                #temp_basket.setChecked(False)
-                #temp_basket.setEnabled(False)
-                #self.baskets.append(temp_basket)
-                #basket_row = basket_index % self.basket_per_column
-                #basket_column = int(basket_index / self.basket_per_column)
-                #self.baskets_grid_layout.addWidget(temp_basket, basket_row, basket_column)
-        
         elif property_name == 'mnemonic':
             self.sample_changer_hwobj = self.getHardwareObject(new_value)
             if self.sample_changer_hwobj is not None:
@@ -1116,6 +1115,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.sample_changer_hwobj.changeMode(SampleChangerMode.Normal, wait=False)
 
     def loadedSampleChanged(self, sample):
+        logging.getLogger().info("Brick received new sample loaded %s" % sample)
         if sample is None:
             # get current location in SC
             sample = self.sample_changer_hwobj.getSelectedSample()
@@ -1130,6 +1130,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         else:
             barcode = sample.getID()
             location = sample.getCoords()
+        logging.getLogger().info("     sample location is %s" % str(location))
         
         self.current_sample_view.setLoadedMatrixCode(barcode)
         self.current_sample_view.setLoadedLocation(location)
@@ -1181,6 +1182,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
         self.status.setStatusMsg(status)
 
     def sc_state_changed(self, state, previous_state=None):
+        logging.getLogger().debug("SampleChangerBrick. State changed %s" % state)
         self.status.setState(state)
         self.current_basket_view.setState(state)
         self.current_sample_view.setState(state)
@@ -1235,7 +1237,8 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def load_this_sample(self, basket_index, vial_index):
         if self.double_click_loads_cbox.isChecked():
             #holder_len = self.current_sample_view.getHolderLength()
-            self.sample_changer_hwobj.load((basket_index, vial_index), wait=False)
+            sample_loc="%d:%02d" % (basket_index+1,vial_index)
+            self.sample_changer_hwobj.load(sample_loc, wait=False)
 
     def loadSample(self, holder_len):
         self.sample_changer_hwobj.load(holder_len, None, None, \
@@ -1244,6 +1247,7 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def unloadSample(self, holder_len, matrix_code, location):
         if matrix_code:
             location = None
+
         self.sample_changer_hwobj.unload(holder_len, matrix_code, location, \
             self.sampleUnloadSuccess, self.sampleUnloadFail, wait=False)
 
@@ -1280,10 +1284,15 @@ class Qt4_SampleChangerBrick3(BlissWidget):
     def infoChanged(self):
         baskets_at_sc = self.sample_changer_hwobj.getComponents()
         presences = []
-        
+
+        logging.getLogger("HWR").debug("SampleChanger infoChanged")
+
+        basketno = 0
         for basket in baskets_at_sc:
             presences.append([[VialView.VIAL_UNKNOWN]] * self.vials_per_basket if \
                basket.isPresent() else [[VialView.VIAL_NONE]] * self.vials_per_basket)
+            self.baskets[basketno].set_number_of_samples( basket.getNumberOfSamples() )
+            basketno += 1
 
         for sample in self.sample_changer_hwobj.getSampleList():
             matrix = sample.getID() or ""

@@ -453,7 +453,8 @@ class DataCollectTree(QWidget):
     def mount_sample(self):
         """Calls sample mounting"""
         self.enable_collect(False)
-        gevent.spawn(self.mount_sample_task)
+        t1=gevent.spawn(self.mount_sample_task)
+        t1.link(self.mount_task_done)
 
     def mount_sample_task(self):
         """Sample mount task via queue_entry"""
@@ -492,7 +493,8 @@ class DataCollectTree(QWidget):
     def unmount_sample(self):
         """Sample unmount task"""
         self.enable_collect(False)
-        gevent.spawn(self.unmount_sample_task)
+        t1=gevent.spawn(self.unmount_sample_task)
+        t1.link(self.mount_task_done)
 
     def unmount_sample_task(self):
         """Sample unmount"""
@@ -552,6 +554,12 @@ class DataCollectTree(QWidget):
             items[0].setText(1, "")
             items[0].setOn(False)
             items[0].set_mounted_style(False)
+
+        #self.enable_collect(True)
+        #self.tree_brick.enable_widgets.emit(True)
+
+    def mount_task_done(self, bla):
+        logging.getLogger("HWR").debug(" mount task completed ")
         self.enable_collect(True)
         self.tree_brick.enable_widgets.emit(True)
 
@@ -729,6 +737,12 @@ class DataCollectTree(QWidget):
         self.sample_tree_widget.clearSelection()
         self.beamline_setup_hwobj.set_plate_mode(False)
         self.confirm_dialog.set_plate_mode(False)
+
+        # Breaks in rhfogh mmock test mode
+        confirm_dialog_default_conf = self.beamline_setup_hwobj.get_confirm_dialog_configuration()
+        if confirm_dialog_default_conf:
+            self.confirm_dialog.set_default_configuration(confirm_dialog_default_conf)
+
         self.sample_mount_method = option
         if option == SC_FILTER_OPTIONS.SAMPLE_CHANGER:
             self.sample_tree_widget.clear()
@@ -877,11 +891,12 @@ class DataCollectTree(QWidget):
                              plate_manipulator_hwobj.getLoadedSample().getCoords():
                        result = True
             elif self.beamline_setup_hwobj.sample_changer_hwobj is not None:
-                if not self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
-                    result = False
-                elif item.get_model().location == self.beamline_setup_hwobj.\
-                        sample_changer_hwobj.getLoadedSample().getCoords():
-                    result = True
+                result = False
+                if self.beamline_setup_hwobj.sample_changer_hwobj.hasLoadedSample():
+                    loaded_sample = self.beamline_setup_hwobj.sample_changer_hwobj.getLoadedSample()
+                    if loaded_sample is not None:
+                        if list(item.get_model().location) == list(loaded_sample.getCoords()):
+                            result = True
         return result
 
     def collect_items(self, items=[], checked_items=[]):
