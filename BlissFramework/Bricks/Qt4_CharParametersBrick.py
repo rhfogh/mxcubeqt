@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from QtImport import *
+import logging
 
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from widgets.Qt4_char_parameters_widget import CharParametersWidget
@@ -98,6 +99,7 @@ class Qt4_CharParametersBrick(BlissWidget):
             self.parameters_widget.set_enabled(False)
 
             if char.html_report is not None:
+                logging.getLogger("HWR").debug("Showing Characterization report from: %s" % char.html_report)
                 self.results_view.set_url(char.html_report)
             else:
                 self.results_view.set_static_page(\

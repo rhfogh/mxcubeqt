@@ -614,6 +614,8 @@ class Qt4_TreeBrick(BlissWidget):
              self.session_hwobj.proposal_id,
              self.session_hwobj.session_id)
 
+        log.debug("Samples are: %s" % repr(self.lims_samples))
+
         basket_list = []
         sample_list = []        
         self.filtered_lims_samples = [] 
