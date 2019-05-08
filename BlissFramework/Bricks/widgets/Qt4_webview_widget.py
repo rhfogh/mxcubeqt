@@ -85,11 +85,17 @@ class WebViewWidget(QWidget):
     def set_url(self, url):
         """
         """
+        self.home_url = url
         if QWEBVIEW_AVAILABLE:
-            self.home_url = url
+        #    self.home_url = url
             self.navigation_bar.setEnabled(True)
             self.go_to_home_page()
-              
+        else:
+            # This is a workaround, since PyQt4 in Debian has no longer the QtWebKit module.
+            # It opens the results file in an external browser.
+            import webbrowser
+            webbrowser.open(self.home_url)
+            _
     def set_static_page(self, html_text):
         """
         """
