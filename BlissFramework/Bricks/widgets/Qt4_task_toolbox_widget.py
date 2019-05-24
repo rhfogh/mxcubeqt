@@ -199,8 +199,7 @@ class TaskToolBoxWidget(QWidget):
         if gphl_workflow_hwobj is None:
             logging.getLogger("HWR").info("GPhL workflow task not available")
         else:
-            self.gphl_workflow_page.initialise_workflows(gphl_workflow_hwobj,
-                                                         beamline_setup_hwobj)
+            self.gphl_workflow_page.initialise_workflows()
 
 
     def update_data_path_model(self):
