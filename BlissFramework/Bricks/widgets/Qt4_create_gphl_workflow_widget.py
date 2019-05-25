@@ -110,7 +110,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
         self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
-        print ('@:~@~ gphl done init_graphics')
 
     def initialise_workflows(self):
 
@@ -130,7 +129,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def workflow_selected(self):
         # necessary as this comes in as a QString object
         name = ConvertUtils.text_type(self._workflow_cbox.currentText())
-        print ('@:~@~ gphl workflow_selected', name)
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
