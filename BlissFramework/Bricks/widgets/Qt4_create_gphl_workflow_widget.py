@@ -137,11 +137,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
-        if strategy_type == "transcal":
+        if strategy_type.startswith("transcal"):
             # NB Once we do not have to set unique prefixes, this should be readOnly
             self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_acq_widget.hide()
-        elif strategy_type == "diffractcal":
+        elif strategy_type.startswith("diffractcal"):
             # TODO update this
             self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_diffractcal_widget.populate_widget()
@@ -254,8 +254,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     for tag in ("a", "b", "c", "alpha", "beta", "gamma")
                 )
             )
-            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
+            tag = self._gphl_diffractcal_widget.get_parameter_value("dose_budget")
             wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            val = self._gphl_diffractcal_widget.get_parameter_value(
+                "relative_rad_sensitivity"
+            )
+            wf.set_relative_rad_sensitivity(val)
             # The entire strategy runs as a 'characterisation'
             wf.set_characterisation_budget_fraction(1.0)
         else:

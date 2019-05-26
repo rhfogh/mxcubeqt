@@ -42,16 +42,16 @@
     <!-- Dose budgets (in MGy) for Pulldown in GphlAcquisitionWidget -->
     <dose_budgets>
         <pulldown_item>
-            <label>Sensitive Crystal:  5.0 MGy</label>
+            <label>Gentle:  5.0 MGy</label>
             <value>5.0</value>
         </pulldown_item>
         <pulldown_item>
-            <label>Standard Crystal: 10.0 MGy</label>
+            <label>Standard: 10.0 MGy</label>
             <value>10.0</value>
             <is_default>True</is_default>
         </pulldown_item>
         <pulldown_item>
-            <label>Robust Crystal: 20.0 MGy</label>
+            <label>Robust: 20.0 MGy</label>
             <value>20.0</value>
         </pulldown_item>
     </dose_budgets>
@@ -279,7 +279,8 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
-            <interleave_order>gs</interleave_order>
+            <!-- Not setting teh value turns off the wedgeWidth widget -->
+            <!--            <interleave_order>gs</interleave_order>-->
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
                 <beam_energy>
@@ -305,7 +306,8 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
-            <interleave_order>gs</interleave_order>
+            <!-- Not setting the value turns off the wedgeWidth widget -->
+<!--            <interleave_order>gs</interleave_order>-->
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
                 <beam_energy>
@@ -333,7 +335,8 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
-            <interleave_order>gs</interleave_order>
+            <!-- Not setting teh value turns off the wedgeWidth widget -->
+            <!--            <interleave_order>gs</interleave_order>-->
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
                 <beam_energy>
@@ -379,6 +382,12 @@
             <documentation>Diffractometer calibration.
                 Designed for use by beamline personnel.
             </documentation>
+            <!-- Workflow interleave order (string);  Slowest changing first-->
+            <!-- 'g' (Goniostat position); 's' (Scan number); -->
+            <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
+            <!-- Not setting the value turns off the wedgeWidth widget -->
+            <interleave_order>gs</interleave_order>
             <options>
                 <wfprefix>Dcalib2_</wfprefix>
                 <!-- Name of strategy from library to use -->
@@ -403,6 +412,12 @@
             <documentation>Diffractometer calibration.
                 Designed for use by beamline personnel.
             </documentation>
+            <!-- Workflow interleave order (string);  Slowest changing first-->
+            <!-- 'g' (Goniostat position); 's' (Scan number); -->
+            <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
+            <!-- Not setting the value turns off the wedgeWidth widget -->
+            <interleave_order>gs</interleave_order>
             <options>
                 <wfprefix>Dcalib1_</wfprefix>
                 <!-- Name of strategy from library to use -->

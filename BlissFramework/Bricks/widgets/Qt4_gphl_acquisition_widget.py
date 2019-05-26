@@ -187,7 +187,7 @@ class GphlSetupWidget(QtImport.QWidget):
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
 
-    def __init__(self, parent=None, name="gphl_acquisition_widget"):
+    def __init__(self, parent=None, name="gphl_diffractcal_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
@@ -226,6 +226,7 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         self._widget_data[label_name] = (label, str, None, label_str)
 
         row += 1
+        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
         field_name = "dose_budget"
         label_name = self._get_label_name(field_name)
         label_str = "Dose budget (MGy) :"
@@ -235,8 +236,8 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
-        self._pulldown_defaults[field_name] = (api.gphl_workflow.default_dose_budget_label)
-        indx = self._pulldowns[field_name].index(api.gphl_workflow.default_dose_budget_label)
+        self._pulldown_defaults[field_name] = default_dose_budget_label
+        indx = self._pulldowns[field_name].index(default_dose_budget_label)
         self._widget_data[field_name] = (widget, str, None, indx)
 
         row += 1
@@ -366,6 +367,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._pulldowns[field_name] = strategy_names
 
         row += 1
+        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
         field_name = "dose_budget"
         label_name = self._get_label_name(field_name)
         label_str = "Dose budget (MGy) :"
@@ -376,8 +378,8 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
         self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
-        self._pulldown_defaults[field_name] = (api.gphl_workflow.default_dose_budget_label)
-        indx = self._pulldowns[field_name].index(api.gphl_workflow.default_dose_budget_label)
+        self._pulldown_defaults[field_name] = default_dose_budget_label
+        indx = self._pulldowns[field_name].index(default_dose_budget_label)
         self._widget_data[field_name] = (widget, str, None, indx)
 
         row += 1
