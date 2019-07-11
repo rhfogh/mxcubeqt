@@ -40,6 +40,8 @@ from BlissFramework.Utils import Qt4_GUILogHandler
 
 from HardwareRepository import HardwareRepository
 
+import api
+
 _logger = logging.getLogger()
 _GUIhdlr = Qt4_GUILogHandler.GUILogHandler()
 _logger.addHandler(_GUIhdlr)
@@ -297,6 +299,11 @@ def run(gui_config_file=None):
     main_application.lastWindowClosed.connect(main_application.quit)
     supervisor = Qt4_GUISupervisor.GUISupervisor(design_mode=opts.designMode,
         show_maximized=opts.showMaximized, no_border=opts.noBorder)
+
+    # For GPHL - initialise api
+    api.init(hwr_server)
+
+
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(supervisor,

@@ -1,43 +1,42 @@
+#! /usr/bin/env python
+# encoding: utf-8
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
 """GPhL runtime-set parameter input widget. """
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
+
+from HardwareRepository import ConvertUtils
 
 import QtImport
-from Qt4_paramsgui import FieldsWidget
-from Utils import Qt4_widget_colors
+from BlissFramework.Utils import Qt4_widget_colors as Colors
+from BlissFramework.Bricks.Qt4_paramsgui import FieldsWidget
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
-class ParameterDialogWidget(QtImport.QWidget):
-
-    def __init__(self, parent=None, name='gphl_parameter_dialog_widget'):
-        QtImport.QWidget.__init__(self,parent)
-        if name is not None:
-            self.setObjectName(name)
-
-        # Properties ----------------------------------------------------------
-
-        # Signals ------------------------------------------------------------
-
-        # Slots ---------------------------------------------------------------
-
-        # Hardware objects ----------------------------------------------------
-
-         # Internal variables -------------------------------------------------
-
-        # Graphic elements ----------------------------------------------------
-
-    def get_parameters_map(self):
-        """Get key:value dictionary of parameter values"""
-        pass
-
-    def set_values(self, values_dict):
-        """set parameter values from input dictionary"""
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
+__license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
 
 
 class SelectionTable(QtImport.QTableWidget):
     """Read-only table for data display and selection"""
+
     def __init__(self, parent=None, name="selection_table", header=None):
         QtImport.QTableWidget.__init__(self, parent)
         if not header:
@@ -50,8 +49,9 @@ class SelectionTable(QtImport.QTableWidget):
         self.setColumnCount(len(header))
         self.setSelectionMode(QtImport.QTableWidget.SingleSelection)
         self.setHorizontalHeaderLabels(header)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
         self.setFont(QtImport.QFont("Courier"))
 
         hdr = self.horizontalHeader()
@@ -71,14 +71,12 @@ class SelectionTable(QtImport.QTableWidget):
             wdg = QtImport.QLineEdit(self)
             wdg.setFont(QtImport.QFont("Courier"))
             wdg.setReadOnly(True)
-            wdg.setText(str(text))
+            wdg.setText(ConvertUtils.text_type(text))
             if colours:
                 colour = colours[rowNum]
                 if colour:
-                    Qt4_widget_colors.set_widget_color(
-                        wdg,
-                        getattr(Qt4_widget_colors, colour),
-                        QtImport.QPalette.Base
+                    Colors.set_widget_color(
+                        wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
                     # wdg.setBackground(getattr(QtImport.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
@@ -86,8 +84,8 @@ class SelectionTable(QtImport.QTableWidget):
     def get_value(self):
         """Get value - list of cell contents for selected row"""
         row_id = self.currentRow()
-        return [self.cellWidget(row_id, ii).text()
-                for ii in range(self.columnCount())]
+        return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
+
 
 class GphlDataDialog(QtImport.QDialog):
 
@@ -99,23 +97,23 @@ class GphlDataDialog(QtImport.QDialog):
         if name is not None:
             self.setObjectName(name)
 
-
         # Internal variables --------------------------------------------------
         # AsyncResult to return values
         self._async_result = None
-        
+
         # Layout
         QtImport.QVBoxLayout(self)
         main_layout = self.layout()
         main_layout.setSpacing(10)
         main_layout.setMargin(6)
-        self.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                           QtImport.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
 
-        self.setWindowTitle('GPhL Workflow parameters')
+        self.setWindowTitle("GPhL Workflow parameters")
 
         # Info box
-        self.info_gbox = QtImport.QGroupBox('Info', self)
+        self.info_gbox = QtImport.QGroupBox("Info", self)
         QtImport.QVBoxLayout(self.info_gbox)
         main_layout.addWidget(self.info_gbox)
         self.info_text = QtImport.QTextEdit(self.info_gbox)
@@ -124,35 +122,38 @@ class GphlDataDialog(QtImport.QDialog):
         self.info_gbox.layout().addWidget(self.info_text)
 
         # Special parameter box
-        self.cplx_gbox = QtImport.QGroupBox('Indexing solution', self)
+        self.cplx_gbox = QtImport.QGroupBox("Indexing solution", self)
         QtImport.QVBoxLayout(self.cplx_gbox)
         main_layout.addWidget(self.cplx_gbox)
-        self.cplx_gbox.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                          QtImport.QSizePolicy.Expanding)
+        self.cplx_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
         self.cplx_widget = None
 
         # Parameter box
-        self.parameter_gbox = QtImport.QGroupBox('Parameters', self,)
+        self.parameter_gbox = QtImport.QGroupBox("Parameters", self)
         main_layout.addWidget(self.parameter_gbox)
-        self.parameter_gbox.setSizePolicy(QtImport.QSizePolicy.Expanding,
-                                          QtImport.QSizePolicy.Expanding)
+        self.parameter_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
         self.params_widget = None
 
         # Button bar
         button_layout = QtImport.QHBoxLayout(None)
-        hspacer = QtImport.QSpacerItem(1, 20, QtImport.QSizePolicy.Expanding,
-                                    QtImport.QSizePolicy.Minimum)
+        hspacer = QtImport.QSpacerItem(
+            1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
+        )
         button_layout.addItem(hspacer)
-        self.continue_button = QtImport.QPushButton('Continue', self)
+        self.continue_button = QtImport.QPushButton("Continue", self)
         button_layout.addWidget(self.continue_button)
-        self.cancel_button = QtImport.QPushButton('Abort', self)
+        self.cancel_button = QtImport.QPushButton("Abort", self)
         button_layout.addWidget(self.cancel_button)
         main_layout.addLayout(button_layout)
 
         self.continue_button.clicked.connect(self.continue_button_click)
         self.cancel_button.clicked.connect(self.cancel_button_click)
 
-        self.resize(QtImport.QSize(1018,472).expandedTo(self.minimumSizeHint()))
+        self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
         # self.clearWState(QtImport.WState_Polished)
 
     def continue_button_click(self):
@@ -160,7 +161,7 @@ class GphlDataDialog(QtImport.QDialog):
         if self.parameter_gbox.isVisible():
             result.update(self.params_widget.get_parameters_map())
         if self.cplx_gbox.isVisible():
-            result['_cplx'] = self.cplx_widget.get_value()
+            result["_cplx"] = self.cplx_widget.get_value()
         self.accept()
         self._async_result.set(result)
         self._async_result = None
@@ -177,24 +178,24 @@ class GphlDataDialog(QtImport.QDialog):
         parameters = []
         info = None
         cplx = None
-        for dd in field_list:
-            if info is None and dd.get('variableName') == '_info':
+        for dd0 in field_list:
+            if info is None and dd0.get("variableName") == "_info":
                 # Info text - goes to info_gbox
-                info = dd
-            elif cplx is None and dd.get('variableName') == '_cplx':
+                info = dd0
+            elif cplx is None and dd0.get("variableName") == "_cplx":
                 # Complex parameter - goes to cplx_gbox
-                cplx = dd
+                cplx = dd0
             else:
-                parameters.append(dd)
+                parameters.append(dd0)
 
         # Info box
         if info is None:
-            self.info_text.setText('')
-            self.info_gbox.setTitle('Info')
+            self.info_text.setText("")
+            self.info_gbox.setTitle("Info")
             self.info_gbox.hide()
         else:
-            self.info_text.setText(info.get('defaultValue'))
-            self.info_gbox.setTitle(info.get('uiLabel'))
+            self.info_text.setText(info.get("defaultValue"))
+            self.info_gbox.setTitle(info.get("uiLabel"))
             self.info_gbox.show()
 
         # Complex box
@@ -203,20 +204,22 @@ class GphlDataDialog(QtImport.QDialog):
         if cplx is None:
             self.cplx_gbox.hide()
         else:
-            if cplx.get('type') == 'selection_table':
-                self.cplx_widget = SelectionTable(self.cplx_gbox, 'cplx_widget',
-                                                cplx['header'])
+            if cplx.get("type") == "selection_table":
+                self.cplx_widget = SelectionTable(
+                    self.cplx_gbox, "cplx_widget", cplx["header"]
+                )
                 self.cplx_gbox.layout().addWidget(self.cplx_widget)
-                self.cplx_gbox.setTitle(cplx.get('uiLabel'))
-                for ii,values in enumerate(cplx['defaultValue']):
-                    self.cplx_widget.populateColumn(ii, values,
-                                                    colours=cplx.get('colours'))
+                self.cplx_gbox.setTitle(cplx.get("uiLabel"))
+                for ii, values in enumerate(cplx["defaultValue"]):
+                    self.cplx_widget.populateColumn(
+                        ii, values, colours=cplx.get("colours")
+                    )
                 self.cplx_gbox.show()
 
             else:
                 raise NotImplementedError(
                     "GPhL complex widget type %s not recognised for parameter _cplx"
-                    % repr(cplx.get('type'))
+                    % repr(cplx.get("type"))
                 )
 
         # parameters widget
@@ -224,15 +227,16 @@ class GphlDataDialog(QtImport.QDialog):
             self.params_widget.close()
             self.params_widget = None
         if parameters:
-            self.params_widget = FieldsWidget(fields=parameters,
-                                              parent=self.parameter_gbox)
+            self.params_widget = FieldsWidget(
+                fields=parameters, parent=self.parameter_gbox
+            )
 
-            values ={}
-            for dd in field_list:
-                name = dd['variableName']
-                value = dd.get('defaultValue')
+            values = {}
+            for dd0 in field_list:
+                name = dd0["variableName"]
+                value = dd0.get("defaultValue")
                 if value is not None:
-                    dd[name] = value
+                    dd0[name] = value
             self.params_widget.set_values(values)
             self.parameter_gbox.show()
         else:

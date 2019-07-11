@@ -1,10 +1,35 @@
+#! /usr/bin/env python
+# encoding: utf-8
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
+
+import api
+
 import QtImport
 import Qt4_queue_item as queue_item
 import queue_model_objects_v1 as queue_model_objects
 
 from queue_model_enumerables_v1 import States
 
-from Qt4_create_task_base import CreateTaskBase
+from widgets.Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_gphl_acquisition_widget import GphlAcquisitionWidget
 from widgets.Qt4_gphl_acquisition_widget import GphlDiffractcalWidget
@@ -15,46 +40,51 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
+import ConvertUtils
+
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
+__license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
+
+
 class CreateGphlWorkflowWidget(CreateTaskBase):
     def __init__(self, parent=None, name=None, fl=0):
-        CreateTaskBase.__init__(self, parent, name,
-                                QtImport.Qt.WindowFlags(fl), 'GphlWorkflow')
+
+        CreateTaskBase.__init__(
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "GphlWorkflow"
+        )
 
         if not name:
-            self.setObjectName("Qt4_create_gphl_workflow_widget")
+            self.setObjectName("create_gphl_workflow_widget")
 
         # Hardware objects ----------------------------------------------------
-        self._workflow_hwobj = None
 
         # Internal variables --------------------------------------------------
         self.current_prefix = None
 
         self.init_models()
 
-
-    def _initialize_graphics(self, workflow_hwobj):
+    def _initialize_graphics(self):
         # Graphic elements ----------------------------------------------------
-        self._workflow_type_widget = QtImport.QGroupBox('Workflow type', self)
+        self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
 
         self._workflow_cbox = QtImport.QComboBox(self._workflow_type_widget)
-        self._gphl_acq_widget = QtImport.QGroupBox('Acquisition', self)
-        self._gphl_acq_param_widget =  GphlAcquisitionWidget(
-            self._gphl_acq_widget, "gphl_acquisition_parameter_widget",
-            workflow_object=workflow_hwobj
+        self._gphl_acq_widget = QtImport.QGroupBox("Acquisition", self)
+        self._gphl_acq_param_widget = GphlAcquisitionWidget(
+            self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
-        self._gphl_diffractcal_widget =  GphlDiffractcalWidget(
-            self._gphl_acq_widget, "gphl_diffractcal_widget",
-            workflow_object=workflow_hwobj
+        self._gphl_diffractcal_widget = GphlDiffractcalWidget(
+            self._gphl_acq_widget, "gphl_diffractcal_widget"
         )
 
-        self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget',
-                                                layout='vertical')
+        self._data_path_widget = DataPathWidget(
+            self, "create_dc_path_widget", layout="vertical"
+        )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.file_name_label.hide()
         data_path_layout.file_name_value_label.hide()
         data_path_layout.run_number_label.hide()
         data_path_layout.run_number_ledit.hide()
-        data_path_layout.prefix_ledit.setReadOnly(True)
         data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
@@ -69,64 +99,64 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         _main_vlayout.addWidget(self._gphl_acq_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(0,0,0,0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._workflow_cbox.currentIndexChanged.connect(
-            self.workflow_selected
-        )
+        self._workflow_cbox.currentIndexChanged.connect(self.workflow_selected)
 
         # set up popup data dialog
-        self.gphl_data_dialog = GphlDataDialog(self, 'GPhL Workflow Data')
+        self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
         self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
-        # self.connect(self.gphl_data_dialog, qt.PYSIGNAL("continue_clicked"),
-        #              self.data_acquired)
 
-    def initialise_workflows(self, workflow_hwobj, beamline_setup_hwobj):
-        self._workflow_hwobj = workflow_hwobj
-        # self._gphl_parameters_widget.set_workflow(workflow_hwobj)
+    def initialise_workflows(self):
 
-        if self._workflow_hwobj is not None:
-            workflow_hwobj.setup_workflow_object(beamline_setup_hwobj)
+        workflow_hwobj = api.gphl_workflow
+        if workflow_hwobj is not None:
+            workflow_hwobj.setup_workflow_object()
             workflow_names = list(workflow_hwobj.get_available_workflows())
-            self._initialize_graphics(workflow_hwobj)
+            self._initialize_graphics()
             self._workflow_cbox.clear()
             for workflow_name in workflow_names:
                 self._workflow_cbox.addItem(workflow_name)
             self.workflow_selected()
-            workflow_hwobj.connect('gphlParametersNeeded',
-                                   self.gphl_data_dialog.open_dialog)
+            workflow_hwobj.connect(
+                "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
+            )
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
-        name = str(self._workflow_cbox.currentText())
+        name = ConvertUtils.text_type(self._workflow_cbox.currentText())
         # if reset or name != self._previous_workflow:
-        xx = self._workflow_cbox
-        xx.setCurrentIndex(xx.findText(name))
+        xx0 = self._workflow_cbox
+        xx0.setCurrentIndex(xx0.findText(name))
         self.init_models()
         self._data_path_widget.update_data_model(self._path_template)
 
-        parameters = self._workflow_hwobj.get_available_workflows()[name]
-        strategy_type = parameters.get('strategy_type')
-        if strategy_type.startswith('transcal'):
+        parameters = api.gphl_workflow.get_available_workflows()[name]
+        strategy_type = parameters.get("strategy_type")
+        if strategy_type.startswith("transcal"):
+            # NB Once we do not have to set unique prefixes, this should be readOnly
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_acq_widget.hide()
-        elif strategy_type.startswith('diffractcal'):
+        elif strategy_type.startswith("diffractcal"):
             # TODO update this
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
+            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.show()
 
-        prefix = parameters.get('prefix')
+        prefix = parameters.get("prefix")
         if prefix is not None:
             self.current_prefix = prefix
 
@@ -173,8 +203,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 model = item.get_model()
                 if isinstance(model, queue_model_objects.GphlWorkflow):
                     dialog = tree_brick.dc_tree_widget.confirm_dialog
-                    ss = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
-                    model.set_snapshot_count(int(ss) if ss else 0)
+                    ss0 = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
+                    model.set_snapshot_count(int(ss0) if ss0 else 0)
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
@@ -185,19 +215,21 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.num_files = 0
         path_template.compression = False
 
-        ho = self._workflow_hwobj
-        if ho.get_state() == States.OFF:
+        workflow_hwobj = api.gphl_workflow
+        if workflow_hwobj.get_state() == States.OFF:
             # We will be setting up the connection now - time to connect to quit
-            QtImport.QApplication.instance().aboutToQuit.connect(ho.shutdown)
+            QtImport.QApplication.instance().aboutToQuit.connect(
+                workflow_hwobj.shutdown
+            )
 
             tree_brick = self._tree_brick
             if tree_brick:
-                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal\
-                    .connect(self.continue_button_click)
+                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal.connect(
+                    self.continue_button_click
+                )
 
-
-        wf = queue_model_objects.GphlWorkflow(self._workflow_hwobj)
-        wf_type = str(self._workflow_cbox.currentText())
+        wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
+        wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
         if self.current_prefix:
@@ -206,39 +238,62 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf.set_name(wf.path_template.get_prefix())
         wf.set_number(wf.path_template.run_number)
 
-        wf_parameters = ho.get_available_workflows()[wf_type]
-        strategy_type = wf_parameters.get('strategy_type')
-        wf.set_interleave_order(wf_parameters.get('interleaveOrder', ''))
-        if strategy_type.startswith('transcal'):
+        wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
+        strategy_type = wf_parameters.get("strategy_type")
+        wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
+        if strategy_type.startswith("transcal"):
             pass
 
-        elif strategy_type.startswith('diffractcal'):
-            ss = self._gphl_diffractcal_widget.get_parameter_value('test_crystal')
-            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss)
+        elif strategy_type.startswith("diffractcal"):
+            ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
+            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
             wf.set_space_group(crystal_data.space_group)
             wf.set_cell_parameters(
-                tuple(getattr(crystal_data, tag)
-                      for tag in ('a', 'b', 'c', 'alpha', 'beta', 'gamma'))
+                tuple(
+                    getattr(crystal_data, tag)
+                    for tag in ("a", "b", "c", "alpha", "beta", "gamma")
+                )
             )
+            tag = self._gphl_diffractcal_widget.get_parameter_value("dose_budget")
+            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            val = self._gphl_diffractcal_widget.get_parameter_value(
+                "relative_rad_sensitivity"
+            )
+            wf.set_relative_rad_sensitivity(val)
+            # The entire strategy runs as a 'characterisation'
+            wf.set_characterisation_budget_fraction(1.0)
         else:
             # Coulds be native_... phasing_... etc.
 
             wf.set_space_group(
-                self._gphl_acq_param_widget.get_parameter_value('space_group')
+                self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
-            tag = self._gphl_acq_param_widget.get_parameter_value('crystal_system')
+            wf.set_characterisation_strategy(
+                self._gphl_acq_param_widget.get_parameter_value("characterisation_strategy")
+            )
+            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
             if tag:
                 data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
                 crystal_system = data.crystal_system
                 point_groups = data.point_groups
-                if len(point_groups) == 1 or point_groups[0] == '32':
+                if len(point_groups) == 1 or point_groups[0] == "32":
                     # '32' is a special case; '312' and '321' are also returned as '32'
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
-            wf.set_beam_energies(wf_parameters['beam_energies'])
-        
+            wf.set_beam_energies(wf_parameters["beam_energies"])
+            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
+            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            val = self._gphl_acq_param_widget.get_parameter_value(
+                "relative_rad_sensitivity"
+            )
+            wf.set_relative_rad_sensitivity(val)
+            wf.set_characterisation_budget_fraction(
+                api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
+                / 100.0
+            )
+
         tasks.append(wf)
 
         return tasks

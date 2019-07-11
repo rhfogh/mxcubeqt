@@ -4,16 +4,16 @@
     - file names below are set as file_name.format(directory_locations) -->
     <directory_locations>
         <!-- Wrapper scripts for GPhL programs - must be reachable from workflow and procesing -->
-        <GPHL_SETUP>/archive/rhfogh/mxcube</GPHL_SETUP>
-        <GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>
-<!--        <GPHL_SETUP>/mnt/scratch/rhfogh/mxcube_setup/</GPHL_SETUP>-->
-<!--        <GPHL_RELEASE>/mnt/scratch/rhfogh/gphl_release/latest</GPHL_RELEASE>-->
+        <!--<GPHL_SETUP>/archive/rhfogh/mxcube</GPHL_SETUP>-->
+        <!--<GPHL_RELEASE>/public/xtal/Server-nightly-alpha-bdg-linux64/</GPHL_RELEASE>-->
+        <GPHL_SETUP>/beamlines/bl13/controls/gphl/latest/mxcube_setup/</GPHL_SETUP>
+        <GPHL_RELEASE>/beamlines/bl13/controls/gphl/latest/gphl_release/latest</GPHL_RELEASE>
     </directory_locations>
 
     <!-- If set, run workflow through ssh with selected options -->
     <!-- NB The  Host option is mandatory -->
-    <!-- ConfigFile is the ssh configuratino file, passed to ssh with the -F option -->
-   <!--<ssh_options>-->
+    <!-- ConfigFile is the ssh configuration file, passed to ssh with the -F option -->
+    <!--<ssh_options>-->
         <!--<Host>lonsdale</Host>-->
         <!--<IdentityFile>/home/rhfogh/.ssh/wf_test_id</IdentityFile>-->
         <!--<User>rhfogh</User>-->
@@ -26,7 +26,8 @@
 
     <software_paths>
         <!-- Location of Java binary to execute for workflow application -->
-        <java_binary>{GPHL_SETUP}/jre1.8.0_144/bin/java</java_binary>
+        <!--<java_binary>{GPHL_SETUP}/jre1.8.0_144/bin/java</java_binary>-->
+        <java_binary>/usr/bin/java</java_binary>
         <!-- Debug mode:  -->
     <!--<java_binary>ssh -i /home/rhfogh/.ssh/wf_test_id -o StrictHostKeyChecking=no lonsdale java</java_binary>-->
 
@@ -42,7 +43,7 @@
 
         <!-- Directory with workflow config input, e.g. instrumentation.nml -->
         <!--<gphl_test_samples>{GPHL_SETUP}/gphl_test_samples</gphl_test_samples>-->
-        <gphl_test_samples>test_samples</gphl_test_samples>
+        <gphl_test_samples>{GPHL_SETUP}/gphl_test_samples</gphl_test_samples>
 
         <!-- Location of installation used for processing queue (not reachable from BCS computer. -->
         <!-- Passed as environmental variable GPHL_PROC_INSTALLATION. Optional -->
@@ -58,8 +59,8 @@
         <co.gphl.wf.bdg_licence_dir>{GPHL_RELEASE}</co.gphl.wf.bdg_licence_dir>
 
         <!-- Location of executable XDS binary. Mandatory-->
-        <co.gphl.wf.xds.bin>/public/xtal/Xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>
-<!--        <co.gphl.wf.xds.bin>/mnt/scratch/rhfogh/gphl_release/XDS/xds_par</co.gphl.wf.xds.bin>-->
+        <!--<co.gphl.wf.xds.bin>/public/xtal/Xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>-->
+        <co.gphl.wf.xds.bin>/beamlines/bl13/commissioning/software/xds/XDS-INTEL64_Linux_x86_64/xds_par</co.gphl.wf.xds.bin>
 
         <!-- <Location of individual binaries are optional. -->
         <!-- They default to within GPHL_INSTALLATION -->
@@ -72,7 +73,7 @@
 
         <!-- Location of simcal binaries -->
         <!--<co.gphl.wf.simcal.bin>{GPHL_SETUP}/scripts/simcal</co.gphl.wf.simcal.bin>-->
-        <co.gphl.wf.simcal.bin>scripts/simcal</co.gphl.wf.simcal.bin>
+        <co.gphl.wf.simcal.bin>{GPHL_SETUP}/scripts/simcal</co.gphl.wf.simcal.bin>
         <!-- Location of simcal-specific license directory - OPTIONAL ->
         <co.gphl.wf.simcal_predict.bdg_licence_dir>/public/xtal/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
         -->
@@ -87,7 +88,7 @@
         calibration) data. In practice, this will almost always be a wrapper
         script that sets up the environment properly. -->
         <!--<co.gphl.wf.diffractcal.bin>{GPHL_SETUP}/scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>-->
-        <co.gphl.wf.diffractcal.bin>scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>
+        <co.gphl.wf.diffractcal.bin>{GPHL_SETUP}/scripts/aP_wf_rotcal</co.gphl.wf.diffractcal.bin>
 
     </software_properties>
 

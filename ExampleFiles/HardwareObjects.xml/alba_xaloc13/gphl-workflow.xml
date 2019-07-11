@@ -307,7 +307,7 @@
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
             <!-- Not setting the value turns off the wedgeWidth widget -->
-<!--            <interleave_order>gs</interleave_order>-->
+            <!--            <interleave_order>gs</interleave_order>-->
             <!-- Default wavelengths (in A) and their roles -->
             <beam_energies>
                 <beam_energy>

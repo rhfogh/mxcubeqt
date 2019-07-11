@@ -1,13 +1,38 @@
+#! /usr/bin/env python
+# encoding: utf-8
+#
+#  Project: MXCuBE
+#  https://github.com/mxcube
+#
+#  This file is part of MXCuBE software.
+#
+#  MXCuBE is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  MXCuBE is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
 """GPhL bespoke input widget. Built from DataCollectParametersWidget"""
+from __future__ import division, absolute_import
+from __future__ import print_function, unicode_literals
 
 import logging
 from collections import namedtuple
 
-import queue_model_enumerables_v1 as enumerables
+import queue_model_enumerables_v1 as queue_model_enumerables
+
+import api
 
 import QtImport
 from widgets.Qt4_widget_utils import DataModelInputBinder
-from HardwareRepository import HardwareRepository
+
 from HardwareRepository.dispatcher import dispatcher
 
 try:
@@ -15,25 +40,31 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-__category__ = 'Qt4_TaskToolbox_Tabs'
+__category__ = "TaskToolbox_Tabs"
 
-CrystalSystemData = namedtuple('CrystalSystemData',
-                               ('crystal_system', 'point_groups'))
-CrystalData = namedtuple('CrystalData', ('name', 'space_group', 'a', 'b', 'c',
-                                         'alpha', 'beta', 'gamma')
-                         )
+__copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
+__license__ = "LGPLv3+"
+__author__ = "Rasmus H Fogh"
+
+CrystalSystemData = namedtuple("CrystalSystemData", ("crystal_system", "point_groups"))
+CrystalData = namedtuple(
+    "CrystalData", ("name", "space_group", "a", "b", "c", "alpha", "beta", "gamma")
+)
+
 
 class GphlAcquisitionData(object):
     """Dummy container class for global phasing acquisition data
 
     Attributes are set in the GphlAcquisitionWidget"""
+
     pass
+
 
 class GphlSetupWidget(QtImport.QWidget):
     """Superclass for GPhL interface widgets"""
 
-    def __init__(self, parent=None, name='gphl_setup_widget'):
-        QtImport.QWidget.__init__(self,parent)
+    def __init__(self, parent=None, name="gphl_setup_widget"):
+        QtImport.QWidget.__init__(self, parent)
         if name is not None:
             self.setObjectName(name)
 
@@ -42,8 +73,7 @@ class GphlSetupWidget(QtImport.QWidget):
         # Signals ------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        dispatcher.connect(self._refresh_interface, 'model_update',
-                           dispatcher.Any)
+        dispatcher.connect(self._refresh_interface, "model_update", dispatcher.Any)
 
         # Hardware objects ----------------------------------------------------
 
@@ -51,6 +81,7 @@ class GphlSetupWidget(QtImport.QWidget):
         self._widget_data = OrderedDict()
         self._data_object = GphlAcquisitionData()
         self._pulldowns = {}
+        self._pulldown_defaults = {}
         self._parameter_mib = DataModelInputBinder(self._data_object)
 
         # Graphic elements ----------------------------------------------------
@@ -71,23 +102,21 @@ class GphlSetupWidget(QtImport.QWidget):
             self.set_parameter_enabled(tag, value, warn=False)
 
     def set_parameter_enabled(self, tag, value, warn=True):
-        tt = self._widget_data.get(tag)
-        if tt:
-            if hasattr(tt[0], 'setEnabled'):
-                tt[0].setEnabled(value)
+        tt0 = self._widget_data.get(tag)
+        if tt0:
+            if hasattr(tt0[0], "setEnabled"):
+                tt0[0].setEnabled(value)
             elif warn:
                 logging.getLogger().warning(
                     "%s Widget has no attribute setEnabled" % tag
                 )
         elif warn:
-            logging.getLogger().warning(
-                "%s field not found in GphlSetupWidget" % tag
-            )
+            logging.getLogger().warning("%s field not found in GphlSetupWidget" % tag)
 
     def get_data_object(self):
         return self._data_object
 
-    def populate_widget(self, **kw):
+    def populate_widget(self, **kwargs):
 
         self._data_object = data_object = GphlAcquisitionData()
         self._parameter_mib.bindings.clear()
@@ -97,7 +126,14 @@ class GphlSetupWidget(QtImport.QWidget):
             widget = self._widget_data[field_name][0]
             widget.clear()
             widget.addItems(list(QtImport.QString(tag) for tag in tags))
-            widget.setCurrentIndex(0)
+            default_label = self._pulldown_defaults.get(field_name)
+            if default_label is None:
+                widget.setCurrentIndex(0)
+                self._data_object.space_group = 0
+
+            else:
+                widget.setCurrentIndex(widget.findText(default_label))
+
 
     def set_parameter_value(self, name, value):
         """Set value - NB ComboBoxes are set by text, not index"""
@@ -120,9 +156,7 @@ class GphlSetupWidget(QtImport.QWidget):
 
             self._parameter_mib._update_widget(name, None)
         else:
-            raise ValueError(
-                "GPhL acquisition widget has no parameter named %s" % name
-            )
+            raise ValueError("GPhL acquisition widget has no parameter named %s" % name)
 
     def get_parameter_value(self, name):
         """Return value of parameter <name> or None if it does not exist
@@ -143,7 +177,7 @@ class GphlSetupWidget(QtImport.QWidget):
             return None
 
     def _get_label_name(self, name):
-        return name + '_label'
+        return name + "_label"
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
@@ -152,28 +186,26 @@ class GphlSetupWidget(QtImport.QWidget):
 
 class GphlDiffractcalWidget(GphlSetupWidget):
     """Input widget for GPhL diffractometer calibration setup"""
-    def __init__(self, parent=None, name='gphl_acquisition_widget',
-                 workflow_object=None):
+
+    def __init__(self, parent=None, name="gphl_diffractcal_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
         _parameters_widget = self._parameters_widget
 
-         # Internal variables -------------------------------------------------
+        # Internal variables -------------------------------------------------
 
         # Get test crystal data
         self.test_crystals = OrderedDict()
-        xx = next(
-            workflow_object.getObjects("test_crystals")
-        )
-        for test_crystal in xx.getObjects("test_crystal"):
-            dd = test_crystal.getProperties()
-            self.test_crystals[dd['name']] = CrystalData(**dd)
+        xx0 = next(api.gphl_workflow.getObjects("test_crystals"))
+        for test_crystal in xx0.getObjects("test_crystal"):
+            dd0 = test_crystal.getProperties()
+            self.test_crystals[dd0["name"]] = CrystalData(**dd0)
 
         row = 0
-        field_name = 'test_crystal'
+        field_name = "test_crystal"
         label_name = self._get_label_name(field_name)
         label_str = "Test Crystal :"
-        label=QtImport.QLabel(label_str, _parameters_widget)
+        label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
@@ -182,28 +214,55 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         self._pulldowns[field_name] = list(self.test_crystals)
 
         row += 1
-        label_name = 'test_crystal_spacegroup'
+        label_name = "test_crystal_spacegroup"
         label_str = " "
-        label=QtImport.QLabel(label_str, _parameters_widget)
+        label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
-        label_name = 'test_crystal_parameters'
+        label_name = "test_crystal_parameters"
         label_str = " "
-        label=QtImport.QLabel(label_str, _parameters_widget)
+        label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 1)
         self._widget_data[label_name] = (label, str, None, label_str)
 
-    def populate_widget(self, **kw):
-        GphlSetupWidget.populate_widget(self, **kw)
+        row += 1
+        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
+        field_name = "dose_budget"
+        label_name = self._get_label_name(field_name)
+        label_str = "Dose budget (MGy) :"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QComboBox()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldown_defaults[field_name] = default_dose_budget_label
+        indx = self._pulldowns[field_name].index(default_dose_budget_label)
+        self._widget_data[field_name] = (widget, str, None, indx)
+
+        row += 1
+        field_name = "relative_rad_sensitivity"
+        label_name = self._get_label_name(field_name)
+        label_str = "Rel. radiation sensitivity"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QLineEdit()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        self._widget_data[field_name] = (widget, float, validator, 1.0)
+
+    def populate_widget(self, **kwargs):
+        GphlSetupWidget.populate_widget(self, **kwargs)
 
         data_object = self._data_object
 
-        for tag, tt in self._widget_data.items():
-            widget, w_type, validator, value = tt
+        for tag, tt0 in self._widget_data.items():
+            widget, w_type, validator, value = tt0
             widget.show()
 
-            if tag in kw:
-                value = kw[tag]
+            if tag in kwargs:
+                value = kwargs[tag]
             setattr(data_object, tag, value)
             self._parameter_mib.bind_value_update(tag, widget, w_type, validator)
         # Must be redone here, after values and bindings are set
@@ -211,65 +270,69 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
         # Special case, reset space_group pulldown
         # which changes with crystal_system
-        self._refresh_interface('test_crystal', None)
+        self._refresh_interface("test_crystal", None)
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
-        if field_name == 'test_crystal':
+        if field_name == "test_crystal":
             # Refresh crystal parameters label to reflect test_crystal pulldown
-            test_crystal = self.get_parameter_value('test_crystal') or ''
+            test_crystal = self.get_parameter_value("test_crystal") or ""
             crystal_data = self.test_crystals.get(test_crystal)
             if crystal_data:
-                label_str1 = ("Spacegroup=%(space_group)s\n\n"
-                              % crystal_data._asdict())
+                label_str1 = "Spacegroup=%(space_group)s\n\n" % crystal_data._asdict()
                 label_str2 = (
                     "a=%(a)s   b=%(b)s   c=%(c)s\n"
                     + "alpha=%(alpha)s   beta=%(beta)s   gamma=%(gamma)s\n"
                 ) % crystal_data._asdict()
             else:
-                label_str1 = label_str2 = ' '
-            label = self._widget_data['test_crystal_spacegroup'][0]
+                label_str1 = label_str2 = " "
+            label = self._widget_data["test_crystal_spacegroup"][0]
             label.setText(QtImport.QString(label_str1))
 
-            label = self._widget_data['test_crystal_parameters'][0]
+            label = self._widget_data["test_crystal_parameters"][0]
             label.setText(QtImport.QString(label_str2))
+
 
 class GphlAcquisitionWidget(GphlSetupWidget):
     """Input widget for GPhL data collection setup"""
 
     # Popup label to point groups dict
-    _CRYSTAL_SYSTEM_DATA = OrderedDict((
-        ('', CrystalSystemData('', (None,))),
-        ('Triclinic    |   1', CrystalSystemData('Triclinic', ('1',))),
-        ('Monoclinic   |   2', CrystalSystemData('Monoclinic', ('2',))),
-        ('Orthorhombic | 222', CrystalSystemData('Orthorhombic', ('222',))),
-        ('Tetragonal   | Any', CrystalSystemData('Tetragonal', ('4', '422'))),
-        ('Tetragonal   |   4', CrystalSystemData('Tetragonal', ('4',))),
-        ('Tetragonal   | 422', CrystalSystemData('Tetragonal', ('422',))),
-        ('Trigonal     | Any', CrystalSystemData('Trigonal', ('3', '32', '321', '312'))),
-        ('Trigonal     |   3', CrystalSystemData('Trigonal', ('3',))),
-        ('Trigonal     |  32', CrystalSystemData('Trigonal', ('32', '321', '312'))),
-        ('Hexagonal    | Any', CrystalSystemData('Hexagonal', ('6', '622'))),
-        ('Hexagonal    |   6', CrystalSystemData('Hexagonal', ('6',))),
-        ('Hexagonal    | 622', CrystalSystemData('Hexagonal', ('622',))),
-        ('Cubic        | Any', CrystalSystemData('Cubic', ('23', '432'))),
-        ('Cubic        |  23', CrystalSystemData('Cubic', ('23',))),
-        ('Cubic        | 432', CrystalSystemData('Cubic', ('432',)))
-    ))
+    _CRYSTAL_SYSTEM_DATA = OrderedDict(
+        (
+            ("", CrystalSystemData("", (None,))),
+            ("Triclinic    |   1", CrystalSystemData("Triclinic", ("1",))),
+            ("Monoclinic   |   2", CrystalSystemData("Monoclinic", ("2",))),
+            ("Orthorhombic | 222", CrystalSystemData("Orthorhombic", ("222",))),
+            ("Tetragonal   | Any", CrystalSystemData("Tetragonal", ("4", "422"))),
+            ("Tetragonal   |   4", CrystalSystemData("Tetragonal", ("4",))),
+            ("Tetragonal   | 422", CrystalSystemData("Tetragonal", ("422",))),
+            (
+                "Trigonal     | Any",
+                CrystalSystemData("Trigonal", ("3", "32", "321", "312")),
+            ),
+            ("Trigonal     |   3", CrystalSystemData("Trigonal", ("3",))),
+            ("Trigonal     |  32", CrystalSystemData("Trigonal", ("32", "321", "312"))),
+            ("Hexagonal    | Any", CrystalSystemData("Hexagonal", ("6", "622"))),
+            ("Hexagonal    |   6", CrystalSystemData("Hexagonal", ("6",))),
+            ("Hexagonal    | 622", CrystalSystemData("Hexagonal", ("622",))),
+            ("Cubic        | Any", CrystalSystemData("Cubic", ("23", "432"))),
+            ("Cubic        |  23", CrystalSystemData("Cubic", ("23",))),
+            ("Cubic        | 432", CrystalSystemData("Cubic", ("432",))),
+        )
+    )
 
-    def __init__(self, parent=None, name='gphl_acquisition_widget',
-                 workflow_object=None):
-        GphlSetupWidget.__init__(self, parent=parent, name=name,)
+    def __init__(self, parent=None, name="gphl_acquisition_widget"):
+        GphlSetupWidget.__init__(self, parent=parent, name=name)
 
-         # Internal variables -------------------------------------------------
+        # Internal variables -------------------------------------------------
 
         _parameters_widget = self._parameters_widget
 
         row = 0
-        field_name = 'crystal_system'
+        field_name = "crystal_system"
         label_name = self._get_label_name(field_name)
         label_str = "Crystal system :"
-        label=QtImport.QLabel(label_str, _parameters_widget)
+        label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
@@ -278,61 +341,107 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._pulldowns[field_name] = list(self._CRYSTAL_SYSTEM_DATA)
 
         row += 1
-        field_name = 'space_group'
+        field_name = "space_group"
         label_name = self._get_label_name(field_name)
         label_str = "Space group :"
-        label=QtImport.QLabel(label_str, _parameters_widget)
+        label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
 
+        row += 1
+        field_name = "characterisation_strategy"
+        label_name = self._get_label_name(field_name)
+        label_str = "Characterisation strategy :"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QComboBox()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        self._widget_data[field_name] = (widget, str, None, 0)
+        strategy_names = (
+            api.gphl_workflow.getProperty("characterisation_strategies").split()
+        )
+        self._pulldowns[field_name] = strategy_names
 
-    def populate_widget(self, beam_energies={}, **kw):
-        GphlSetupWidget.populate_widget(self, **kw)
+        row += 1
+        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
+        field_name = "dose_budget"
+        label_name = self._get_label_name(field_name)
+        label_str = "Dose budget (MGy) :"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QComboBox()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        self._widget_data[field_name] = (widget, str, None, 0)
+        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
+        self._pulldown_defaults[field_name] = default_dose_budget_label
+        indx = self._pulldowns[field_name].index(default_dose_budget_label)
+        self._widget_data[field_name] = (widget, str, None, indx)
+
+        row += 1
+        field_name = "relative_rad_sensitivity"
+        label_name = self._get_label_name(field_name)
+        label_str = "Rel. radiation sensitivity"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QLineEdit()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        self._widget_data[field_name] = (widget, float, validator, 1.0)
+
+    def populate_widget(self, **kwargs):
+        GphlSetupWidget.populate_widget(self, **kwargs)
 
         data_object = self._data_object
 
         # Special case, reset space_group pulldown
         # which changes with crystal_system
-        self._refresh_interface('crystal_system', None)
+        self._refresh_interface("crystal_system", None)
 
         skip_fields = []
 
-        for tag, tt in self._widget_data.items():
+        for tag, tt0 in self._widget_data.items():
             if tag in skip_fields:
-                tt[0].hide()
+                tt0[0].hide()
             else:
-                widget, w_type, validator, value = tt
+                widget, w_type, validator, value = tt0
                 widget.show()
 
-                if tag in kw:
-                    value = kw[tag]
+                if tag in kwargs:
+                    value = kwargs[tag]
                 setattr(data_object, tag, value)
                 self._parameter_mib.bind_value_update(tag, widget, w_type, validator)
 
         # Must be redone here, after values and bindings are set
         self._parameter_mib.set_model(data_object)
 
-
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
-        if field_name == 'crystal_system':
-            #Refresh space_group pulldown to reflect crystal_system pulldown
-            crystal_system = self.get_parameter_value('crystal_system') or ''
+        if field_name == "crystal_system":
+            # Refresh space_group pulldown to reflect crystal_system pulldown
+            crystal_system = self.get_parameter_value("crystal_system") or ""
             data = self._CRYSTAL_SYSTEM_DATA[crystal_system]
-            ll = self._pulldowns['space_group'] = []
+            ll0 = self._pulldowns["space_group"] = []
             if data.crystal_system:
-                ll.append('')
-                ll.extend([x.name for x in enumerables.SPACEGROUP_DATA
-                           if x.point_group in data.point_groups])
+                ll0.append("")
+                ll0.extend(
+                    [
+                        x.name
+                        for x in queue_model_enumerables.SPACEGROUP_DATA
+                        if x.point_group in data.point_groups
+                    ]
+                )
             else:
-                ll.extend(enumerables.XTAL_SPACEGROUPS)
+                ll0.extend(queue_model_enumerables.XTAL_SPACEGROUPS)
 
-            widget = self._widget_data['space_group'][0]
+            widget = self._widget_data["space_group"][0]
             widget.clear()
-            widget.addItems(list(QtImport.QString(tag) for tag in ll))
+            widget.addItems(list(QtImport.QString(tag) for tag in ll0))
             self._data_object.space_group = 0
             # widget.setCurrentIndex(0)
             # self._parameter_mib._update_widget('space_group', None)
