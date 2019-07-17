@@ -171,9 +171,11 @@
         <!--<co.gphl.wf.stratcal.collision_mode>2</co.gphl.wf.stratcal.collision_mode>-->
         <co.gphl.wf.devMode>true</co.gphl.wf.devMode>
         <!--<co.gphl.wf.stratcal.strategy_type>Set Automatically</co.gphl.wf.stratcal.strategy_type>-->
-        <!-- Maxim,um allowed chi - in degrees. NB may be overridden by code -->
+        <!-- Maximum allowed chi - in degrees. NB may be overridden by code -->
+        <co.gphl.wf.stratcal.opt.--driver>5</co.gphl.wf.stratcal.opt.--driver>
+<!--        <co.gphl.wf.stratcal.opt.&#45;&#45;main-only/>-->
         <co.gphl.wf.stratcal.opt.--maximum_chi>48</co.gphl.wf.stratcal.opt.--maximum_chi>
-        <co.gphl.wf.stratcal.opt.--type-of-correction>1</co.gphl.wf.stratcal.opt.--type-of-correction>
+        <co.gphl.wf.stratcal.opt.--type-of-correction>0</co.gphl.wf.stratcal.opt.--type-of-correction>
     </workflow_properties>
 
     <!-- List of supported workflows, with options for each -->
