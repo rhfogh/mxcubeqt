@@ -106,9 +106,10 @@ class WebViewWidget(QWidget):
     def go_to_home_page(self):
         """
         """
-        self.url_ledit.setText(self.home_url)
-        self.web_page_viewer.load(QUrl(self.home_url))
-        self.web_page_viewer.show()
+        if QWEBVIEW_AVAILABLE:
+            self.url_ledit.setText(self.home_url)
+            self.web_page_viewer.load(QUrl(self.home_url))
+            self.web_page_viewer.show()
 
     def go_back(self):
         """
