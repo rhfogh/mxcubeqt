@@ -65,6 +65,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.addProperty('enableVisualAlign', 'boolean', True)
         self.addProperty('enableAutoCenter', 'boolean', True)
         self.addProperty('enableRealignBeam', 'boolean', False)
+        self.addProperty('enableBeamAlign', 'boolean', True)
 
         # Signals -------------------------------------------------------------
         
@@ -82,6 +83,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.draw_grid_button = MonoStateButton(self, "Grid", "Grid")
         self.auto_focus_button = MonoStateButton(self, "Focus", "Eyeball")
         self.snapshot_button = MonoStateButton(self, "Snapshot", "Camera")
+        self.align_mode_button = DuoStateButton(self, "BeamView")
+        self.align_mode_button.set_icons("BeamAlign", "Delete")
         self.refresh_camera_button = MonoStateButton(self, "Refresh", "Refresh")
         self.visual_align_button = MonoStateButton(self, "Align", "Align")
         self.select_all_button = MonoStateButton(self, "Select all", "Check")
@@ -99,6 +102,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         _main_vlayout.addWidget(self.draw_grid_button)
         _main_vlayout.addWidget(self.auto_focus_button)
         _main_vlayout.addWidget(self.snapshot_button)
+        _main_vlayout.addWidget(self.align_mode_button)
         _main_vlayout.addWidget(self.refresh_camera_button)
         _main_vlayout.addWidget(self.visual_align_button)
         _main_vlayout.addWidget(self.select_all_button)
@@ -117,6 +121,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.draw_grid_button.clicked.connect(self.draw_grid_clicked)
         self.auto_focus_button.clicked.connect(self.auto_focus_clicked)
         self.snapshot_button.clicked.connect(self.save_snapshot_clicked)
+        self.align_mode_button.clicked.connect(self.align_mode_clicked)
         self.refresh_camera_button.clicked.connect(self.refresh_camera_clicked)
         self.visual_align_button.clicked.connect(self.visual_align_clicked)
         self.select_all_button.clicked.connect(self.select_all_clicked)
@@ -133,6 +138,7 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+G)")
         self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
         self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
+        self.align_mode_button.setToolTip("Toggle between centring and beam alignment mode.")
         #self.instanceSynchronize("")
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -186,6 +192,8 @@ class Qt4_HutchMenuBrick(BlissWidget):
             self.auto_center_button.setVisible(new_value)
         elif property_name == "enableRealignBeam":
             self.realign_button.setVisible(new_value)
+        elif property_name == "enableBeamAlign":
+            self.align_mode_button.setVisible(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
@@ -223,6 +231,20 @@ class Qt4_HutchMenuBrick(BlissWidget):
                 self.file_index += 1        
             except:
                 logging.getLogger().exception("HutchMenuBrick: error saving snapshot!")
+
+    def align_mode_clicked(self):
+        """
+        Descript. : 
+        Args.     : 
+        Return    : 
+        """
+        mode =  self.graphics_manager_hwobj.camera_hwobj.align_mode
+        if mode:
+            self.graphics_manager_hwobj.camera_hwobj.align_mode = False
+        else:
+            self.graphics_manager_hwobj.camera_hwobj.align_mode = True
+
+
 
     def refresh_camera_clicked(self):
         """
