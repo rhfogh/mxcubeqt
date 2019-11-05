@@ -38,6 +38,8 @@ class Qt4_ALBA_LoginBrick(Qt4_ProposalBrick2):
         Qt4_ProposalBrick2.__init__(self, *args)
         self.logger = logging.getLogger("GUI")
         self.logger.info("ALBA_LoginBrick.__init__()")
+        self.proposal_number_ledit.setFixedWidth(100)
+        self.proposal_password_ledit.setFixedWidth(100)
 
     # Handler for the Login button (check the password in LDAP)
     def login(self):
