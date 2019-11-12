@@ -16,6 +16,7 @@
 #
 #   You should have received a copy of the GNU General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+import logging
 
 from QtImport import *
 
@@ -23,7 +24,9 @@ from BlissFramework import Qt4_Icons
 from BlissFramework.Qt4_BaseComponents import BlissWidget
 from BlissFramework.Utils import Qt4_widget_colors
 
-
+__credits__ = ["ALBA"]
+__licence__ = "LGPLv3+"
+__version__ = "2.3"
 __category__ = 'General'
 
 
@@ -38,10 +41,10 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.zoom_hwobj = None
 
         # Internal values -----------------------------------------------------
-
         self.positions = None
+
         # Properties ----------------------------------------------------------
-        self.addProperty('label','string','')
+        self.addProperty('label', 'string', '')
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('icons', 'string', '')
         self.addProperty('showMoveButtons', 'boolean', True)
@@ -49,7 +52,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot('setEnabled',())
+        self.defineSlot('setEnabled', ())
 
         # Graphic elements ----------------------------------------------------
         _main_gbox = QGroupBox(self)
@@ -86,9 +89,13 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.next_position_button.setIcon(Qt4_Icons.load_icon('Plus2'))
         self.next_position_button.setFixedSize(27, 27)
 
-        #self.init_state_colors()
-
     def _init_state_colors(self):
+        """
+        Map state to widget colors.
+
+        Returns: None
+
+        """
         # TODO: it there a generic method for this?
         # This mapping should be universal for all widgets --> unique set of states
         state = self.zoom_hwobj.STATE
@@ -111,7 +118,6 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         Returns: None
 
         """
-        states = self.zoom_hwobj.STATE
         if name is None:
             name = self['mnemonic']
         if self.zoom_hwobj is None:
@@ -132,25 +138,40 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         Update combo box color according to zoom state
 
         Args:
-            state: New zoom state (enum)
+            state: New zoom tango state.
 
         Returns: None
 
         """
-        s = state in list(self.zoom_hwobj.STATE)
+        # TODO: state is a Tango state, but we need a DigitalZoomState instead.
+        state = self.zoom_hwobj.getState()
 
-        self.positions_combo.setEnabled(s)
+        found = state in list(self.zoom_hwobj.STATE)
+
+        self.positions_combo.setEnabled(found)
         Qt4_widget_colors.set_widget_color(self.positions_combo, 
                                            self.STATE_COLORS[state],
                                            QPalette.Button)
         self.setToolTip(state=state)
 
     def propertyChanged(self, property_name, old_value, new_value):
+        """
+        Updates Brick property values (Bliss API).
+
+        Args:
+            property_name: Name of the property to be changed
+            old_value: old property value
+            new_value: new_property value
+
+        Returns: None
+
+        """
         if property_name == 'label':
             if new_value == "" and self.zoom_hwobj is not None:
                 self.label.setText("<i>" + self.zoom_hwobj.username + ":</i>")
             else:
                 self.label.setText(new_value)
+
         elif property_name == 'mnemonic':
             if self.zoom_hwobj is not None:
                 self.disconnect(self.zoom_hwobj,
@@ -162,7 +183,9 @@ class Qt4_DigitalZoomBrick(BlissWidget):
                 self.disconnect(self.zoom_hwobj,
                                 'predefinedPositionChanged',
                                 self.predefined_position_changed)
+
             self.zoom_hwobj = self.getHardwareObject(new_value)
+
             if self.zoom_hwobj is not None:
                 self.connect(self.zoom_hwobj,
                              'newPredefinedPositions',
@@ -175,22 +198,19 @@ class Qt4_DigitalZoomBrick(BlissWidget):
                              self.predefined_position_changed)
                 self.fill_positions()
                 self._init_state_colors()
+
                 if self.zoom_hwobj.is_ready():
-                    if hasattr(self.zoom_hwobj, "getCurrentPositionName"):
-                        self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName(), 0)
-                    else:
-                        self.predefined_position_changed(self.zoom_hwobj.get_current_position_name(), 0)
+                    self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName())
+
                 if self['label'] == "":
-                    lbl=self.zoom_hwobj.username
+                    lbl = self.zoom_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
+
                 Qt4_widget_colors.set_widget_color(self.positions_combo,
                                                    Qt4_widget_colors.DARK_GRAY,
                                                    QPalette.Button)
-                #TODO remove this check
-                if hasattr(self.zoom_hwobj, "getState"):
-                    self.motor_state_changed(self.zoom_hwobj.getState())
-                else:
-                    self.motor_state_changed(self.zoom_hwobj.get_state())
+                self.motor_state_changed(self.zoom_hwobj.getState())
+
         elif property_name == 'showMoveButtons':
             if new_value:
                 self.previous_position_button.show()
@@ -198,56 +218,70 @@ class Qt4_DigitalZoomBrick(BlissWidget):
             else:
                 self.previous_position_button.hide()
                 self.next_position_button.hide()
-        elif property_name == 'icons':
-            icons_list = new_value.split()
-            try:
-                self.previous_position_button.setIcon(\
-                    Qt4_Icons.load_icon(icons_list[0]))
-                self.next_position_button.setIcon(\
-                    Qt4_Icons.load_icon(icons_list[1]))
-            except:
-                pass
-        else:
-            BlissWidget.propertyChanged(self,property_name, old_value, new_value)
 
-    def fill_positions(self, positions = None):
+        elif property_name == 'icons':
+            icons = new_value.split()
+            if icons:
+                try:
+                    self.previous_position_button.setIcon(Qt4_Icons.load_icon(icons[0]))
+                    self.next_position_button.setIcon(Qt4_Icons.load_icon(icons[1]))
+                except Exception as e:
+                    msg = "Cannot set icons {} for {}\n{}".format(icons,
+                                                                  self.objectName(),
+                                                                  e)
+                    logging.getLogger().warning(msg)
+        else:
+            BlissWidget.propertyChanged(self, property_name, old_value, new_value)
+
+    def fill_positions(self, positions=None):
+        """
+        Update combo box with positions list from the hardware object.
+        Args:
+            positions: list of strings
+
+        Returns: None
+
+        """
         self.positions_combo.clear()
         if self.zoom_hwobj is not None:
             if positions is None:
-                #TODO remove this check
-                if hasattr(self.zoom_hwobj, "getPredefinedPositionsList"):
-                    positions = self.zoom_hwobj.getPredefinedPositionsList()
-                else:
-                    positions = self.zoom_hwobj.get_predefined_positions_list()
+                positions = self.zoom_hwobj.getPredefinedPositionsList()
         if positions is None:
-            positions=[]
+            positions = []
         for p in positions:
-            #pos_list=str(p).split()
-            #pos_name=pos_list[1]
             self.positions_combo.addItem(str(p))
-        self.positions=positions
+        self.positions = positions
         if self.zoom_hwobj is not None:
             if self.zoom_hwobj.is_ready():
-                #TODO remove this check
-                if hasattr(self.zoom_hwobj, "getCurrentPositionName"):
-                    self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName(), 0)
-                else:
-                    self.predefined_position_changed(self.zoom_hwobj.get_current_position_name(), 0)
+                self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName())
 
     def position_selected(self, index):
+        """
+        Slot for setting the position selected in the combo box.
+
+        Args:
+            index: Index for the combo box position list.
+
+        Returns: None
+
+        """
         if index >= 0:
             if self.zoom_hwobj.is_ready():
-                #TODO remove this check
-                if hasattr(self.zoom_hwobj, "moveToPosition"):
-                    self.zoom_hwobj.moveToPosition(self.positions[index])
-                else:
-                    self.zoom_hwobj.move_to_position(self.positions[index])
+                self.zoom_hwobj.moveToPosition(self.positions[index])
             else:
                 self.positions_combo.setCurrentIndex(0)
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
-    def predefined_position_changed(self, position_name, offset):
+    def predefined_position_changed(self, position_name):
+        """
+        Slot for update the current position list.
+        Args:
+            position_name:
+
+        Returns: None
+
+        """
         if self.positions:
             index = 0
             for index in range(len(self.positions)):
@@ -259,8 +293,19 @@ class Qt4_DigitalZoomBrick(BlissWidget):
             self.previous_position_button.setEnabled(index > 0)
 
     def select_previous_position(self):
+        """
+        Selects previous position.
+
+        Returns: None
+
+        """
         self.position_selected(self.positions_combo.currentIndex() - 1) 
 
     def select_next_position(self):
-        self.position_selected(self.positions_combo.currentIndex() + 1)
+        """
+        Selects next position.
 
+        Returns: None
+
+        """
+        self.position_selected(self.positions_combo.currentIndex() + 1)
