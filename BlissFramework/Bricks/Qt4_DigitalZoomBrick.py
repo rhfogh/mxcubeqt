@@ -27,7 +27,7 @@ from BlissFramework.Utils import Qt4_widget_colors
 __credits__ = ["ALBA"]
 __licence__ = "LGPLv3+"
 __version__ = "2.3"
-__category__ = 'General'
+__category__ = "General"
 
 
 class Qt4_DigitalZoomBrick(BlissWidget):
@@ -44,15 +44,15 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.positions = None
 
         # Properties ----------------------------------------------------------
-        self.addProperty('label', 'string', '')
-        self.addProperty('mnemonic', 'string', '')
-        self.addProperty('icons', 'string', '')
-        self.addProperty('showMoveButtons', 'boolean', True)
+        self.addProperty("label", "string", "")
+        self.addProperty("mnemonic", "string", "")
+        self.addProperty("icons", "string", "")
+        self.addProperty("showMoveButtons", "boolean", True)
 
         # Signals -------------------------------------------------------------
 
         # Slots ---------------------------------------------------------------
-        self.defineSlot('setEnabled', ())
+        self.defineSlot("setEnabled", ())
 
         # Graphic elements ----------------------------------------------------
         _main_gbox = QGroupBox(self)
@@ -61,10 +61,10 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.previous_position_button = QPushButton(_main_gbox)
         self.next_position_button = QPushButton(_main_gbox)
 
-        # Layout -------------------------------------------------------------- 
+        # Layout --------------------------------------------------------------
         _main_gbox_hlayout = QHBoxLayout(_main_gbox)
         _main_gbox_hlayout.addWidget(self.label)
-        _main_gbox_hlayout.addWidget(self.positions_combo) 
+        _main_gbox_hlayout.addWidget(self.positions_combo)
         _main_gbox_hlayout.addWidget(self.previous_position_button)
         _main_gbox_hlayout.addWidget(self.next_position_button)
         _main_gbox_hlayout.setSpacing(2)
@@ -84,9 +84,9 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         # Other ---------------------------------------------------------------
         self.positions_combo.setFixedHeight(27)
         self.positions_combo.setToolTip("Selects zoom level")
-        self.previous_position_button.setIcon(Qt4_Icons.load_icon('Minus2'))
-        self.previous_position_button.setFixedSize(27, 27) 
-        self.next_position_button.setIcon(Qt4_Icons.load_icon('Plus2'))
+        self.previous_position_button.setIcon(Qt4_Icons.load_icon("Minus2"))
+        self.previous_position_button.setFixedSize(27, 27)
+        self.next_position_button.setIcon(Qt4_Icons.load_icon("Plus2"))
         self.next_position_button.setFixedSize(27, 27)
 
     def _init_state_colors(self):
@@ -119,7 +119,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
 
         """
         if name is None:
-            name = self['mnemonic']
+            name = self["mnemonic"]
         if self.zoom_hwobj is None:
             tip = "Unknown zoom device with name {}".format(name)
         else:
@@ -149,9 +149,9 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         found = state in list(self.zoom_hwobj.STATE)
 
         self.positions_combo.setEnabled(found)
-        Qt4_widget_colors.set_widget_color(self.positions_combo, 
-                                           self.STATE_COLORS[state],
-                                           QPalette.Button)
+        Qt4_widget_colors.set_widget_color(
+            self.positions_combo, self.STATE_COLORS[state], QPalette.Button
+        )
         self.setToolTip(state=state)
 
     def propertyChanged(self, property_name, old_value, new_value):
@@ -166,52 +166,56 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         Returns: None
 
         """
-        if property_name == 'label':
+        if property_name == "label":
             if new_value == "" and self.zoom_hwobj is not None:
                 self.label.setText("<i>" + self.zoom_hwobj.username + ":</i>")
             else:
                 self.label.setText(new_value)
 
-        elif property_name == 'mnemonic':
+        elif property_name == "mnemonic":
             if self.zoom_hwobj is not None:
-                self.disconnect(self.zoom_hwobj,
-                                'stateChanged',
-                                self.motor_state_changed)
-                self.disconnect(self.zoom_hwobj,
-                                'newPredefinedPositions',
-                                self.fill_positions)
-                self.disconnect(self.zoom_hwobj,
-                                'predefinedPositionChanged',
-                                self.predefined_position_changed)
+                self.disconnect(
+                    self.zoom_hwobj, "stateChanged", self.motor_state_changed
+                )
+                self.disconnect(
+                    self.zoom_hwobj, "newPredefinedPositions", self.fill_positions
+                )
+                self.disconnect(
+                    self.zoom_hwobj,
+                    "predefinedPositionChanged",
+                    self.predefined_position_changed,
+                )
 
             self.zoom_hwobj = self.getHardwareObject(new_value)
 
             if self.zoom_hwobj is not None:
-                self.connect(self.zoom_hwobj,
-                             'newPredefinedPositions',
-                             self.fill_positions)
-                self.connect(self.zoom_hwobj,
-                             'stateChanged',
-                             self.motor_state_changed)
-                self.connect(self.zoom_hwobj,
-                             'predefinedPositionChanged',
-                             self.predefined_position_changed)
+                self.connect(
+                    self.zoom_hwobj, "newPredefinedPositions", self.fill_positions
+                )
+                self.connect(self.zoom_hwobj, "stateChanged", self.motor_state_changed)
+                self.connect(
+                    self.zoom_hwobj,
+                    "predefinedPositionChanged",
+                    self.predefined_position_changed,
+                )
                 self.fill_positions()
                 self._init_state_colors()
 
                 if self.zoom_hwobj.is_ready():
-                    self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName())
+                    self.predefined_position_changed(
+                        self.zoom_hwobj.getCurrentPositionName()
+                    )
 
-                if self['label'] == "":
+                if self["label"] == "":
                     lbl = self.zoom_hwobj.username
                     self.label.setText("<i>" + lbl + ":</i>")
 
-                Qt4_widget_colors.set_widget_color(self.positions_combo,
-                                                   Qt4_widget_colors.DARK_GRAY,
-                                                   QPalette.Button)
+                Qt4_widget_colors.set_widget_color(
+                    self.positions_combo, Qt4_widget_colors.DARK_GRAY, QPalette.Button
+                )
                 self.motor_state_changed(self.zoom_hwobj.getState())
 
-        elif property_name == 'showMoveButtons':
+        elif property_name == "showMoveButtons":
             if new_value:
                 self.previous_position_button.show()
                 self.next_position_button.show()
@@ -219,16 +223,16 @@ class Qt4_DigitalZoomBrick(BlissWidget):
                 self.previous_position_button.hide()
                 self.next_position_button.hide()
 
-        elif property_name == 'icons':
+        elif property_name == "icons":
             icons = new_value.split()
             if icons:
                 try:
                     self.previous_position_button.setIcon(Qt4_Icons.load_icon(icons[0]))
                     self.next_position_button.setIcon(Qt4_Icons.load_icon(icons[1]))
                 except Exception as e:
-                    msg = "Cannot set icons {} for {}\n{}".format(icons,
-                                                                  self.objectName(),
-                                                                  e)
+                    msg = "Cannot set icons {} for {}\n{}".format(
+                        icons, self.objectName(), e
+                    )
                     logging.getLogger().warning(msg)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
@@ -253,7 +257,9 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.positions = positions
         if self.zoom_hwobj is not None:
             if self.zoom_hwobj.is_ready():
-                self.predefined_position_changed(self.zoom_hwobj.getCurrentPositionName())
+                self.predefined_position_changed(
+                    self.zoom_hwobj.getCurrentPositionName()
+                )
 
     def position_selected(self, index):
         """
@@ -299,7 +305,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         Returns: None
 
         """
-        self.position_selected(self.positions_combo.currentIndex() - 1) 
+        self.position_selected(self.positions_combo.currentIndex() - 1)
 
     def select_next_position(self):
         """
