@@ -279,7 +279,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         self.next_position_button.setEnabled(index < (len(self.positions) - 1))
         self.previous_position_button.setEnabled(index >= 0)
 
-    def predefined_position_changed(self, position_name):
+    def predefined_position_changed(self, position_name, offset=0):
         """
         Slot for update the current position list.
         Args:
@@ -291,7 +291,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         if self.positions:
             index = 0
             for index in range(len(self.positions)):
-                if str(self.positions[index]) == position_name:
+                if str(self.positions[index]) == position_name[0]:
                     break
 
             self.positions_combo.setCurrentIndex(index)
