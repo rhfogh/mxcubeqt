@@ -34,6 +34,7 @@ class Qt4_ResolutionBrick(BlissWidget):
     """
     Descript. : 
     """
+    
     STATE_COLORS = (Qt4_widget_colors.LIGHT_RED,
                     Qt4_widget_colors.LIGHT_RED,
                     Qt4_widget_colors.LIGHT_GREEN,
@@ -41,6 +42,8 @@ class Qt4_ResolutionBrick(BlissWidget):
                     Qt4_widget_colors.LIGHT_YELLOW,
                     Qt4_widget_colors.LIGHT_YELLOW,
                     QColor(255,165,0),
+                    Qt4_widget_colors.LIGHT_RED,   
+                    Qt4_widget_colors.LIGHT_RED,   
                     Qt4_widget_colors.LIGHT_RED)   
 
     def __init__(self, *args):
@@ -466,6 +469,7 @@ class Qt4_ResolutionBrick(BlissWidget):
 
     def resolution_state_changed(self, state):
         if self.detector_distance_hwobj is not None:
+            logging.getLogger("HWR").debug("******* %s" % state)
             if state:
                 color = Qt4_ResolutionBrick.STATE_COLORS[state]
             else:
