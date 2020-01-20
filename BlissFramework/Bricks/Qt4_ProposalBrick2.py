@@ -156,30 +156,46 @@ class Qt4_ProposalBrick2(BlissWidget):
         _user_group_widget_hlayout.setContentsMargins(0, 0, 0, 0)
         self.user_group_widget.hide()
 
-        _login_as_proposal_widget_layout = QHBoxLayout(self.login_as_proposal_widget)
-        _login_as_proposal_widget_layout.addWidget(self.code_label)
-        _login_as_proposal_widget_layout.addWidget(self.proposal_type_combox)
-        _login_as_proposal_widget_layout.addWidget(self.dash_label)
-        _login_as_proposal_widget_layout.addWidget(self.proposal_number_ledit)
-        _login_as_proposal_widget_layout.addWidget(self.password_label)
-        _login_as_proposal_widget_layout.addWidget(self.proposal_password_ledit)
-        _login_as_proposal_widget_layout.addWidget(self.login_button)
+        _login_as_proposal_widget_layout = QVBoxLayout(self.login_as_proposal_widget)
+
+        _login_as_proposal_widget_layout1 = QHBoxLayout(self.login_as_proposal_widget)
+        _login_as_proposal_widget_layout1.addWidget(self.code_label)
+        _login_as_proposal_widget_layout1.addWidget(self.proposal_type_combox)
+        _login_as_proposal_widget_layout1.addWidget(self.dash_label)
+        _login_as_proposal_widget_layout1.addWidget(self.proposal_number_ledit)
+
+        _login_as_proposal_widget_layout2 = QHBoxLayout(self.login_as_proposal_widget)
+        _login_as_proposal_widget_layout2.addWidget(self.password_label)
+        _login_as_proposal_widget_layout2.addWidget(self.proposal_password_ledit)
+        _login_as_proposal_widget_layout2.addWidget(self.login_button)
+
         _login_as_proposal_widget_layout.setSpacing(2)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
+
+        _login_as_proposal_widget_layout.addLayout(_login_as_proposal_widget_layout1)
+        _login_as_proposal_widget_layout.addLayout(_login_as_proposal_widget_layout2)
 
         _login_as_user_widget_layout = QHBoxLayout(self.login_as_user_widget)
         _login_as_user_widget_layout.addWidget(self.proposal_combo)
         _login_as_user_widget_layout.setSpacing(2)
         _login_as_user_widget_layout.setContentsMargins(0, 0, 0, 0)
 
-        _main_gboxlayout = QHBoxLayout(self.main_gbox)
-        _main_gboxlayout.addWidget(self.login_as_proposal_widget)
-        _main_gboxlayout.addWidget(self.logout_button)
-        _main_gboxlayout.addWidget(self.login_as_user_widget)
+        _main_gboxlayout = QVBoxLayout(self.main_gbox)
+
+        _main_gboxlayout1 = QHBoxLayout(self.main_gbox)
+        _main_gboxlayout1.addWidget(self.login_as_proposal_widget)
+        _main_gboxlayout1.addWidget(self.logout_button)
+        _main_gboxlayout1.addWidget(self.login_as_user_widget)
         #_main_vlayout.addSpacing(10)
-        _main_gboxlayout.addWidget(self.user_group_widget)
+
+        _main_gboxlayout2 = QHBoxLayout(self.main_gbox)
+        _main_gboxlayout2.addWidget(self.user_group_widget)
+
         _main_gboxlayout.setSpacing(2)
         _main_gboxlayout.setContentsMargins(0, 0, 0, 0)
+
+        _main_gboxlayout.addLayout(_main_gboxlayout1)
+        _main_gboxlayout.addLayout(_main_gboxlayout2)
 
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
