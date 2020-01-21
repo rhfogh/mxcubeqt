@@ -78,14 +78,15 @@ class TaskToolBoxWidget(QWidget):
 
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
-        self.tool_box.addItem(self.helical_page, "Helical Collection")
-        self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
-        self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
-        if self.gphl_workflow_page is not None:
-            self.tool_box.addItem(self.gphl_workflow_page,
-                                  "GPhL Workflows")
-        self.tool_box.addItem(self.advanced_page, "Advanced")
-        #self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
+        # Not implemented yet @ XALOC
+        # self.tool_box.addItem(self.helical_page, "Helical Collection")
+        # self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
+        # self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
+        #if self.gphl_workflow_page is not None:
+        #    self.tool_box.addItem(self.gphl_workflow_page,
+        #                          "GPhL Workflows")
+        # self.tool_box.addItem(self.advanced_page, "Advanced")
+        # self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
 
         self.button_box = QWidget(self)
         self.create_task_button = QPushButton("  Add to queue", self.button_box)
