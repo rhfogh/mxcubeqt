@@ -129,6 +129,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         self.logout_button.hide()
         self.logout_button.setFixedWidth(70)
         self.login_as_proposal_widget.hide()
+        self.logged_proposal_label = QLabel("", self.main_gbox)
+        self.logged_proposal_label.hide()
         
 
         self.login_as_user_widget = QWidget(self.main_gbox)
@@ -184,6 +186,7 @@ class Qt4_ProposalBrick2(BlissWidget):
 
         _main_gboxlayout1 = QHBoxLayout(self.main_gbox)
         _main_gboxlayout1.addWidget(self.login_as_proposal_widget)
+        _main_gboxlayout1.addWidget(self.logged_proposal_label)
         _main_gboxlayout1.addWidget(self.logout_button)
         _main_gboxlayout1.addWidget(self.login_as_user_widget)
         #_main_vlayout.addSpacing(10)
@@ -258,11 +261,13 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.dash_label.hide()
             self.proposal_number_ledit.hide()
             self.password_label.hide()
+            self.logged_proposal_label.show()
             self.logout_button.show()
             self.user_group_widget.show()
         else:
             self.login_button.show()
             self.proposal_password_ledit.show()
+            self.logged_proposal_label.hide()
             self.logout_button.hide()
             self.user_group_widget.hide()
             self.code_label.show()
@@ -355,6 +360,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         if not self.login_as_user: 
             self.login_as_proposal_widget.setEnabled(True)
             self.set_login_mode("login")
+            self.logged_proposal_label.setText("")
+
         #self.title_label.hide()
         self.user_group_widget.hide()
        
@@ -394,6 +401,8 @@ class Qt4_ProposalBrick2(BlissWidget):
         if not self.login_as_user:
             logging.getLogger("HWR").debug("Hiding login controls")
             self.set_login_mode("logout")
+            self.logged_proposal_label.setText("%s%s" % (proposal['code'], str(proposal['number'])))
+
             self.login_as_proposal_widget.setDisabled(True)
 
         # Store info in the brick
