@@ -56,7 +56,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
 
         # Graphic elements ----------------------------------------------------
         _main_gbox = QGroupBox(self)
-        self.label = QLabel("zoom:", _main_gbox)
+        self.label = QLabel("zoom", _main_gbox)
         self.positions_combo = QComboBox(self)
         self.previous_position_button = QPushButton(_main_gbox)
         self.next_position_button = QPushButton(_main_gbox)
@@ -168,7 +168,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
         """
         if property_name == "label":
             if new_value == "" and self.zoom_hwobj is not None:
-                self.label.setText("<i>" + self.zoom_hwobj.username + ":</i>")
+                self.label.setText(self.zoom_hwobj.username)
             else:
                 self.label.setText(new_value)
 
