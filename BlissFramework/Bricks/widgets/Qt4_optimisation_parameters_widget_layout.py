@@ -39,6 +39,8 @@ class OptimisationParametersWidgetLayout(QWidget):
         self.opt_param_widget = loadUi(os.path.join(os.path.dirname(__file__),
              "ui_files/Qt4_optimization_parameters_widget_layout.ui"))
 
+        self.opt_param_widget.hide()
+
         # Layout --------------------------------------------------------------
         _main_vlayout = QVBoxLayout(self)
         _main_vlayout.addWidget(self.opt_param_widget)

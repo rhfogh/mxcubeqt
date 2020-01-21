@@ -46,12 +46,15 @@ class ProcessingWidget(QWidget):
         self.processing_widget = self.acq_widget_layout = loadUi(
                            os.path.join(os.path.dirname(__file__),
                            "ui_files/Qt4_processing_widget_vertical_layout.ui"))
-      
+
+
+        self.processing_widget.hide()
+
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.processing_widget)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-       
+
         self.processing_widget.space_group_combo.\
             addItems(queue_model_enumerables.XTAL_SPACEGROUPS)
         
