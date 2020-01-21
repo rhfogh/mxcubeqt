@@ -81,6 +81,8 @@ class DataPathWidget(QWidget):
         self.data_path_layout.compression_cbox.toggled.\
              connect(self._compression_toggled)
 
+        self.data_path_layout.compression_cbox.setEnabled(False)
+
         # Other ---------------------------------------------------------------
         self._data_model_pm.bind_value_update('base_prefix', 
              self.data_path_layout.prefix_ledit, str, None)
