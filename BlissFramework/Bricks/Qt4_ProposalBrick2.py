@@ -264,6 +264,8 @@ class Qt4_ProposalBrick2(BlissWidget):
             self.logged_proposal_label.show()
             self.logout_button.show()
             self.user_group_widget.show()
+            # TODO Workaround: smart folder looses ref- when user group is set
+            self.user_group_widget.setEnabled(False)
         else:
             self.login_button.show()
             self.proposal_password_ledit.show()
