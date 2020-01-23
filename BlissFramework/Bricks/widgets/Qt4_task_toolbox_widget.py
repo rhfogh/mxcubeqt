@@ -204,9 +204,22 @@ class TaskToolBoxWidget(QWidget):
 
 
     def update_data_path_model(self):
+
+        log = logging.getLogger("HWR")
+
         for i in range(0, self.tool_box.count()):
+
             item = self.tool_box.widget(i)
+
+            # log.info("*** Init_model for item type: %s" % type(item))
+            # if isinstance(item, CreateCharWidget):
+            #     item.init_models()
+            # item.init_models()
+
+            log.info("*** Update_data_path_model for item type: %s" % type(item))
             item.init_data_path_model()
+
+            log.info("*** Update_selection for item type: %s" % type(item))
             item.update_selection()
 
     def ispyb_logged_in(self, logged_in):
@@ -278,13 +291,15 @@ class TaskToolBoxWidget(QWidget):
         """
         Called by the parent widget when selection in the tree changes.
         """
-        title = "<b>Collection method template</b>"
-
+        # Unused
+        # title = "<b>Collection method template</b>"
+        logging.getLogger("HWR").debug("*** TaskToolBoxWidget.selection_changed")
         if len(items) == 1:
             self.create_task_button.setEnabled(False)
             data_model = items[0].get_model()
             title = "<b>%s</b>" % data_model.get_display_name()
 
+            logging.getLogger("HWR").debug("*** TaskToolBoxWidget.selection_changed: %s" % title)
             if not isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
@@ -308,12 +323,14 @@ class TaskToolBoxWidget(QWidget):
                 self.tool_box.setCurrentWidget(self.advanced_page)
             elif isinstance(items[0], Qt4_queue_item.SampleQueueItem):
                 title = "<b>Sample: %s</b>" % data_model.get_display_name()
+                logging.getLogger("HWR").debug("*** TaskToolBoxWidget.selection_changed: display name is %s" % title)
             self.method_label.setText(title)
         else:
             self.create_task_button.setEnabled(True)
 
         current_page = self.tool_box.currentWidget()
         current_page.selection_changed(items)
+        logging.getLogger("HWR").debug("*** TaskToolBoxWidget.selection_changed: current page: %r" % current_page)
 
     def create_task_button_click(self):
         if self.tool_box.currentWidget().approve_creation():
