@@ -127,6 +127,12 @@ class DataPathWidget(QWidget):
             new_value = new_value[:-1]
 
         self.data_path_layout.prefix_ledit.setText(new_value)
+
+        # XALOC specific: Change subfolder When prefix is manually edited
+        # and preserve group (if any).
+        _group, _ = os.path.split(str(self.data_path_layout.folder_ledit.text()))
+        self.data_path_layout.folder_ledit.setText(os.path.join(_group, new_value))
+        #
         self.data_path_layout.prefix_ledit.setCursorPosition(cursor_pos)
 
         self._data_model.base_prefix = str(new_value)

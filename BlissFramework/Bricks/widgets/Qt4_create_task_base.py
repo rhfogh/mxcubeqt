@@ -110,6 +110,7 @@ class CreateTaskBase(QWidget):
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
             if self._data_path_widget:
+                logging.getLogger('HWR').debug("*** CreateTaskBase.init_data_path_model: data path widget")
                 self._data_path_widget._base_image_dir = \
                     self._session_hwobj.get_base_image_directory()
                 self._data_path_widget._base_process_dir = \
@@ -123,6 +124,7 @@ class CreateTaskBase(QWidget):
                 self._path_template.run_number = bl_setup.queue_model_hwobj.\
                     get_next_run_number(self._path_template)
         else:
+            logging.getLogger('HWR').debug("*** CreateTaskBase.init_data_path_model: data path template")
             self._path_template = queue_model_objects.PathTemplate()
 
     def tab_changed(self, tab_index, tab):
@@ -185,6 +187,7 @@ class CreateTaskBase(QWidget):
             self.acqParametersConflictSignal.emit(len(conflict) > 0)
  
     def path_template_changed(self):
+        logging.getLogger("HWR").debug("*** CreateTaskBase.path_template_changed: update filename")
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
@@ -388,15 +391,29 @@ class CreateTaskBase(QWidget):
 
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
-            if sample_data_model.lims_id != -1:
-                prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(\
-                  tree_item, sub_dir = "%s%s" % (prefix.split("-")[0], os.path.sep))
 
-                #TODO create templates to customize this
-                #self._path_template.directory = data_directory
-                #self._path_template.process_directory = proc_directory
+            # Default XALOC prefix
+            logging.getLogger("HWR").debug("*** CreateTaskBase.single_item_selection: sample is %s" % sample_item.get_model().get_display_name())
+
+            prefix = self.get_default_prefix(sample_item.get_model())
+
+            # XALOC specific
+            if True:
+            # if sample_data_model.lims_id != -1:
+                (data_directory, proc_directory) = self.get_default_directory( \
+                    tree_item, sub_dir=prefix)
+
+                logging.getLogger("HWR").debug("*** data directory: %s" % data_directory)
+                logging.getLogger("HWR").debug("*** proc directory: %s" % proc_directory)
+
+            # Created templates to customize this
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
+
+                logging.getLogger("HWR").debug("*** base prefix: %s" % prefix)
+                logging.getLogger("HWR").debug("*** ref prefix: %s" % self._path_template.reference_image_prefix)
+
             elif self._session_hwobj.get_group_name() != '':
                 base_dir = self._session_hwobj.get_base_image_directory()
                 # Update with group name as long as user didn't specify
