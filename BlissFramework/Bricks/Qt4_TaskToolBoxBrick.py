@@ -116,8 +116,6 @@ class Qt4_TaskToolBoxBrick(BlissWidget):
         """
         self.session_hwobj.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
-        path = os.path.join(self.session_hwobj.get_base_image_directory(),str(new_user_group))
-        logging.getLogger('GUI').info('New RAW images path is: %s' % path)
 
     @pyqtSlot(BlissWidget)
     def set_tree_brick(self, brick):
