@@ -210,16 +210,12 @@ class TaskToolBoxWidget(QWidget):
         for i in range(0, self.tool_box.count()):
 
             item = self.tool_box.widget(i)
-
-            # log.info("*** Init_model for item type: %s" % type(item))
-            # if isinstance(item, CreateCharWidget):
-            #     item.init_models()
-            # item.init_models()
-
-            log.info("*** Update_data_path_model for item type: %s" % type(item))
-            item.init_data_path_model()
-
-            log.info("*** Update_selection for item type: %s" % type(item))
+            #log.info("****** Init_model for item type: %s" % type(item))
+            item.init_models()
+            #log.info("****** Update_data_path_model for item type: %s" % type(item))
+            # This fixes bug related to ref-
+            #item.init_data_path_model()
+            #log.info("****** Update_selection for item type: %s" % type(item))
             item.update_selection()
 
     def ispyb_logged_in(self, logged_in):
