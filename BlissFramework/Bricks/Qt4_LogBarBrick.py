@@ -91,7 +91,8 @@ class Qt4_LogBarBrick(BlissWidget):
     def append_log_record(self, record):
         """Appends a new log line to the text edit
         """
-        if self.isRunning() and record.name in ('user_level_log', 'GUI'):
+        # if self.isRunning() and record.name in ('user_level_log', 'GUI'):
+        if self.isRunning() and record.name in ('user_level_log'):
             msg = record.getMessage()#.replace('\n',' ').strip()
             level = record.getLevel()
             color = Qt4_LogBarBrick.COLORS[level]
