@@ -103,7 +103,7 @@ class DataPathWidget(QWidget):
 
         selected_dir = str(file_dialog.getExistingDirectory(\
             self, "Select a directory", self._base_image_dir))
-        selected_dir = os.path.dirname(selected_dir)
+        logging.getLogger('GUI').debug('selected_dir: %s' % selected_dir)
 
         if selected_dir is not None and len(selected_dir) > 0:
             self.set_directory(selected_dir)
@@ -219,9 +219,12 @@ class DataPathWidget(QWidget):
         """
         Descript. :
         """
-        base_image_dir = self._base_image_dir
-        dir_parts = directory.split(base_image_dir) 
 
+        base_image_dir = self._base_image_dir
+        dir_parts = directory.split(base_image_dir)
+        logging.getLogger('GUI').debug('base image dir: %s' % base_image_dir)
+        logging.getLogger('GUI').debug('directory: %s' % directory)
+        logging.getLogger('GUI').debug('dir_parts: %s' % dir_parts)
         if len(dir_parts) > 1:
             sub_dir = dir_parts[1]
             self._data_model.directory = directory
