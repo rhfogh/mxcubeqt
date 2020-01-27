@@ -458,6 +458,8 @@ class GUISupervisor(QWidget):
             logging.getLogger().exception("exception while loading GUI file")
             QApplication.exit()
 
+        logging.getLogger('user_level_log').info('MXCuBE READY')
+
     def customEvent(self, event):
         """Custom event"""
 
