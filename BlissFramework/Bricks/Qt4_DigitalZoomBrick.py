@@ -208,7 +208,7 @@ class Qt4_DigitalZoomBrick(BlissWidget):
 
                 if self["label"] == "":
                     lbl = self.zoom_hwobj.username
-                    self.label.setText("<i>" + lbl + ":</i>")
+                    self.label.setText(lbl)
 
                 Qt4_widget_colors.set_widget_color(
                     self.positions_combo, Qt4_widget_colors.DARK_GRAY, QPalette.Button
