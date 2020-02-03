@@ -193,7 +193,7 @@ class CreateCharWidget(CreateTaskBase):
                                 get_default_characterisation_parameters()
         else:
             self._acquisition_parameters = queue_model_objects.AcquisitionParameters()
-        
+
         self._path_template.reference_image_prefix = 'ref'
         # The num images drop down default value is 1
         # we would like it to be 2
@@ -211,7 +211,7 @@ class CreateCharWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            #self._init_models() 
+            #self._init_models()
             if self._char_params.space_group == "":
                 sample_model = tree_item.get_model()
                 self._set_space_group(sample_model.processing_parameters.space_group)

@@ -99,6 +99,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         Descript. :
         """
         CreateTaskBase.init_models(self)
+        self._init_models()
+
+    def _init_models(self):
+        """
+        Descript. :
+        """
         #self._energy_scan_result = queue_model_objects.EnergyScanResult()
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
