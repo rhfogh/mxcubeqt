@@ -189,6 +189,7 @@ def run(gui_config_file=None):
           os.path.basename(gui_config_file or "unnamed"))
         try:
             lockfile = open(lock_filename, "w")
+            logging.getLogger().info("Creating lockfile: %s" % lock_filename)
         except:
             logging.getLogger().exception(\
                  "Cannot create lock file (%s), exiting" % lock_filename)
@@ -224,6 +225,7 @@ def run(gui_config_file=None):
         log_ok = True
         try:
             log_lockfile = open(log_lock_filename, "w")
+            logging.getLogger().info("Creating log lock file: %s" % log_lockfile.name)
         except:
             log_ok = False
         else:
@@ -303,7 +305,6 @@ def run(gui_config_file=None):
     # For GPHL - initialise api
     api.init(hwr_server)
 
-
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(supervisor,
@@ -320,7 +321,10 @@ def run(gui_config_file=None):
     main_application.setOrganizationDomain("https://github.com/mxcube")
     main_application.setApplicationName("MXCuBE")
     #app.setWindowIcon(QIcon("images/icon.png"))
+
+    # lockfile EXISTS HERE
     main_application.exec_()
+    # lockfile DOES NOT EXIST HERE
 
     #gevent_timer = QTimer()
     #gevent_timer.timeout.connect(do_gevent)
@@ -328,21 +332,24 @@ def run(gui_config_file=None):
 
     supervisor.finalize()
 
-    if lockfile is not None:
-        filename = lockfile.name
-        try:
-            lockfile.close()
-            os.unlink(filename)
-        except:
-            logging.getLogger().error("Problem removing the lock file")
-
+    # This lock file is already deleted at this point
+    #if lockfile is not None:
+    #    filename = lockfile.name
+    #    try:
+    #        lockfile.close()
+    #        os.unlink(filename)
+    #        logging.getLogger().info("Removing lock file %s" % filename)
+    #    except Exception as e:
+    #        logging.getLogger().error("Problem removing the lock file:\n%s" % str(e))
+    
     if log_lockfile is not None:
         filename = log_lockfile.name
         try:
             log_lockfile.close()
             os.unlink(filename)
-        except:
-            logging.getLogger().exception("Problem removing the log lock file")
+            logging.getLogger().info("Removing log lock file %s" % filename)
+        except Exception as e:
+            logging.getLogger().exception("Problem removing the log lock file:\n%s" % str(e))
 
 
 if __name__ == '__main__':
