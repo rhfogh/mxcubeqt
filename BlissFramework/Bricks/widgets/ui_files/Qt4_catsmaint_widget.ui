@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>555</width>
+    <width>587</width>
     <height>928</height>
    </rect>
   </property>
@@ -509,13 +509,20 @@ color: #009;</string>
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="btSoak">
+              <property name="text">
+               <string>Soak</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_3">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>20</width>
                 <height>20</height>
                </size>
               </property>

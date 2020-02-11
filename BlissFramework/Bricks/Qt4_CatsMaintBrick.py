@@ -78,7 +78,8 @@ class Qt4_CatsMaintBrick(BlissWidget):
         self.widget.btBack.clicked.connect(self.back_traj)                     
         self.widget.btSafe.clicked.connect(self.safe_traj)                     
         self.widget.btDry.clicked.connect(self.dry)                     
-        self.widget.btHome.clicked.connect(self.home)                     
+        self.widget.btHome.clicked.connect(self.home)
+        self.widget.btSoak.clicked.connect(self.soak)
 
         #self.widget.btRestart.clicked.connect(self.restart)                     
         self.widget.btResetPutGet.clicked.connect(self.reset_put_get)                     
@@ -278,6 +279,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
                 self.widget.btBarcodeRead.hide()
                 self.widget.btBack.hide()
                 self.widget.btSafe.hide()
+                self.widget.btSoak.hide()
                 self.widget.btClear.hide()
                 self.widget.btMemClear.hide()
                 self.widget.btRegulationOff.hide()
@@ -288,6 +290,7 @@ class Qt4_CatsMaintBrick(BlissWidget):
                 #self.widget.btBarcodeRead.show()
                 self.widget.btBack.show()
                 self.widget.btSafe.show()
+                self.widget.btSoak.show()
                 #self.widget.btClear.show()
                 self.widget.btMemClear.show()
                 self.widget.btRegulationOff.show()
@@ -449,10 +452,10 @@ class Qt4_CatsMaintBrick(BlissWidget):
         except:
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
-    def home(self):
+    def soak(self):
         try:
             if self.device is not None:
-                self.device._doHome()
+                self.device._doSoak()
         except:
             QMessageBox.warning( self, "Error",str(sys.exc_info()[1]))
 
