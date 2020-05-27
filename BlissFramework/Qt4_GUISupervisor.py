@@ -210,7 +210,13 @@ class GUISupervisor(QWidget):
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file) 
                         elif gui_config_file.endswith(".yml"):
-                            raw_config = yaml.load(gui_file, Loader=yaml.FullLoader)
+                            try:
+                                raw_config = yaml.load(gui_file, Loader=yaml.FullLoader)
+                            except AttributeError:
+                                logging.getLogger().warning(
+                                    "WARNING, missing new yaml version. Fallback to old loader"
+                                )
+                                raw_config = yaml.load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
                     except:

@@ -73,6 +73,8 @@ class TaskToolBoxWidget(QWidget):
         else:
             self.gphl_workflow_page = CreateGphlWorkflowWidget(self.tool_box,
                                                                "gphl_workflow")
+            # Added as bug fix
+            self.gphl_workflow_page.set_beamline_setup(beamline_setup)
         self.advanced_page = CreateAdvancedWidget(self.tool_box, "advanced_scan")
         #self.xray_imaging_page = CreateXrayImagingWidget(self.tool_box, "xray_imaging")
 
