@@ -1,7 +1,7 @@
 <object class = "Session" role = "session">
-  <synchrotron_name>TEST</synchrotron_name>
-  <endstation_name>eh1</endstation_name>
-  <beamline_name>test</beamline_name>
+  <synchrotron_name>ALBA</synchrotron_name>
+  <endstation_name>MX-XALOC</endstation_name>
+  <beamline_name>MX-XALOC</beamline_name>
   <file_info>
     <file_suffix>cbf</file_suffix>
     <precision>'04'</precision>
