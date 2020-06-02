@@ -13,6 +13,7 @@ beam_sd_deg= 0.03 0.03
 lambda_sd= 0.0002
 pol_plane_n= 0.0 0.0 1.0
 pol_frac= 0.99
+d_sensor= 0.320
 
 det_name= "PILATUS6M"
 det_x_axis= 0.999997820231305 , -1.857625150483821E-003 , 1.835574039278710E-004
