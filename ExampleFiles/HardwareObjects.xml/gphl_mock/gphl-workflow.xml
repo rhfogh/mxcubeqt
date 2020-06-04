@@ -292,13 +292,14 @@
             </options>
         </ThreeWavelengthMAD>
 
-        <NativeData_fast>
+        <NativeData_short>
             <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
             <strategy_type>native_fast</strategy_type>
             <documentation>
                 Single wavelength data acquisition for native data collection
                 Includes initial characterisation and complete collection.
-                Fast, 1 sweep (2 for triclinic)
+                Short, 1 sweep (2 for triclinic)
+                Optimised for uniform distribution of redundancy,
             </documentation>
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
@@ -317,16 +318,16 @@
             <options>
                 <wfprefix>Native_fast_</wfprefix>
             </options>
-        </NativeData_fast>
+        </NativeData_short>
 
-        <NativeData_fast-eq>
+        <NativeData_short-eq>
             <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
             <strategy_type>native_fast-eq</strategy_type>
             <documentation>
                 Single wavelength data acquisition for native data collection
                 Includes initial characterisation and complete collection.
-                Fast, 1 sweep (2 for triclinic)
-                Optimised for where main symetry axis is extra-long or diffracts better
+                Short, 1 sweep (2 for triclinic)
+                Optimised for cases where main symetry axis is extra-long or diffracts better
             </documentation>
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
@@ -345,7 +346,35 @@
             <options>
                 <wfprefix>Native_fast_</wfprefix>
             </options>
-        </NativeData_fast-eq>
+        </NativeData_short-eq>
+
+        <NativeData_short-ax>
+            <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
+            <strategy_type>native_fast-ax</strategy_type>
+            <documentation>
+                Single wavelength data acquisition for native data collection
+                Includes initial characterisation and complete collection.
+                Short, 1 sweep (2 for triclinic)
+                Optimised for cases where main symetry axis diffracts less well
+            </documentation>
+            <!-- Workflow interleave order (string);  Slowest changing first-->
+            <!-- 'g' (Goniostat position); 's' (Scan number); -->
+            <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
+            <!-- Not setting the value turns off the wedgeWidth widget -->
+            <!--            <interleave_order>gs</interleave_order>-->
+            <!-- Default wavelengths (in A) and their roles -->
+            <beam_energies>
+                <beam_energy>
+                    <role>Acquisition</role>
+                    <!-- beamline energies in keV -->
+                    <value>12.7</value>
+                </beam_energy>
+            </beam_energies>
+            <options>
+                <wfprefix>Native_fast_</wfprefix>
+            </options>
+        </NativeData_short-ax>
 
         <NativeData_full>
             <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
@@ -353,7 +382,7 @@
             <documentation>
                 Single wavelength data acquisition for native data collection
                 Includes initial characterisation and complete collection.
-                Strategy for optimal distribution of redundancy,
+                Optimised for uniform distribution of redundancy,
                 2-3 sweeps (4 for triclinic).
             </documentation>
             <!-- Workflow interleave order (string);  Slowest changing first-->
@@ -381,9 +410,8 @@
             <documentation>
                 Single wavelength data acquisition for native data collection
                 Includes initial characterisation and complete collection.
-                Strategy for optimal distribution of redundancy,
-                2-3 sweeps (4 for triclinic).
-                Optimised for where main symetry axis is extra-long or diffracts better
+                Generally multiple sweeps
+                Optimised for cases where main symetry axis is extra long or diffracts better
             </documentation>
             <!-- Workflow interleave order (string);  Slowest changing first-->
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
@@ -403,6 +431,34 @@
                 <wfprefix>Native_full_</wfprefix>
             </options>
         </NativeData_full-eq>
+
+        <NativeData_full-ax>
+            <application>co.gphl.wf.workflows.WFSimpleCharToProcessing</application>
+            <strategy_type>native_full-ax</strategy_type>
+            <documentation>
+                Single wavelength data acquisition for native data collection
+                Includes initial characterisation and complete collection.
+                Generally multiple sweeps
+                Optimised for cases where main symetry axis diffracts less well
+            </documentation>
+            <!-- Workflow interleave order (string);  Slowest changing first-->
+            <!-- 'g' (Goniostat position); 's' (Scan number); -->
+            <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
+            <!-- NB position interleaving in NOT done for the moment. So 'gs' is a no-op -->
+            <!-- Not setting teh value turns off the wedgeWidth widget -->
+            <!--            <interleave_order>gs</interleave_order>-->
+            <!-- Default wavelengths (in A) and their roles -->
+            <beam_energies>
+                <beam_energy>
+                    <role>Acquisition</role>
+                    <!-- beamline energies in keV -->
+                    <value>12.7</value>
+                </beam_energy>
+            </beam_energies>
+            <options>
+                <wfprefix>Native_full_</wfprefix>
+            </options>
+        </NativeData_full-ax>
 
         <TranslationalCalibration>
             <application>co.gphl.wf.workflows.WFTransCal</application>
