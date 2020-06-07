@@ -1,4 +1,10 @@
 #!/bin/sh
+printenv
 
-${GPHL_INSTALLATION}/aP_wf_rotcal "$@" </dev/null &
-[ "$?" -eq 0 ] && echo " NORMAL termination" || echo " ERROR: Unable to start aP_wf_rotcal"
+echo ###############################################
+echo Run with:
+echo "      " cd `pwd`
+echo "      " `printenv GPHL_INSTALLATION`/aP_wf_rotcal "$@"
+echo ###############################################
+
+echo " NORMAL Termination"
