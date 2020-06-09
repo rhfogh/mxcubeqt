@@ -3,7 +3,7 @@
 ! Diffractcal Dcalib2_006 from 2019-07-04T23:30:46
 
 calibration_name= 'Dcalib2_006'
-beamline_name= 'XALOC13'
+beamline_name= 'XALOC'
 coord_sys_name= 'UNKNOWN'
 nominal_beam_dir= 0.0  1.0  0.0
 ! beam      = -4.648734546771855E-004 , 0.999995738250254 , -2.940000000000000E-003
@@ -15,7 +15,7 @@ pol_plane_n= 0.0 0.0 1.0
 pol_frac= 0.99
 d_sensor= 0.320
 
-det_name= "PILATUS6M"
+det_name= "PILATUS"
 det_x_axis= 0.999997820231305 , -1.857625150483821E-003 , 1.835574039278710E-004
 det_y_axis= 1.823551132966447E-004 , -6.477839798111872E-004 , -0.999999987414205
 det_qx= 0.172000
