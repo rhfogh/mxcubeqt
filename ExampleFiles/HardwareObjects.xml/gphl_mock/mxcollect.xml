@@ -63,6 +63,8 @@
     <!-- too high for 'insufficient indexed fraction' errors -->
     <!-- For now all test hkli files are sdcaled to work with scale 1.0 -->
     <hkl-scale>1.0</hkl-scale>
+    <!-- NB set specifically for 5yav PONLY -->
+<!--    <hkl-scale>0.1</hkl-scale>-->
   </simcal_options>
 
   <!-- Both thread number variables should be less than all available threads -->
