@@ -27,8 +27,6 @@ import QtImport
 import Qt4_queue_item as queue_item
 import queue_model_objects_v1 as queue_model_objects
 
-from queue_model_enumerables_v1 import States
-
 from widgets.Qt4_create_task_base import CreateTaskBase
 from widgets.Qt4_data_path_widget import DataPathWidget
 from widgets.Qt4_gphl_acquisition_widget import GphlAcquisitionWidget
@@ -208,7 +206,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.compression = False
 
         workflow_hwobj = api.gphl_workflow
-        if workflow_hwobj.get_state() == States.OFF:
+        if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
             # We will be setting up the connection now - time to connect to quit
             QtImport.QApplication.instance().aboutToQuit.connect(
                 workflow_hwobj.shutdown

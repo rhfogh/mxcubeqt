@@ -23,6 +23,8 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
+import logging
+
 from HardwareRepository import ConvertUtils
 
 import QtImport
@@ -172,6 +174,9 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result = None
 
     def open_dialog(self, field_list, async_result):
+
+        msg = "GPhL Workflow waiting for input, verify parameters and press continue."
+        logging.getLogger("user_level_log").warning(msg)
 
         self._async_result = async_result
 
