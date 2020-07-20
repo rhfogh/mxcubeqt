@@ -270,7 +270,7 @@
         <persistname>persistence</persistname>
         <!-- Workflow enactment prefix  OPTIONAL - if set to e.g. 'wfx', data
         for successive workflow runs will be stored in 'wfx_1, ,wfx_2, ... -->
-        <wfprefix>gphl_wf_</wfprefix>
+<!--        <wfprefix>gphl_wf_</wfprefix>-->
         <samplesubdir/>
     </workflow_options>
 

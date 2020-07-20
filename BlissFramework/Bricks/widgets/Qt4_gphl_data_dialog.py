@@ -23,8 +23,6 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-import api
-
 from HardwareRepository import ConvertUtils
 
 import QtImport
@@ -170,7 +168,8 @@ class GphlDataDialog(QtImport.QDialog):
 
     def cancel_button_click(self):
         self.reject()
-        api.gphl_workflow.abort("Manual abort")
+        self._async_result.set("BeamlineAbort")
+        self._async_result = None
 
     def open_dialog(self, field_list, async_result):
 

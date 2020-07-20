@@ -78,13 +78,16 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
         self._data_path_widget = DataPathWidget(
-            self, "create_dc_path_widget", layout="vertical"
+            self,
+            "create_dc_path_widget",
+            data_model=self._path_template,
+            layout="vertical"
         )
         data_path_layout = self._data_path_widget.data_path_layout
-        data_path_layout.file_name_label.hide()
-        data_path_layout.file_name_value_label.hide()
-        data_path_layout.run_number_label.hide()
-        data_path_layout.run_number_ledit.hide()
+        # data_path_layout.file_name_label.hide()
+        # data_path_layout.file_name_value_label.hide()
+        # data_path_layout.run_number_label.hide()
+        data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
@@ -109,7 +112,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
-        self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
 
     def initialise_workflows(self):
 
@@ -132,25 +134,25 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
-        self.init_models()
-        self._data_path_widget.update_data_model(self._path_template)
+        # self.init_models()
+        # self._data_path_widget.update_data_model(self._path_template)
 
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
         if strategy_type.startswith("transcal"):
             # NB Once we do not have to set unique prefixes, this should be readOnly
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_acq_widget.hide()
         elif strategy_type.startswith("diffractcal"):
             # TODO update this
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
@@ -160,28 +162,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if prefix is not None:
             self.current_prefix = prefix
 
-    def data_acquired(self):
-        """Data gathered from popup, continue execution"""
-        pass
-
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         wf_model = tree_item.get_model()
 
-        if isinstance(tree_item, queue_item.SampleQueueItem):
-            self.init_models()
+        if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
 
-        else:
-            if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
-                if tree_item.get_model().is_executed():
-                    self.setDisabled(True)
-                else:
-                    self.setDisabled(False)
-
-                if wf_model.get_path_template():
-                    self._path_template = wf_model.get_path_template()
-
-                self._data_path_widget.update_data_model(self._path_template)
+            if wf_model.get_path_template():
+                self._path_template = wf_model.get_path_template()
 
             elif isinstance(tree_item, queue_item.BasketQueueItem):
                 self.setDisabled(False)
@@ -229,6 +221,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 )
 
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
+        wf.path_template = self._path_template
         wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
