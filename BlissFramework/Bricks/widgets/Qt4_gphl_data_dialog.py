@@ -51,6 +51,7 @@ class SelectionTable(QtImport.QTableWidget):
         self.setColumnCount(len(header))
         self.setSelectionMode(QtImport.QTableWidget.SingleSelection)
         self.setHorizontalHeaderLabels(header)
+        self.horizontalHeader().setDefaultAlignment(QtImport.Qt.AlignLeft)
         self.setSizePolicy(
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
@@ -69,6 +70,9 @@ class SelectionTable(QtImport.QTableWidget):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
+        selectRow = None
+        no_colours = not colours or not any(colours)
+        colour = None
         for rowNum, text in enumerate(values):
             wdg = QtImport.QLineEdit(self)
             wdg.setFont(QtImport.QFont("Courier"))
@@ -77,15 +81,24 @@ class SelectionTable(QtImport.QTableWidget):
             if colours:
                 colour = colours[rowNum]
                 if colour:
+                    # Currently colours are either None or light green
                     Colors.set_widget_color(
                         wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
-                    # wdg.setBackground(getattr(QtImport.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
+            if "*" in text and colour or no_colours:
+                selectRow = rowNum
+        if selectRow is not None:
+            self.setCurrentCell(selectRow, 0)
+
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
         row_id = self.currentRow()
+        if not self.cellWidget(row_id, 0):
+            logging.getLogger("user_log").warning(
+                "Select a row of the table, and then press [Continue]"
+            )
         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
 
 
@@ -169,14 +182,15 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result = None
 
     def cancel_button_click(self):
+        logging.getLogger("HWR").debug("GPhL Data dialog abort pressed.")
         self.reject()
-        self._async_result.set("BeamlineAbort")
+        self._async_result.set(StopIteration)
         self._async_result = None
 
     def open_dialog(self, field_list, async_result):
 
         msg = "GPhL Workflow waiting for input, verify parameters and press continue."
-        logging.getLogger("user_level_log").warning(msg)
+        logging.getLogger("user_level_log").info(msg)
 
         self._async_result = async_result
 
