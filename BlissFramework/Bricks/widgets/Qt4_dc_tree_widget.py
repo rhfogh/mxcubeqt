@@ -955,6 +955,7 @@ class DataCollectTree(QWidget):
 
     def stop_collection(self):
         """Stops queue"""
+        logging.getLogger("user_level_log").warning("Queue stopped bu user.")
         QApplication.setOverrideCursor(QCursor(Qt.ArrowCursor))
         self.queue_hwobj.stop()
         self.queue_stop_handler()

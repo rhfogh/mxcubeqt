@@ -22,7 +22,7 @@ lambda = 1.0
 ! ################### 6deg/5 characteristation strategy
 
 &sdcp_strategy_list
-strategy_name= 'InitialCharacterisation_6_5'
+strategy_name= 'Std_Characterisation_6_5'
 type= 'geometric'
 allowed_widths= 0.02 0.03 0.04 0.05 0.06 0.08 0.1 0.12 0.15 0.2 0.3 0.4
 default_width_idx= 6
@@ -71,7 +71,7 @@ start_deg= 180.0
 ! ################### 12deg/5 characteristation strategy
 
 &sdcp_strategy_list
-strategy_name= 'InitialCharacterisation_12_5'
+strategy_name= 'TEST_Characterisation_12_5'
 type= 'geometric'
 allowed_widths= 0.02 0.03 0.04 0.05 0.06 0.08 0.1 0.12 0.15 0.2 0.3 0.4
 default_width_idx= 6
@@ -120,7 +120,7 @@ start_deg= 180.0
 ! ################### 12deg/4 characteristation strategy
 
 &sdcp_strategy_list
-strategy_name= 'InitialCharacterisation_12_4'
+strategy_name= 'TEST_Characterisation_12_4'
 type= 'geometric'
 allowed_widths= 0.02 0.03 0.04 0.05 0.06 0.08 0.1 0.12 0.15 0.2 0.3 0.4
 default_width_idx= 6
@@ -161,7 +161,7 @@ start_deg= 180.0
 ! ################### 12deg/3 characteristation strategy
 
 &sdcp_strategy_list
-strategy_name= 'InitialCharacterisation_12_3'
+strategy_name= 'TEST_Characterisation_12_3'
 type= 'geometric'
 allowed_widths= 0.02 0.03 0.04 0.05 0.06 0.08 0.1 0.12 0.15 0.2 0.3 0.4
 default_width_idx= 6

@@ -160,6 +160,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if prefix is not None:
             self.current_prefix = prefix
 
+    def get_default_directory(self, tree_item=None, sub_dir=''):
+        # Add placeholder for enactment number
+        if sub_dir:
+            sub_dir += "_000"
+        #
+        return super(CreateGphlWorkflowWidget, self).get_default_directory(
+            tree_item=tree_item, sub_dir=sub_dir
+        )
+
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         wf_model = tree_item.get_model()

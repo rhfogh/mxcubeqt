@@ -62,7 +62,7 @@
             </beam_energies>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>InitialCharacterisation</strategy>
+                <strategy>Std_Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
@@ -103,7 +103,7 @@
             </beam_energies>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>InitialCharacterisation</strategy>
+                <strategy>Std_Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
@@ -149,7 +149,7 @@
             </beam_energies>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>InitialCharacterisation</strategy>
+                <strategy>Std_Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
