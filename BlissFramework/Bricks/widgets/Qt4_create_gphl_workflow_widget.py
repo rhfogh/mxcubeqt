@@ -194,17 +194,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def _init_models(self):
         pass
 
-    def continue_button_click(self, sample_items, checked_items):
-        """Intercepts the datacollection continue_button click for parameter setting"""
-        tree_brick = self._tree_brick
-        if tree_brick:
-            for item in checked_items:
-                model = item.get_model()
-                if isinstance(model, queue_model_objects.GphlWorkflow):
-                    dialog = tree_brick.dc_tree_widget.confirm_dialog
-                    ss0 = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
-                    model.set_snapshot_count(int(ss0) if ss0 else 0)
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
@@ -220,12 +209,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             QtImport.QApplication.instance().aboutToQuit.connect(
                 workflow_hwobj.shutdown
             )
-
-            tree_brick = self._tree_brick
-            if tree_brick:
-                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal.connect(
-                    self.continue_button_click
-                )
 
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
         wf.path_template = self._path_template
@@ -254,14 +237,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     for tag in ("a", "b", "c", "alpha", "beta", "gamma")
                 )
             )
-            tag = self._gphl_diffractcal_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
             val = self._gphl_diffractcal_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )
             wf.set_relative_rad_sensitivity(val)
             # The entire strategy runs as a 'characterisation'
             wf.set_characterisation_budget_fraction(1.0)
+            wf.set_decay_limit(
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            )
         else:
             # Coulds be native_... phasing_... etc.
 
@@ -282,9 +266,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
-            wf.set_beam_energies(wf_parameters["beam_energies"])
-            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
             val = self._gphl_acq_param_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )
@@ -293,6 +274,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
                 / 100.0
             )
+            wf.set_decay_limit(
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            )
+        beam_energy_tags = wf_parameters.get("beam_energy_tags")
+        if beam_energy_tags:
+            wf.set_beam_energy_tags(beam_energy_tags)
 
         tasks.append(wf)
 

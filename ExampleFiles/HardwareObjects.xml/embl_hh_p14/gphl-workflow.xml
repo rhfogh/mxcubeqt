@@ -52,14 +52,6 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <interleave_order>gs</interleave_order>
-            <!-- Default wavelengths (in A) and their roles -->
-            <beam_energies>
-                <beam_energy>
-                    <role>Acquisition</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.7</value>
-                </beam_energy>
-            </beam_energies>
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>Std_Characterisation_6_5</strategy>
@@ -88,19 +80,8 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <interleave_order>gsb</interleave_order>
-            <!-- Default wavelengths (in A) and their roles -->
-            <beam_energies>
-                <beam_energy>
-                    <role>Peak</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.7</value>
-                </beam_energy>
-                <beam_energy>
-                    <role>Remote</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.72</value>
-                </beam_energy>
-            </beam_energies>
+            <!-- Names of beam energies used, space-separated. -->
+            <beam_energy_tags>Peak Remote</beam_energy_tags>
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>Std_Characterisation_6_5</strategy>
@@ -129,24 +110,8 @@
             <!-- 'g' (Goniostat position); 's' (Scan number); -->
             <!-- 'b' (Beam wavelength); 'd' (Detector position)-->
             <interleave_order>gsb</interleave_order>
-            <!-- Default wavelengths (in A) and their roles -->
-            <beam_energies>
-                <beam_energy>
-                    <role>Peak</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.7</value>
-                </beam_energy>
-                <beam_energy>
-                    <role>Rising_Inflection</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.69</value>
-                </beam_energy>
-                <beam_energy>
-                    <role>Falling_Inflection</role>
-                    <!-- beamline energies in keV -->
-                    <value>12.71</value>
-                </beam_energy>
-            </beam_energies>
+            <!-- Names of beam energies used, space-separated. -->
+            <beam_energy_tags>Peak Rising_Inflection Falling_Inflection</beam_energy_tags>
             <options>
                 <!-- Name of initial strategy from library to use -->
                 <strategy>Std_Characterisation_6_5</strategy>
