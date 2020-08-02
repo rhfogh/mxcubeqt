@@ -54,7 +54,7 @@
             <interleave_order>gs</interleave_order>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>Std_Characterisation_6_5</strategy>
+                <strategy>Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
@@ -84,7 +84,7 @@
             <beam_energy_tags>Peak Remote</beam_energy_tags>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>Std_Characterisation_6_5</strategy>
+                <strategy>Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
@@ -114,7 +114,7 @@
             <beam_energy_tags>Peak Rising_Inflection Falling_Inflection</beam_energy_tags>
             <options>
                 <!-- Name of initial strategy from library to use -->
-                <strategy>Std_Characterisation_6_5</strategy>
+                <strategy>Characterisation_6_5</strategy>
                 <!--&lt;!&ndash; Working subdirectory for workflow-side application data&ndash;&gt;-->
                 <!--<appdir>calculations</appdir>-->
                 <!-- Pattern name for inverse-beam collections -->
