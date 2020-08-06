@@ -20,18 +20,12 @@
 """Configuration
 """
 
-import imp
+import json
+import yaml
 import logging
+import imp
 import pprint
 import pickle
-
-import json
-
-try:
-    import ruamel.yaml as yaml
-except ImportError:
-    import yaml
-
 
 from gui import BaseLayoutItems
 from gui.utils import PropertyBag
@@ -456,6 +450,8 @@ class Configuration:
             for prop in window_cfg.properties:
                 window_cfg_dict["properties"].append(prop.__getstate__())
 
+            children = []
+
             def add_children(item_cfg):
                 children = []
 
@@ -491,6 +487,7 @@ class Configuration:
 
             wl.append(window_cfg_dict)
         return wl
+        # pprint.pprint(wl)
 
     def save(self, filename):
         """Saves config"""

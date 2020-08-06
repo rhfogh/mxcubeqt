@@ -15,15 +15,23 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
 
-PYMCA_EXISTS = False
+PYMCA_IMPORTED = False
 
-try: 
-   from PyMca.QtBlissGraph import QtBlissGraph as Plot
-   PYMCA_EXISTS = True
-except BaseException:
-   from gui.widgets.matplot_widget import TwoAxisPlotWidget as Plot
+try:
+    from PyMca5.PyMcaGui.PlotWidget import PlotWidget
+    PYMCA_IMPORTED = 5
+except ImportError:
+    try: 
+        from PyMca.QtBlissGraph import QtBlissGraph as PlotWidget
+        PYMCA_IMPORTED = 4
+    except ImportError:
+        pass
+
+print PYMCA_IMPORTED
+if not PYMCA_IMPORTED:
+    from gui.widgets.matplot_widget import TwoAxisPlotWidget as PlotWidget
 
 from gui.utils import Colors, QtImport
 
@@ -43,7 +51,7 @@ class PymcaPlotWidget(QtImport.QWidget):
 
         self.realtime_plot = realtime_plot
 
-        self.pymca_graph = Plot(self)
+        self.pymca_graph = PlotWidget(self)
         self.pymca_graph.showGrid()
         self.info_label = QtImport.QLabel("", self)
         self.info_label.setAlignment(QtImport.Qt.AlignRight)
@@ -58,7 +66,7 @@ class PymcaPlotWidget(QtImport.QWidget):
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
 
-        if PYMCA_EXISTS:
+        if PYMCA_IMPORTED == 4:
             QtImport.QObject.connect(
                 self.pymca_graph,
                 QtImport.SIGNAL("QtBlissGraphSignal"),
@@ -68,8 +76,8 @@ class PymcaPlotWidget(QtImport.QWidget):
         Colors.set_widget_color(self, Colors.WHITE)
 
     def clear(self):
-        self.pymca_graph.clearcurves()
-        self.pymca_graph.setTitle("")
+        self.pymca_graph.clear()
+        #self.pymca_graph.setTitle("")
         self.info_label.setText("")
 
     def plot_energy_scan_curve(self, scan_result, scan_title):
@@ -86,7 +94,7 @@ class PymcaPlotWidget(QtImport.QWidget):
     def start_new_scan(self, scan_info):
         self.axis_x_array = []
         self.axis_y_array = []
-        self.pymca_graph.clearcurves()
+        self.pymca_graph.clear()
         self.pymca_graph.xlabel(scan_info["xlabel"])
         self.ylabel = scan_info["ylabel"]
         self.pymca_graph.ylabel(self.ylabel)
@@ -108,28 +116,40 @@ class PymcaPlotWidget(QtImport.QWidget):
         chooch_graph_y2,
         title,
     ):
-        self.pymca_graph.clearcurves()
-        self.pymca_graph.setTitle(title)
-        self.pymca_graph.newcurve("spline", chooch_graph_x, chooch_graph_y1)
-        self.pymca_graph.newcurve("fp", chooch_graph_x, chooch_graph_y2)
+        self.pymca_graph.clear()
+        #self.pymca_graph.setTitle(title)
+        self.pymca_graph.addCurve(legend="spline",
+                                  x=chooch_graph_x,
+                                  y=chooch_graph_y1,
+                                  xlabel="energy",
+                                  ylabel="counts")
+        self.pymca_graph.addCurve(legend="fp",
+                                  x=chooch_graph_x,
+                                  y=chooch_graph_y2,
+                                  xlabel="energy",
+                                  ylabel="counts")
         self.pymca_graph.replot()
-        self.pymca_graph.setx1axislimits(min(chooch_graph_x), max(chooch_graph_x))
+        #self.pymca_graph.setx1axislimits(min(chooch_graph_x), max(chooch_graph_x))
 
     def plot_finished(self):
         if self.axis_x_array:
-            self.pymca_graph.setx1axislimits(
-                min(self.axis_x_array), max(self.axis_x_array)
-            )
+            #self.pymca_graph.setx1axislimits(
+            #    min(self.axis_x_array), max(self.axis_x_array)
+            #)
             self.pymca_graph.replot()
 
     def add_new_plot_value(self, x, y):
         if self.realtime_plot:
             self.axis_x_array.append(x / 1000.0)
             self.axis_y_array.append(y / 1000.0)
-            self.pymca_graph.newcurve("Energy", self.axis_x_array, self.axis_y_array)
-            self.pymca_graph.setx1axislimits(
-                min(self.axis_x_array), max(self.axis_x_array)
-            )
+            self.pymca_graph.addCurve(legend="Energy",
+                                      x=self.axis_x_array,
+                                      y=self.axis_y_array,
+                                      xlabel="energy",
+                                      ylabel="counts")
+            #self.pymca_graph.setx1axislimits(
+            #    min(self.axis_x_array), max(self.axis_x_array)
+            #)
             # self.pymca_graph.replot()
 
     def handle_graph_signal(self, signal_info):

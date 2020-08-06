@@ -33,6 +33,7 @@ class ImageTrackingStatusBrick(BaseWidget):
         "tracking": Colors.LIGHT_GREEN,
         "disabled": Colors.LIGHT_GRAY,
         "error": Colors.LIGHT_RED,
+        "tracking": Colors.LIGHT_GREEN,
         "ready": Colors.LIGHT_BLUE,
     }
 
@@ -61,7 +62,7 @@ class ImageTrackingStatusBrick(BaseWidget):
             "Filter frames based on Dozor score", _main_groupbox
         )
         self.spot_list_cbox = QtImport.QCheckBox(
-            "Indicate spots in ADxV", _main_groupbox
+            "Indicate spots", _main_groupbox
         )
 
         # Layout --------------------------------------------------------------
@@ -87,7 +88,7 @@ class ImageTrackingStatusBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
         self.state_label.setAlignment(QtImport.Qt.AlignCenter)
-        self.state_label.setFixedHeight(24)
+        #self.state_label.setFixedHeight(24)
         self.state_changed("unknown")
         # self.state_label.setFixedHeight(20)
 
@@ -119,7 +120,7 @@ class ImageTrackingStatusBrick(BaseWidget):
                 self.connect(
                     self.image_tracking_hwobj, "stateChanged", self.state_changed
                 )
-                self.image_tracking_hwobj.re_emit_values()
+                self.image_tracking_hwobj.update_values()
                 self.setEnabled(True)
             else:
                 self.setEnabled(False)

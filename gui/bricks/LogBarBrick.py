@@ -91,9 +91,9 @@ class LogBarBrick(BaseWidget):
             self._status_bar_widget.text_edit.append(
                 "[%s %s]  %s" % (record.getDate(), record.getTime(), msg)
             )
+            self._status_bar_widget.text_edit.verticalScrollBar().setValue(
+                self._status_bar_widget.text_edit.verticalScrollBar().maximum())
 
-            # if level == logging.WARNING or level == logging.ERROR:
-            #    self._status_bar_widget.toggle_background_color()
             text_document = self._status_bar_widget.text_edit.document()
             if (
                 self.max_log_lines > -1

@@ -18,33 +18,22 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from gui.utils import QtImport
-from gui.BaseComponents import BaseWidget
-from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidget
-from gui.widgets.xray_imaging_results_widget import XrayImagingResultsWidget
-
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
-__category__ = "Task"
 
 
-class XrayImagingBrick(BaseWidget):
-    def __init__(self, *args):
-        BaseWidget.__init__(self, *args)
+class ISPyBSampleInfoWidget(QtImport.QWidget):
 
-        self._xray_imaging_results_widget = XrayImagingResultsWidget(
-            self, "xray_imaging_results_widget"
+    def __init__(self, parent):
+
+        QtImport.QWidget.__init__(self, parent)
+
+        self.ispyb_sample_widget = QtImport.load_ui_file(
+            "ispyb_widget_layout.ui"
         )
 
-        # Layout
         _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(self._xray_imaging_results_widget)
-        _main_vlayout.setContentsMargins(2, 2, 2, 2)
+        _main_vlayout.addWidget(self.ispyb_sample_widget)
         _main_vlayout.setSpacing(2)
-        _main_vlayout.addStretch(10)
-
-        # Qt-Slots
-        self.define_slot("populate_parameter_widget", ({}))
-
-    def populate_parameter_widget(self, item):
-        self._xray_imaging_results_widget.populate_widget(item)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)

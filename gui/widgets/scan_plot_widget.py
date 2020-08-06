@@ -36,6 +36,7 @@ class ScanPlotWidget(QtImport.QWidget):
             self.setObjectName(name)
 
         self.xdata = []
+        self.ydatas = []
         self.ylabel = ""
 
         self.isRealTimePlot = None

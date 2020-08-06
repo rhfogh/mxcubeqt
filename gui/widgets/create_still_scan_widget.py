@@ -21,21 +21,18 @@
 
 import copy
 
+import api
+
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.acquisition_still_widget import AcquisitionStillWidget
 from gui.widgets.data_path_widget import DataPathWidget
-from gui.widgets.ssx_sequence_widget import SSXSequenceWidget
 from gui.widgets.processing_widget import ProcessingWidget
-#from gui.widgets.comment_widget import CommentWidget
-
 
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -43,10 +40,11 @@ __license__ = "LGPLv3+"
 
 
 class CreateStillScanWidget(CreateTaskBase):
-    def __init__(self, parent=None, name=None, flags=0):
+
+    def __init__(self, parent=None, name=None, fl=0):
 
         CreateTaskBase.__init__(
-            self, parent, name, QtImport.Qt.WindowFlags(flags), "Still"
+            self, parent, name, QtImport.Qt.WindowFlags(fl), "Still"
         )
 
         if not name:
@@ -73,21 +71,15 @@ class CreateStillScanWidget(CreateTaskBase):
             layout="vertical",
         )
 
-        self._col_seq_widget = SSXSequenceWidget(self)
-
         self._processing_widget = ProcessingWidget(
             self, data_model=self._processing_parameters
         )
-
-        #self._comment_widget = CommentWidget(self)
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._acq_widget)
         _main_vlayout.addWidget(self._data_path_widget)
-        _main_vlayout.addWidget(self._col_seq_widget)
         _main_vlayout.addWidget(self._processing_widget)
-        #_main_vlayout.addWidget(self._comment_widget)
         _main_vlayout.addStretch(0)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
@@ -95,9 +87,7 @@ class CreateStillScanWidget(CreateTaskBase):
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
-        self._acq_widget.acqParametersChangedSignal.connect(
-            self.acq_parameters_changed
-        )
+        self._acq_widget.acqParametersChangedSignal.connect(self.acq_parameters_changed)
         self._data_path_widget.pathTemplateChangedSignal.connect(
             self.path_template_changed
         )
@@ -106,16 +96,9 @@ class CreateStillScanWidget(CreateTaskBase):
         )
 
         # Other ---------------------------------------------------------------
-        self._processing_widget.processing_widget.run_processing_parallel_cbox.setChecked(
-            HWR.beamline.run_processing_parallel
+        self._processing_widget.processing_widget.run_processing_parallel_cbox.\
+            setChecked(api.beamline_setup._get_run_processing_parallel()
         )
-
-        #Rename to self._processing_widget.layout
-        self._processing_widget.processing_widget.resolution_cutoff_label.setHidden(False)
-        self._processing_widget.processing_widget.resolution_cutoff_ledit.setHidden(False)
-        self._processing_widget.processing_widget.pdb_file_label.setHidden(False)
-        self._processing_widget.processing_widget.pdb_file_ledit.setHidden(False)
-        self._processing_widget.processing_widget.pdb_file_browse_button.setHidden(False)
 
     def use_osc_start(self, status):
         """
@@ -140,11 +123,11 @@ class CreateStillScanWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = HWR.beamline.detector.has_shutterless()
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
-        self._acquisition_parameters = (
-            HWR.beamline.get_default_acquisition_parameters()
+        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
+            "default_acquisition_values"
         )
         self._acquisition_parameters.num_triggers = 1
         self._acquisition_parameters.num_images_per_trigger = 1
@@ -156,6 +139,21 @@ class CreateStillScanWidget(CreateTaskBase):
         :return: None
         """
         self._acq_widget.set_tunable_energy(state)
+
+    def update_processing_parameters(self, crystal):
+        """
+        Updates processing parameters
+        :param crystal: Crystal
+        :return:
+        """
+        self._processing_parameters.space_group = crystal.space_group
+        self._processing_parameters.cell_a = crystal.cell_a
+        self._processing_parameters.cell_alpha = crystal.cell_alpha
+        self._processing_parameters.cell_b = crystal.cell_b
+        self._processing_parameters.cell_beta = crystal.cell_beta
+        self._processing_parameters.cell_c = crystal.cell_c
+        self._processing_parameters.cell_gamma = crystal.cell_gamma
+        self._processing_widget.update_data_model(self._processing_parameters)
 
     def single_item_selection(self, tree_item):
         """
@@ -173,11 +171,11 @@ class CreateStillScanWidget(CreateTaskBase):
         elif isinstance(tree_item, queue_item.BasketQueueItem):
             self.setDisabled(False)
         elif isinstance(tree_item, queue_item.DataCollectionQueueItem):
-            dc_model = tree_item.get_model()
+            dc = tree_item.get_model()
             self._acq_widget.use_kappa(False)
 
-            if not dc_model.is_helical():
-                if dc_model.is_executed():
+            if not dc.is_helical():
+                if dc.is_executed():
                     self.setDisabled(True)
                 else:
                     self.setDisabled(False)
@@ -188,27 +186,27 @@ class CreateStillScanWidget(CreateTaskBase):
 
                 # self._acq_widget.disable_inverse_beam(True)
 
-                self._path_template = dc_model.get_path_template()
+                self._path_template = dc.get_path_template()
                 self._data_path_widget.update_data_model(self._path_template)
 
-                self._acquisition_parameters = dc_model.acquisitions[0].acquisition_parameters
+                self._acquisition_parameters = dc.acquisitions[0].acquisition_parameters
                 self._acq_widget.update_data_model(
                     self._acquisition_parameters, self._path_template
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
-                if len(dc_model.acquisitions) == 1:
-                    HWR.beamline.sample_view.select_shape_with_cpos(
+                if len(dc.acquisitions) == 1:
+                    self.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
-                self._processing_parameters = dc_model.processing_parameters
+                self._processing_parameters = dc.processing_parameters
                 self._processing_widget.update_data_model(self._processing_parameters)
             else:
                 self.setDisabled(True)
         else:
             self.setDisabled(True)
 
-    def _create_task(self, sample, shape, comments=None):
+    def _create_task(self, sample, shape):
         """
         Creates a new Still scan task
         :param sample: sample node
@@ -218,9 +216,9 @@ class CreateStillScanWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
+        cpos.snapshot_image = api.graphics.get_scene_snapshot()
 
-        tasks.extend(self.create_dc(sample, cpos=cpos, comments=comments))
+        tasks.extend(self.create_dc(sample, cpos=cpos))
         self._path_template.run_number += 1
 
         return tasks
@@ -235,7 +233,6 @@ class CreateStillScanWidget(CreateTaskBase):
         sc=None,
         cpos=None,
         inverse_beam=False,
-        comments=None
     ):
         """
         Creates a new data collection item
@@ -272,24 +269,23 @@ class CreateStillScanWidget(CreateTaskBase):
             acq.acquisition_parameters.inverse_beam = False
 
         acq.acquisition_parameters.centred_position = cpos
-        if comments:
-            acq.acquisition_parameters.comments = comments
 
         processing_parameters = copy.deepcopy(self._processing_parameters)
-        data_collection = queue_model_objects.DataCollection(
+        dc = queue_model_objects.DataCollection(
             [acq], sample.crystals[0], processing_parameters
         )
-        data_collection.set_name(acq.path_template.get_prefix())
-        data_collection.set_number(acq.path_template.run_number)
-        data_collection.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
-        run_processing_after, run_processing_parallel = \
-            self._processing_widget.get_processing_state()
+        dc.set_name(acq.path_template.get_prefix())
+        dc.set_number(acq.path_template.run_number)
+        dc.experiment_type = queue_model_enumerables.EXPERIMENT_TYPE.OSC
+        dc.run_processing_after = (
+            self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
+        )
+        if (
+            self._processing_widget.processing_widget.run_processing_parallel_cbox.isChecked()
+        ):
+            dc.run_processing_parallel = "Still"
+        dc.set_requires_centring(False)
 
-        data_collection.run_processing_after = run_processing_after
-        if run_processing_parallel:
-            data_collection.run_processing_parallel = "Still"
-        data_collection.set_requires_centring(False)
-
-        tasks.append(data_collection)
+        tasks.append(dc)
 
         return tasks

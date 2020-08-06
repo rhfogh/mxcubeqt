@@ -17,13 +17,12 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 from gui.utils import queue_item, QtImport
 from gui.BaseComponents import BaseWidget
 from gui.widgets.advanced_parameters_widget import AdvancedParametersWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -38,7 +37,6 @@ class AdvancedBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
 
         # Internal values -----------------------------------------------------
-        self._data_collection = None
 
         # Properties ----------------------------------------------------------
 
@@ -71,30 +69,31 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(HWR.beamline.sample_view,
-                     "gridClicked",
-                     self.grid_clicked
-        )
+
+        self.init_api()
 
     def populate_advanced_widget(self, item):
-        self.parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+        self.parameters_widget._data_path_widget._base_image_dir = (
+            api.session.get_base_image_directory()
         )
-        self.parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+        self.parameters_widget._data_path_widget._base_process_dir = (
+            api.session.get_base_process_directory()
         )
 
-        self.line_parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+        self.line_parameters_widget._data_path_widget._base_image_dir = (
+            api.session.get_base_image_directory()
         )
-        self.line_parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+        self.line_parameters_widget._data_path_widget._base_process_dir = (
+            api.session.get_base_process_directory()
         )
+
+        # self.parameters_widget.populate_widget(item)
+        # self.results_widget.populate_widget(item)
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
-            self._data_collection = item.get_model().reference_image_collection
-            self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item)
+            data_collection = item.get_model().reference_image_collection
+            self.parameters_widget.populate_widget(item, data_collection)
+            self.results_widget.populate_widget(item, data_collection)
 
             self.line_parameters_widget.populate_widget(
                 item, item.get_model().line_collection
@@ -103,9 +102,9 @@ class AdvancedBrick(BaseWidget):
                 item, item.get_model().line_collection
             )
         else:
-            self._data_collection = item.get_model()
-            self.parameters_widget.populate_widget(item, self._data_collection)
-            self.results_widget.populate_widget(item)
+            data_collection = item.get_model()
+            self.parameters_widget.populate_widget(item, data_collection)
+            self.results_widget.populate_widget(item, data_collection)
 
         self.line_parameters_widget.setEnabled(
             isinstance(item, queue_item.XrayCenteringQueueItem)
@@ -115,18 +114,14 @@ class AdvancedBrick(BaseWidget):
         )
 
         try:
-            self.snapshot_widget.display_snapshot(self._data_collection.grid.get_snapshot())
+            self.snapshot_widget.display_snapshot(data_collection.grid.get_snapshot())
         except BaseException:
             pass
 
         self.tool_box.setCurrentWidget(self.results_widget)
 
-    def grid_clicked(self, grid, image, line, image_num):
-        if self._data_collection is not None:
-            image_path = self._data_collection.acquisitions[0].path_template.get_image_path() % image_num
-            # try:
-            #     HWR.beamline.image_tracking.load_image(image_path)
-            # except AttributeError:
-            #     pass
-            if hasattr(HWR.beamline, "image_tracking"):
-                HWR.beamline.image_tracking.load_image(image_path)
+    def init_api(self):
+        self.parameters_widget.init_api()
+        self.results_widget.init_api()
+        self.line_parameters_widget.init_api()
+        self.line_results_widget.init_api()

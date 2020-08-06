@@ -17,10 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
+
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -122,73 +122,57 @@ class ResolutionBrick(BaseWidget):
         )
 
     def run(self):
-        if HWR.beamline.detector.distance is not None:
+        if api.detector_distance is not None:
             self.connect(
-                HWR.beamline.detector.distance,
-                "deviceReady",
-                self.detector_distance_ready
+                    api.detector_distance,
+                    "deviceReady",
+                    self.detector_distance_ready,
             )
             self.connect(
-                HWR.beamline.detector.distance,
+                api.detector_distance,
                 "deviceNotReady",
                 self.detector_distance_not_ready,
             )
             self.connect(
-                HWR.beamline.detector.distance,
+                api.detector_distance,
                 "stateChanged",
                 self.detector_distance_state_changed,
             )
             self.connect(
-                HWR.beamline.detector.distance,
-                "valueChanged",
-                self.detector_distance_changed
+                api.detector_distance,
+                "positionChanged",
+                self.detector_distance_changed,
             )
             self.connect(
-                HWR.beamline.detector.distance,
+                api.detector_distance,
                 "limitsChanged",
                 self.detector_distance_limits_changed,
             )
 
-            if HWR.beamline.detector.distance.is_ready():
-                HWR.beamline.detector.distance.re_emit_values()
+            if api.detector_distance.is_ready():
+                api.detector_distance.update_values()
                 self.connected()
             else:
                 self.disconnected()
-        if HWR.beamline.energy is not None:
-            self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
-        if HWR.beamline.resolution is not None:
-            self.connect(
-                HWR.beamline.resolution, "deviceReady", self.resolution_ready
-            )
-            self.connect(
-                HWR.beamline.resolution, "deviceNotReady", self.resolution_not_ready
-            )
-            self.connect(
-                HWR.beamline.resolution,
-                "stateChanged",
-                self.resolution_state_changed
-            )
-            self.connect(
-                HWR.beamline.resolution,
-                "valueChanged",
-                self.resolution_value_changed
-            )
-            self.connect(
-                HWR.beamline.resolution,
-                "limitsChanged",
-                self.resolution_limits_changed
-            )
+        if api.energy is not None:
+            self.connect(api.energy, "energyChanged", self.energy_changed)
+        if api.resolution is not None:
+            self.connect(api.resolution, "deviceReady", self.resolution_ready)
+            self.connect(api.resolution, "deviceNotReady", self.resolution_not_ready)
+            self.connect(api.resolution, "stateChanged", self.resolution_state_changed)
+            self.connect(api.resolution, "positionChanged", self.resolution_value_changed)
+            self.connect(api.resolution, "limitsChanged", self.resolution_limits_changed)
 
-            if HWR.beamline.resolution.is_ready():
-                HWR.beamline.resolution.re_emit_values()
+            if api.resolution.is_ready():
+                api.resolution.update_values()
                 self.connected()
             else:
                 self.disconnected()
             self.update_gui()
 
-        if HWR.beamline.hutch_interlock is not None:
+        if api.door_interlock is not None:
             self.connect(
-                HWR.beamline.hutch_interlock,
+                api.door_interlock,
                 "doorInterlockStateChanged",
                 self.door_interlock_state_changed,
             )
@@ -271,16 +255,23 @@ class ResolutionBrick(BaseWidget):
         Door interlock is optional, because not all sites might have it
         """
         groupbox_title = ""
-        detector_distance = HWR.beamline.detector.distance
-        if detector_distance is None:
+
+        if api.detector_distance is None:
             detector_ready = False
         elif detector_ready is None:
-            detector_ready = detector_distance.is_ready()
+            try:
+                if api.detector_distance.connection.isSpecConnected():
+                    detector_ready = api.detector_distance.isReady()
+            except AttributeError:
+                detector_ready = api.detector_distance.is_ready()
+
         if detector_ready:
             self.get_detector_distance_limits()
-            curr_detector_distance = detector_distance.get_value()
+            curr_detector_distance = api.detector_distance.get_position()
             self.detector_distance_changed(curr_detector_distance)
-            self.detector_distance_state_changed(detector_distance.get_state())
+            self.detector_distance_state_changed(
+                api.detector_distance.get_state()
+            )
             if self.units_combobox.currentText() == "mm":
                 groupbox_title = "Detector distance"
                 self.new_value_validator.setRange(
@@ -291,15 +282,20 @@ class ResolutionBrick(BaseWidget):
         else:
             self.detector_distance_state_changed(None)
 
-        if HWR.beamline.resolution is None:
+        if api.resolution is None:
             resolution_ready = False
         elif resolution_ready is None:
-            resolution_ready = HWR.beamline.resolution.is_ready()
+            try:
+                if api.resolution.connection.isSpecConnected():
+                    resolution_ready = api.resolution.isReady()
+            except AttributeError:
+                resolution_ready = api.resolution.isReady()
+
         if resolution_ready:
             self.get_resolution_limits()
-            curr_resolution = HWR.beamline.resolution.get_value()
+            curr_resolution = api.resolution.getPosition()
             self.resolution_value_changed(curr_resolution)
-            self.resolution_state_changed(HWR.beamline.resolution.get_state())
+            self.resolution_state_changed(api.resolution.getState())
             if self.units_combobox.currentText() != "mm":
                 groupbox_title = "Resolution"
                 self.new_value_validator.setRange(
@@ -329,7 +325,7 @@ class ResolutionBrick(BaseWidget):
     def set_resolution(self, value):
         if self.resolution_limits is not None:
             if self.resolution_limits[0] < value < self.resolution_limits[1]:
-                HWR.beamline.resolution.set_value(value)
+                api.resolution.move(value)
 
     def set_detector_distance(self, value):
         if self.detector_distance_limits is not None:
@@ -338,7 +334,7 @@ class ResolutionBrick(BaseWidget):
                 < value
                 < self.detector_distance_limits[1]
             ):
-                HWR.beamline.detector.distance.set_value(value)
+                api.detector_distance.move(value)
 
     def energy_changed(self, energy_kev, energy_wavelength):
         self.get_resolution_limits(True)
@@ -349,10 +345,19 @@ class ResolutionBrick(BaseWidget):
 
         if resolution_ready is None:
             resolution_ready = False
-            if HWR.beamline.resolution is not None:
-                resolution_ready = HWR.beamline.resolution.is_ready()
+            if api.resolution is not None:
+                try:
+                    if api.resolution.connection.isSpecConnected():
+                        resolution_ready = api.resolution.isReady()
+                except AttributeError:
+                    resolution_ready = api.resolution.isReady()
+
         if resolution_ready:
-            self.resolution_limits_changed(HWR.beamline.resolution.get_limits())
+            # TODO remove this check and use get_limits
+            if hasattr(api.resolution, "getLimits"):
+                self.resolution_limits_changed(api.resolution.getLimits())
+            else:
+                self.resolution_limits_changed(api.resolution.get_limits())
         else:
             self.resolution_limits = None
 
@@ -361,12 +366,16 @@ class ResolutionBrick(BaseWidget):
             return
 
         detector_ready = False
-        detector_distance = HWR.beamline.detector.distance
-        if detector_distance is not None:
-            detector_ready = detector_distance.is_ready()
+        if api.detector_distance is not None:
+            try:
+                if api.detector_distance.connection.isSpecConnected():
+                    detector_ready = api.detector_distance.is_ready()
+            except AttributeError:
+                detector_ready = api.detector_distance.is_ready()
+
         if detector_ready:
             self.detector_distance_limits_changed(
-                detector_distance.get_limits()
+                api.detector_distance.get_limits()
             )
         else:
             self.detector_distance_limits = None
@@ -382,24 +391,23 @@ class ResolutionBrick(BaseWidget):
             self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
-        detector_distance = HWR.beamline.detector.distance
-        if detector_distance is not None:
+        if api.detector_distance is not None:
             if state:
-                color = ResolutionBrick.STATE_COLORS[state.value]
+                color = ResolutionBrick.STATE_COLORS[state]
             else:
                 color = Colors.LIGHT_RED
 
             unit = self.units_combobox.currentText()
             if unit is chr(197):
-                if state == detector_distance.motor_states.READY:
+                if state == api.detector_distance.motor_states.READY:
                     self.new_value_ledit.blockSignals(True)
                     self.new_value_ledit.setText("")
                     self.new_value_ledit.blockSignals(False)
                     self.new_value_ledit.setEnabled(True)
                 else:
                     self.new_value_ledit.setEnabled(False)
-                # or state == detector_distance.motor_states.MOVESTARTED:
-                if state == detector_distance.motor_states.MOVING:
+                # or state == api.detector_distance.motor_states.MOVESTARTED:
+                if state == api.detector_distance.motor_states.MOVING:
                     self.stop_button.setEnabled(True)
                 else:
                     self.stop_button.setEnabled(False)
@@ -410,20 +418,18 @@ class ResolutionBrick(BaseWidget):
         if state is None:
             return
 
-        detector_distance = HWR.beamline.detector.distance
-        color = ResolutionBrick.STATE_COLORS[state.value]
+        color = ResolutionBrick.STATE_COLORS[state]
         unit = self.units_combobox.currentText()
         if unit == "mm":
-            if state == detector_distance.motor_states.READY:
+            if state == api.detector_distance.motor_states.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
                 self.new_value_ledit.blockSignals(False)
                 self.new_value_ledit.setEnabled(True)
             else:
                 self.new_value_ledit.setEnabled(False)
-            if state == detector_distance.motor_states.MOVING:
-                # or \
-                # state == detector_distance.motor_states.MOVESTARTED:
+            if state == api.detector_distance.motor_states.MOVING:  # or \
+                # state == api.detector_distance.motor_states.MOVESTARTED:
                 self.stop_button.setEnabled(True)
             else:
                 self.stop_button.setEnabled(False)
@@ -433,9 +439,9 @@ class ResolutionBrick(BaseWidget):
     def stop_clicked(self):
         unit = self.units_combobox.currentText()
         if unit == chr(197):
-            HWR.beamline.resolution.stop()
+            api.resolution.stop()
         elif unit == "mm":
-            HWR.beamline.detector.distance.stop()
+            api.detector_distance.stop()
 
     def door_interlock_state_changed(self, state, state_message):
         self.door_interlocked = state in ["locked_active", "locked_inactive"]

@@ -22,13 +22,12 @@ import abc
 import logging
 from copy import deepcopy
 
+import api
 from gui.utils import queue_item, QtImport
 from HardwareRepository.HardwareObjects import (
     queue_model_objects,
     queue_model_enumerables,
 )
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -71,51 +70,8 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget = None
         self._current_selected_items = []
         self._path_template = None
+        self._in_plate_mode = None
         self._enable_compression = None
-
-        self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
-        try:
-            HWR.beamline.energy.connect("energyChanged", self.set_energy)
-            HWR.beamline.energy.connect(
-                "energyLimitsChanged", self.set_energy_limits
-            )
-            HWR.beamline.transmission.connect(
-                "transmissionChanged", self.set_transmission
-            )
-            HWR.beamline.transmission.connect(
-                "limitsChanged", self.set_transmission_limits
-            )
-            HWR.beamline.resolution.connect(
-                "valueChanged", self.set_resolution
-            )
-            HWR.beamline.resolution.connect(
-                "limitsChanged", self.set_resolution_limits
-            )
-            HWR.beamline.diffractometer.omega.connect(
-                "valueChanged", self.set_osc_start
-            )
-            HWR.beamline.diffractometer.kappa.connect(
-                "valueChanged", self.set_kappa
-            )
-            HWR.beamline.diffractometer.kappa_phi.connect(
-                "valueChanged", self.set_kappa_phi
-            )
-            HWR.beamline.detector.connect(
-                "detectorRoiModeChanged", self.set_detector_roi_mode
-            )
-            HWR.beamline.detector.connect(
-                "expTimeLimitsChanged", self.set_detector_exp_time_limits
-            )
-            HWR.beamline.beam.connect(
-                "beamInfoChanged", self.set_beam_info
-            )
-
-            HWR.beamline.resolution.re_emit_values()
-            HWR.beamline.detector.re_emit_values()
-            self.set_resolution_limits(HWR.beamline.resolution.get_limits())
-        except AttributeError as ex:
-            msg = "Could not connect to one or more hardware objects " + str(ex)
-            logging.getLogger("HWR").warning(msg)
 
     def set_expert_mode(self, state):
         if self._acq_widget:
@@ -148,9 +104,10 @@ class CreateTaskBase(QtImport.QWidget):
 
     def init_acq_model(self):
         if self._acq_widget:
-            def_acq_parameters = HWR.beamline.get_default_acquisition_parameters()
+            #self._acq_widget.init_api()
+            def_acq_parameters = api.beamline_setup.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-            if HWR.beamline.diffractometer.in_plate_mode():
+            if api.diffractometer.in_plate_mode():
                 self._acq_widget.use_kappa(False)
                 self._acq_widget.use_max_osc_range(True)
             else:
@@ -164,19 +121,19 @@ class CreateTaskBase(QtImport.QWidget):
         # Initialize the path_template of the widget to default
         # values read from the beamline setup
         if self._data_path_widget:
-            self._data_path_widget.set_base_image_directory(
-                HWR.beamline.session.get_base_image_directory()
+            self._data_path_widget._base_image_dir = (
+                api.session.get_base_image_directory()
             )
-            self._data_path_widget.set_base_process_directory(
-                HWR.beamline.session.get_base_process_directory()
+            self._data_path_widget._base_process_dir = (
+                api.session.get_base_process_directory()
             )
 
             (data_directory, proc_directory) = self.get_default_directory()
-            self._path_template = HWR.beamline.get_default_path_template()
+            self._path_template = api.beamline_setup.get_default_path_template()
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix()
-            self._path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
+            self._path_template.run_number = api.queue_model.get_next_run_number(
                   self._path_template
             )
             self._path_template.compression = self._enable_compression
@@ -186,8 +143,54 @@ class CreateTaskBase(QtImport.QWidget):
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index is 0 and HWR.beamline.session.proposal_code:
+        if tab_index is 0 and api.session.proposal_code:
             self.update_selection()
+
+    def init_api(self):
+        self._in_plate_mode = api.diffractometer.in_plate_mode()
+
+        try:
+            api.energy.connect("energyChanged", self.set_energy)
+            api.energy.connect(
+                "energyLimitsChanged", self.set_energy_limits
+            )
+            api.transmission.connect(
+                "valueChanged", self.set_transmission
+            )
+            api.transmission.connect(
+                "limitsChanged", self.set_transmission_limits
+            )
+            api.resolution.connect(
+                "positionChanged", self.set_resolution
+            )
+            api.resolution.connect(
+                "limitsChanged", self.set_resolution_limits
+            )
+            api.omega_axis.connect(
+                "positionChanged", self.set_osc_start
+            )
+            api.kappa_axis.connect("positionChanged", self.set_kappa)
+            api.kappa_phi_axis.connect(
+                "positionChanged", self.set_kappa_phi
+            )
+            api.detector.connect(
+                "detectorRoiModeChanged", self.set_detector_roi_mode
+            )
+            api.detector.connect(
+                "expTimeLimitsChanged", self.set_detector_exp_time_limits
+            )
+            api.beam_info.connect(
+                "beamInfoChanged", self.set_beam_info
+            )
+
+            api.resolution.update_values()
+            api.detector.update_values()
+            self.set_resolution_limits(api.resolution.get_limits())
+        except AttributeError as ex:
+            msg = "Could not connect to one or more hardware objects " + str(ex)
+            logging.getLogger("HWR").warning(msg)
+
+        self.init_models()
 
     def set_osc_start(self, new_value):
         acq_widget = self.get_acquisition_widget()
@@ -212,7 +215,7 @@ class CreateTaskBase(QtImport.QWidget):
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-            path_conflict = HWR.beamline.queue_model.check_for_path_collisions(
+            path_conflict = api.queue_model.check_for_path_collisions(
                 self._path_template
             )
             self._data_path_widget.indicate_path_conflict(path_conflict)
@@ -239,9 +242,6 @@ class CreateTaskBase(QtImport.QWidget):
             return self.item.parent()
         else:
             return None
-
-    def get_task_node_name(self):
-        return self._task_node_name
 
     def get_acquisition_widget(self):
         return self._acq_widget
@@ -274,7 +274,7 @@ class CreateTaskBase(QtImport.QWidget):
         return result
 
     def set_energy(self, energy, wavelength):
-        if not self._item_is_dc() and energy is not None:
+        if not self._item_is_dc() and energy:
             acq_widget = self.get_acquisition_widget()
 
             if acq_widget:
@@ -282,18 +282,16 @@ class CreateTaskBase(QtImport.QWidget):
                 acq_widget.update_energy(energy, wavelength)
 
     def set_transmission(self, trans):
-        if trans is not None:
-            acq_widget = self.get_acquisition_widget()
+        acq_widget = self.get_acquisition_widget()
 
-            if not self._item_is_dc() and acq_widget:
-                acq_widget.update_transmission(trans)
+        if not self._item_is_dc() and acq_widget:
+            acq_widget.update_transmission(trans)
 
     def set_resolution(self, res):
-        if res is not None:
-            acq_widget = self.get_acquisition_widget()
+        acq_widget = self.get_acquisition_widget()
 
-            if not self._item_is_dc() and acq_widget:
-                acq_widget.update_resolution(res)
+        if not self._item_is_dc() and acq_widget:
+            acq_widget.update_resolution(res)
 
     def set_detector_roi_mode(self, detector_roi_mode):
         acq_widget = self.get_acquisition_widget()
@@ -349,13 +347,11 @@ class CreateTaskBase(QtImport.QWidget):
         pass
 
     def get_default_prefix(self, sample_data_node=None, generic_name=False):
-        prefix = HWR.beamline.session.get_default_prefix(
-            sample_data_node, generic_name
-        )
+        prefix = api.session.get_default_prefix(sample_data_node, generic_name)
         return prefix
 
     def get_default_directory(self, tree_item=None, sub_dir=""):
-        group_name = HWR.beamline.session.get_group_name()
+        group_name = api.session.get_group_name()
 
         if group_name:
             sub_dir = group_name + "/" + sub_dir
@@ -369,9 +365,9 @@ class CreateTaskBase(QtImport.QWidget):
                     if item.get_model().lims_id == -1:
                         sub_dir += ""
 
-        data_directory = HWR.beamline.session.get_image_directory(sub_dir)
+        data_directory = api.session.get_image_directory(sub_dir)
 
-        proc_directory = HWR.beamline.session.get_process_directory(sub_dir)
+        proc_directory = api.session.get_process_directory(sub_dir)
 
         return (data_directory, proc_directory)
 
@@ -380,7 +376,7 @@ class CreateTaskBase(QtImport.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        HWR.beamline.sample_view.select_shape_with_cpos(cpos)
+        api.graphics.select_shape_with_cpos(cpos)
 
     def selection_changed(self, items):
         if items:
@@ -397,8 +393,8 @@ class CreateTaskBase(QtImport.QWidget):
 
                 if sample_items:
                     self._current_selected_items = sample_items
-                    self.single_item_selection(items[0])
-                    # self.multiple_item_selection(sample_items)
+                    #self.single_item_selection(items[0])
+                    self.multiple_item_selection(sample_items)
         else:
             self.setDisabled(True)
 
@@ -416,9 +412,7 @@ class CreateTaskBase(QtImport.QWidget):
 
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
-            self._acquisition_parameters.centred_position.snapshot_image = (
-                HWR.beamline.sample_view.get_scene_snapshot()
-            )
+            self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
 
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
@@ -432,8 +426,8 @@ class CreateTaskBase(QtImport.QWidget):
                 # self._path_template.directory = data_directory
                 # self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
-            elif HWR.beamline.session.get_group_name() != "":
-                base_dir = HWR.beamline.session.get_base_image_directory()
+            elif api.session.get_group_name() != "":
+                base_dir = api.session.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
 
@@ -455,8 +449,8 @@ class CreateTaskBase(QtImport.QWidget):
             #    self._path_template.process_directory = proc_directory
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = (
-                HWR.beamline.queue_model.get_next_run_number(self._path_template)
+            self._path_template.run_number = api.queue_model.get_next_run_number(
+                self._path_template
             )
 
             # Update energy transmission and resolution
@@ -502,10 +496,48 @@ class CreateTaskBase(QtImport.QWidget):
         #    self._acq_widget.set_enable_parameter_update(\
         #         not isinstance(tree_item, queue_item.TaskQueueItem))
 
+    def multiple_item_selection(self, tree_items):
+        tree_item = tree_items[0]
+
+        if isinstance(tree_item, queue_item.SampleQueueItem):
+            sample_data_model = tree_item.get_model()
+            self._path_template = deepcopy(self._path_template)
+            self._acquisition_parameters = deepcopy(self._acquisition_parameters)
+
+            # Sample with lims information, use values from lims
+            # to set the data path.
+            #(data_directory, proc_directory) = self.get_default_directory(\
+            #                 sub_dir = '<acronym>%s<sample_name>%s' % (os.path.sep, os.path.sep))    
+            #self._path_template.directory = data_directory
+            #self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
+
+            # Get the next available run number at this level of the model.
+            self._path_template.run_number = api.queue_model.\
+                get_next_run_number(self._path_template)
+
+            #Update energy transmission and resolution
+            if self._acq_widget:
+                self._update_etr()
+                energy_scan_result = sample_data_model.crystals[0].energy_scan_result
+                self._acq_widget.set_energies(energy_scan_result)
+                self._acq_widget.update_data_model(self._acquisition_parameters,
+                                                   self._path_template)
+                self.get_acquisition_widget().use_osc_start(False)
+
+            if self._data_path_widget:
+                self._data_path_widget.update_data_model(self._path_template)
+
+            self.setDisabled(False)
+
+
     def _update_etr(self):
-        default_acq_params = HWR.beamline.get_default_acquisition_parameters()
-        for tag in ("kappa", "kappa_phi", "energy", "transmission", "resolution", ):
-            setattr(self._acquisition_parameters, tag, getattr(default_acq_params, tag))
+        omega = api.beamline_setup._get_omega_axis_position()
+        kappa = api.beamline_setup._get_kappa_axis_position()
+        kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
+        energy = api.energy.get_current_energy()
+        transmission = api.beamline_setup._get_transmission()
+        resolution = api.beamline_setup._get_resolution()
 
         set_omega = True
         if self._acq_widget:
@@ -515,7 +547,12 @@ class CreateTaskBase(QtImport.QWidget):
                 if self._acq_widget.acq_widget_layout.max_osc_range_cbx.isChecked():
                     set_omega = False
         if set_omega:
-            self._acquisition_parameters.osc_start = default_acq_params.osc_start
+            self._acquisition_parameters.osc_start = omega
+        self._acquisition_parameters.kappa = kappa
+        self._acquisition_parameters.kappa_phi = kappa_phi
+        self._acquisition_parameters.energy = energy
+        self._acquisition_parameters.transmission = transmission
+        self._acquisition_parameters.resolution = resolution
 
         self._acq_widget.value_changed_list = []
         self._acq_widget._acquisition_mib.clear_edit()
@@ -538,7 +575,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = HWR.beamline.queue_model.\
+            self._path_template.run_number = api.queue_model.\
                 get_next_run_number(self._path_template)
 
             #Update energy transmission and resolution
@@ -584,15 +621,15 @@ class CreateTaskBase(QtImport.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = HWR.beamline.sample_view.get_scene_snapshot(
+                        snapshot = api.graphics.get_scene_snapshot(
                             position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                kappa = HWR.beamline.diffractometer.kappa.get_value()
-                kappa_phi =  HWR.beamline.diffractometer.kappa_phi.get_value()
+                kappa = api.beamline_setup._get_kappa_axis_position()
+                kappa_phi = api.beamline_setup._get_kappa_phi_axis_position()
 
             if kappa:
                 self.set_kappa(kappa)
@@ -604,7 +641,7 @@ class CreateTaskBase(QtImport.QWidget):
     def approve_creation(self):
         result = True
 
-        path_conflict = HWR.beamline.queue_model.check_for_path_collisions(
+        path_conflict = api.queue_model.check_for_path_collisions(
             self._path_template
         )
 
@@ -637,12 +674,12 @@ class CreateTaskBase(QtImport.QWidget):
     def create_task(self, sample, shape):
         (tasks, sc) = ([], None)
 
-        dm = HWR.beamline.diffractometer
+        dm = api.diffractometer
         sample_is_mounted = False
         if self._in_plate_mode:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.plate_manipulator.getLoadedSample().getCoords()
+                    api.plate_manipulator.getLoadedSample().getCoords()
                     == sample.location
                 )
             except BaseException:
@@ -650,7 +687,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.sample_changer.getLoadedSample().getCoords()
+                    api.sample_changer.getLoadedSample().getCoords()
                     == sample.location
                 )
 
@@ -767,7 +804,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         if "<acronym>-<name>" in acq_path_template.base_prefix:
             acq_path_template.base_prefix = self.get_default_prefix(sample)
-            acq_path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
+            acq_path_template.run_number = api.queue_model.get_next_run_number(
                 acq_path_template
             )
 
@@ -817,6 +854,8 @@ class CreateTaskBase(QtImport.QWidget):
         )
         acq_path_template.base_prefix
 
+        # acq_path_template.suffix = api.beamline_setup.suffix
+
         return acq_path_template
 
     def _create_acq(self, sample):
@@ -828,9 +867,7 @@ class CreateTaskBase(QtImport.QWidget):
 
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
-        self._acquisition_parameters.centred_position.snapshot_image = (
-            HWR.beamline.sample_view.get_scene_snapshot()
-        )
+        self._acquisition_parameters.centred_position.snapshot_image = api.graphics.get_scene_snapshot()
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
         )
@@ -844,9 +881,9 @@ class CreateTaskBase(QtImport.QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = HWR.beamline.sample_view.create_auto_grid()
+            grid = api.graphics.create_auto_grid()
 
-        grid.set_snapshot(HWR.beamline.sample_view.get_snapshot(grid))
+        grid.set_snapshot(api.graphics.get_scene_snapshot(grid))
 
         grid_properties = grid.get_properties()
 
@@ -896,7 +933,7 @@ class CreateTaskBase(QtImport.QWidget):
         else:
             self._path_template.mad_prefix = ""
 
-        run_number = HWR.beamline.queue_model.get_next_run_number(
+        run_number = api.queue_model.get_next_run_number(
             self._path_template
         )
 
@@ -930,7 +967,7 @@ class CreateTaskBase(QtImport.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if HWR.beamline.diffractometer.in_plate_mode() and self._acq_widget:
+        if api.diffractometer.in_plate_mode() and self._acq_widget:
             set_max_range = False
 
             if num_images is None:
@@ -952,7 +989,7 @@ class CreateTaskBase(QtImport.QWidget):
             exp_time = None
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
 
-            scan_limits = HWR.beamline.diffractometer.get_scan_limits(
+            scan_limits = api.diffractometer.get_scan_limits(
                 num_images, exp_time
             )
 

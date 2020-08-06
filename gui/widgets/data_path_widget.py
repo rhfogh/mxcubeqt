@@ -111,15 +111,13 @@ class DataPathWidget(QtImport.QWidget):
 
         selected_dir = str(
             file_dialog.getExistingDirectory(
-                self, "Select a directory", str(self._base_image_dir), QtImport.QFileDialog.ShowDirsOnly
+                self, "Select a directory", self._base_image_dir
             )
         )
-        if selected_dir is not None and len(selected_dir) > 0 and selected_dir.startswith(self._base_image_dir):
-             self.set_directory(selected_dir)
-        else:
-            msg = "Selected directory do not start " +\
-                  "with the base directory %s" % self._base_image_dir
-            logging.getLogger("GUI").error(msg) 
+        #selected_dir = os.path.dirname(selected_dir)
+
+        if selected_dir is not None and len(selected_dir) > 0:
+            self.set_directory(selected_dir)
 
     def _prefix_ledit_change(self, new_value):
         cursor_pos = self.data_path_layout.prefix_ledit.cursorPosition()
@@ -198,6 +196,7 @@ class DataPathWidget(QtImport.QWidget):
             if self.parent._tree_brick:
                 self.parent._tree_brick.compression_state = state
 
+        queue_model_objects.Characterisation.set_char_compression(state)
         self._data_model.compression = state
         self.update_file_name()
         self.pathTemplateChangedSignal.emit()
@@ -244,6 +243,13 @@ class DataPathWidget(QtImport.QWidget):
 
         self.data_path_layout.base_path_ledit.setText(self._base_image_dir)
 
+    # def set_run_number(self, run_number):
+    #    """
+    #    Descript. :
+    #    """
+    #    self._data_model.run_number = int(run_number)
+    #    self.data_path_layout.run_number_ledit.setText(str(run_number))
+
     def set_prefix(self, base_prefix):
         self._data_model.base_prefix = str(base_prefix)
         self.data_path_layout.prefix_ledit.setText(str(base_prefix))
@@ -254,25 +260,10 @@ class DataPathWidget(QtImport.QWidget):
         )
         self.data_path_layout.file_name_value_label.setText(file_name)
 
-    def set_base_image_directory(self, base_image_dir):
-        self._base_image_dir = base_image_dir
-
-    def set_base_process_directory(self, base_process_dir):
-        self._base_process_dir = base_process_dir
-
-    def set_run_number(self, run_number):
-        """
-        Sets a run number and updates file name
-        """
-        self._data_model.run_number = run_number
-        self.update_file_name()
-        self.pathTemplateChangedSignal.emit()
-
     def update_data_model(self, data_model):
         self._data_model = data_model
         self.set_data_path(data_model.get_image_path())
         self._data_model_pm.set_model(data_model)
-        self.data_path_layout.browse_button.setEnabled(os.path.exists(self._base_image_dir))
 
     def indicate_path_conflict(self, conflict):
         if conflict:

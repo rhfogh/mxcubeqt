@@ -16,18 +16,18 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-# import os
+import os
 import logging
-# from collections import namedtuple
+from collections import namedtuple
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import queue_item, Colors, QtImport
 from gui.utils.sample_changer_helper import SC_STATE_COLOR, SampleChanger
 from gui.widgets.dc_tree_widget import DataCollectTree
 
-from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
+import api
 
-from HardwareRepository import HardwareRepository as HWR
+from HardwareRepository.HardwareObjects.queue_model_enumerables import CENTRING_METHOD
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -93,7 +93,7 @@ class TreeBrick(BaseWidget):
         self.add_property("queue", "string", "/queue")
         self.add_property("queue_model", "string", "/queue-model")
         self.add_property("xml_rpc_server", "string", "/xml_rpc_server")
-        self.add_property("redis_client", "string", "")
+        self.add_property("redis_client", "string", "/redis")
         self.add_property("useFilterWidget", "boolean", True)
         self.add_property("useSampleWidget", "boolean", True)
         self.add_property("scOneName", "string", "Sample changer")
@@ -203,124 +203,126 @@ class TreeBrick(BaseWidget):
         # Other ---------------------------------------------------------------
         self.enable_collect(True)
         self.sample_changer_widget.synch_ispyb_button.setEnabled(False)
+        #self.setFixedWidth(315)
+        # self.sample_changer_widget.setFixedHeight(46)
+        # self.dc_tree_widget.set_centring_method(1)
+
         #self.setSizePolicy(QtImport.QSizePolicy.Maximum, QtImport.QSizePolicy.Expanding)
 
-        if HWR.beamline.sample_changer is not None:
+        if not api.sample_changer:
+            logging.getLogger("GUI").debug(
+                "TreeBrick: sample changer hwobj not defined."
+            )
+        if not api.plate_manipulator:
+            logging.getLogger("GUI").debug(
+               "TreeBrick: plate manipulator hwobj not defined."
+            )
+
+        if api.sample_changer is not None:
             self.connect(
-                HWR.beamline.sample_changer,
-                SampleChanger.STATE_CHANGED_EVENT,
-                self.sample_load_state_changed,
+               api.sample_changer,
+               SampleChanger.STATE_CHANGED_EVENT,
+               self.sample_load_state_changed,
             )
             self.connect(
-                HWR.beamline.sample_changer,
+                api.sample_changer,
                 SampleChanger.SELECTION_CHANGED_EVENT,
                 self.sample_selection_changed,
             )
             self.connect(
-                HWR.beamline.sample_changer,
+                api.sample_changer,
                 SampleChanger.INFO_CHANGED_EVENT,
                 self.set_sample_pin_icon,
             )
             self.connect(
-                HWR.beamline.sample_changer,
+                api.sample_changer,
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-        else:
-            logging.getLogger("HWR").debug(
-                "TreeBrick: Sample changer not available."
-            )
+            #api.sample_changer.update_values()
 
-        if HWR.beamline.plate_manipulator is not None:
+        if api.plate_manipulator is not None:
             self.connect(
-                HWR.beamline.plate_manipulator,
+                api.plate_manipulator,
                 SampleChanger.STATE_CHANGED_EVENT,
                 self.sample_load_state_changed,
             )
             self.connect(
-                HWR.beamline.plate_manipulator,
+                api.plate_manipulator,
                 SampleChanger.INFO_CHANGED_EVENT,
                 self.plate_info_changed,
             )
+            api.plate_manipulator.update_values()
 
-            HWR.beamline.plate_manipulator.re_emit_values()
-
-        else:
-            logging.getLogger("GUI").debug(
-                "TreeBrick: plate manipulator hwobj not defined."
-            )
-        self.connect(
-            HWR.beamline.sample_view, "shapeCreated", self.dc_tree_widget.shape_created
-        )
-        self.connect(
-            HWR.beamline.sample_view,
-            "shapeChanged",
-            self.dc_tree_widget.shape_changed
-        )
-        self.connect(
-            HWR.beamline.sample_view, "shapeDeleted", self.dc_tree_widget.shape_deleted
-        )
-        self.connect(
-            HWR.beamline.sample_view,
-            "diffractometerReady",
-            self.diffractometer_ready_changed
-        )
-        self.connect(
-            HWR.beamline.diffractometer,
-            "newAutomaticCentringPoint",
-            self.diffractometer_automatic_centring_done,
-        )
-        self.connect(
-            HWR.beamline.diffractometer,
-            "minidiffPhaseChanged",
-            self.diffractometer_phase_changed,
-        )
-        self.diffractometer_phase_changed(
-            HWR.beamline.diffractometer.get_current_phase()
-        )
+        self.connect(api.graphics, "shapeCreated", self.dc_tree_widget.shape_created)
+        self.connect(api.graphics, "shapeChanged", self.dc_tree_widget.shape_changed)
+        self.connect(api.graphics, "shapeDeleted", self.dc_tree_widget.shape_deleted)
+        self.connect(api.graphics, "diffractometerReady", self.diffractometer_ready_changed)
+        self.connect(api.diffractometer, "newAutomaticCentringPoint", self.diffractometer_automatic_centring_done)
+        self.connect(api.diffractometer, "minidiffPhaseChanged", self.diffractometer_phase_changed)
+        self.diffractometer_phase_changed(api.diffractometer.get_current_phase())
 
         self.connect(
-            HWR.beamline.queue_manager,
+            api.queue_manager,
             "show_workflow_tab",
             self.show_workflow_tab_from_model
         )
         self.connect(
-            HWR.beamline.queue_manager,
+            api.queue_manager,
             "queue_entry_execute_started",
             self.queue_entry_execution_started,
         )
         self.connect(
-            HWR.beamline.queue_manager,
+            api.queue_manager,
             "queue_entry_execute_finished",
             self.queue_entry_execution_finished,
         )
-        self.connect(HWR.beamline.queue_manager, "queue_paused", self.queue_paused_handler)
         self.connect(
-            HWR.beamline.queue_manager, "queue_execution_finished", self.queue_execution_finished
+            api.queue_manager,
+            "queue_paused",
+            self.queue_paused_handler
         )
-        self.connect(HWR.beamline.queue_manager, "queue_stopped", self.queue_stop_handler)
-        self.connect(HWR.beamline.queue_model, "child_added", self.dc_tree_widget.add_to_view)
+        self.connect(
+            api.queue_manager,
+            "queue_execution_finished",
+            self.queue_execution_finished,
+        )
+        self.connect(
+            api.queue_manager,
+            "queue_stopped",
+            self.queue_stop_handler
+        )
+        self.connect(
+            api.queue_model,
+            "child_added",
+            self.dc_tree_widget.add_to_view
+        )
 
-        if hasattr(HWR.beamline, "ppu_control"):
+
+        if hasattr(api.beamline_setup, "ppu_control_hwobj"):
             self.connect(
-               HWR.beamline.ppu_control,
+                api.beamline_setup.ppu_control_hwobj,
                 "ppuStatusChanged",
                 self.ppu_status_changed,
             )
-            HWR.beamline.ppu_control.re_emit_values()
+            api.beamline_setup.ppu_control_hwobj.update_values()
 
-        if HWR.beamline.safety_shutter is not None:
+        if api.safety_shutter is not None:
             self.connect(
-                HWR.beamline.safety_shutter, "shutterStateChanged", self.shutter_state_changed
+               api.safety_shutter,
+               "shutterStateChanged",
+               self.shutter_state_changed,
             )
-            HWR.beamline.safety_shutter.re_emit_values()
+            api.safety_shutter.update_values()
 
-        if HWR.beamline.machine_info is not None:
+        if api.machine_info is not None:
             self.connect(
-                HWR.beamline.machine_info, "machineCurrentChanged", self.machine_current_changed
+                api.machine_info,
+                "machineCurrentChanged",
+                self.machine_current_changed,
             )
 
-        has_shutter_less = HWR.beamline.detector.has_shutterless()
+        has_shutter_less = api.beamline_setup.detector_has_shutterless()
         if has_shutter_less:
             self.dc_tree_widget.confirm_dialog.disable_dark_current_cbx()
 
@@ -422,7 +424,7 @@ class TreeBrick(BaseWidget):
         prop_code=None,
         is_inhouse=None,
     ):
-        HWR.beamline.session.set_session_start_date(str(start_date))
+        api.session.set_session_start_date(str(start_date))
 
     @QtImport.pyqtSlot()
     def set_requested_tree_brick(self):
@@ -448,8 +450,8 @@ class TreeBrick(BaseWidget):
             self.dc_tree_widget.plate_navigator_cbox.setVisible(False)
 
             if (
-                HWR.beamline.sample_changer is not None
-                and HWR.beamline.diffractometer.use_sample_changer()
+                api.sample_changer is not None
+                and api.diffractometer.use_sample_changer()
             ):
                 sc_basket_content, sc_sample_content = self.get_sc_content()
                 if sc_basket_content and sc_sample_content:
@@ -465,12 +467,13 @@ class TreeBrick(BaseWidget):
                     self.sample_changer_widget.details_button.setText("Show SC-details")
 
             if (
-                    HWR.beamline.plate_manipulator is not None
-                    and HWR.beamline.diffractometer.in_plate_mode()
+                api.plate_manipulator is not None
+                and api.diffractometer.in_plate_mode()
             ):
                 if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
                 plate_row_content, plate_sample_content = self.get_plate_content()
+                api.beamline_setup.set_plate_mode(True)
                 if plate_sample_content:
                     plate_row_list, plate_sample_list = self.dc_tree_widget.samples_from_sc_content(
                         plate_row_content, plate_sample_content
@@ -545,7 +548,6 @@ class TreeBrick(BaseWidget):
 
     def queue_execution_finished(self, status):
         # self.enable_widgets.emit(True)
-        self.current_queue_entry = None
         self.dc_tree_widget.queue_execution_completed(status)
 
     def queue_stop_handler(self, status):
@@ -554,10 +556,10 @@ class TreeBrick(BaseWidget):
         # BaseWidget.set_status_info("status", "Queue stoped")
 
     def diffractometer_ready_changed(self, status):
-        self.diffractometer_ready.emit(HWR.beamline.diffractometer.is_ready())
+        self.diffractometer_ready.emit(api.diffractometer.is_ready())
 
         try:
-            info_message = HWR.beamline.diffractometer.get_status()
+            info_message = api.diffractometer.get_status()
         except AttributeError:
             info_message = None
 
@@ -588,13 +590,13 @@ class TreeBrick(BaseWidget):
 
             result = message_box.exec_()
             if result == QtImport.QMessageBox.AcceptRole:
-                HWR.beamline.diffractometer.automatic_centring_try_count = 0
+                api.diffractometer.automatic_centring_try_count = 0
             elif result == QtImport.QMessageBox.RejectRole:
                 logging.getLogger("GUI").info(
                     "Optical centring result rejected. " + "Trying once again."
                 )
             else:
-                HWR.beamline.diffractometer.automatic_centring_try_count = 0
+                api.diffractometer.automatic_centring_try_count = 0
                 if self.current_queue_entry:
                     logging.getLogger("GUI").info(
                         "Optical centring rejected "
@@ -632,8 +634,8 @@ class TreeBrick(BaseWidget):
         """
         log = logging.getLogger("user_level_log")
 
-        self.lims_samples = HWR.beamline.lims.get_samples(
-            HWR.beamline.session.proposal_id, HWR.beamline.session.session_id
+        self.lims_samples = api.lims.get_samples(
+            api.session.proposal_id, api.session.session_id
         )
 
         basket_list = []
@@ -656,9 +658,9 @@ class TreeBrick(BaseWidget):
         self.sample_changer_widget.sample_combo.setCurrentIndex(-1)
 
         if self.dc_tree_widget.sample_mount_method == 1:
-            sample_changer = HWR.beamline.sample_changer
+            sample_changer = api.sample_changer
         elif self.dc_tree_widget.sample_mount_method == 2:
-            sample_changer = HWR.beamline.plate_manipulator
+            sample_changer = api.plate_manipulator
 
         # if len(self.lims_samples) == 0:
         #    log.warning("No sample available in LIMS")
@@ -693,8 +695,7 @@ class TreeBrick(BaseWidget):
                         log.warning(
                             "The sample with the barcode (%s) exists" % sc_sample.code
                             + " in LIMS but the location does not mat"
-                            + "ch. Sample changer location: %s, LIMS "
-                            % sc_sample.location
+                            + "ch. Sample changer location: %s, LIMS " % sc_sample.location
                             + "location %s" % lims_sample.lims_location
                         )
                         sample_list.append(sc_sample)
@@ -739,7 +740,7 @@ class TreeBrick(BaseWidget):
         Assigns lims sample to manually-mounted sample
         """
         self.dc_tree_widget.filter_sample_list(0)
-        root_model = HWR.beamline.queue_model.get_model_root()
+        root_model = api.queue_model.get_model_root()
         sample_model = root_model.get_children()[0]
 
         sample_model.init_from_lims_object(self.filtered_lims_samples[index])
@@ -755,16 +756,19 @@ class TreeBrick(BaseWidget):
         sc_basket_content = []
         sc_sample_content = []
 
-        for basket in HWR.beamline.sample_changer.get_basket_list():
-            basket_index = basket.get_index()
-            basket_name = basket.get_name()
+        for basket in api.sample_changer.getBasketList():
+            basket_index = basket.getIndex()
+            basket_code = basket.getID() or ""
+            basket_name = basket.getName()
+            is_present = basket.isPresent()
             sc_basket_content.append((basket_index + 1, basket, basket_name))
 
-        for sample in HWR.beamline.sample_changer.get_sample_list():
-            matrix = sample.get_id() or ""
-            basket_index = sample.get_container().get_index()
-            sample_index = sample.get_index()
-            sample_name = sample.get_name()
+        for sample in api.sample_changer.getSampleList():
+            matrix = sample.getID() or ""
+            basket_index = sample.getContainer().getIndex()
+            sample_index = sample.getIndex()
+            basket_code = sample.getContainer().getID() or ""
+            sample_name = sample.getName()
             sc_sample_content.append(
                 (matrix, basket_index + 1, sample_index + 1, sample_name)
             )
@@ -776,16 +780,21 @@ class TreeBrick(BaseWidget):
         plate_row_content = []
         plate_sample_content = []
 
-        for row in HWR.beamline.plate_manipulator.get_basket_list():
-            row_index = row.get_index()
-            row_name = row.get_name()
+        for row in api.plate_manipulator.getBasketList():
+            row_index = row.getIndex()
+            row_code = row.getID() or ""
+            row_name = row.getName()
+            is_present = row.isPresent()
             plate_row_content.append((row_index, row, row_name))
 
-        for sample in HWR.beamline.plate_manipulator.get_sample_list():
-            row_index = sample.get_cell().get_row_index()
-            sample_name = sample.get_name()
-            coords = sample.get_coords()
-            matrix = sample.get_id() or ""
+        for sample in api.plate_manipulator.getSampleList():
+            row_index = sample.getCell().getRowIndex()
+            col_index = sample.getCell().getCol()
+            drop_index = sample.getDrop().getWellNo()
+            sample_name = sample.getName()
+            coords = sample.getCoords()
+            matrix = sample.getID() or ""
+            # vial_index = ":".join(map(str, coords[1:]))
             plate_sample_content.append((matrix, coords[0], coords[1], sample_name))
 
         return plate_row_content, plate_sample_content
@@ -822,7 +831,7 @@ class TreeBrick(BaseWidget):
             self.sample_changer_widget.details_button, QtImport.QColor(s_color)
         )
         self.dc_tree_widget.scroll_to_item()
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if api.diffractometer.in_plate_mode():
             self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
 
     def sample_selection_changed(self):
@@ -901,7 +910,7 @@ class TreeBrick(BaseWidget):
     def show_workflow_tab(self, item):
         self.sample_changer_widget.details_button.setText("Show SC-details")
 
-        running = HWR.beamline.queue_manager.is_executing()
+        running = api.queue_manager.is_executing()
         self.populate_workflow_tab(item, running=running)
 
     def populate_workflow_tab(self, item, running=False):
@@ -982,11 +991,11 @@ class TreeBrick(BaseWidget):
         self.selection_changed.emit(items)
 
     def emit_set_directory(self):
-        directory = str(HWR.beamline.session.get_base_image_directory())
+        directory = str(api.session.get_base_image_directory())
         self.set_directory.emit(directory)
 
     def emit_set_prefix(self, item):
-        prefix = HWR.beamline.session.get_default_prefix(item.get_model())
+        prefix = api.session.get_default_prefix(item.get_model())
         self.set_prefix.emit(prefix)
 
     def emit_set_sample(self, item):
@@ -1129,18 +1138,16 @@ class TreeBrick(BaseWidget):
             self.update_enable_collect()
 
     def ppu_status_changed(self, in_error, status_msg):
+        #TODO revert
+        return
+
         if self.enable_collect_conditions.get("ppu") != (in_error != True):
             self.enable_collect_conditions["ppu"] = in_error != True
             self.update_enable_collect()
 
     def shutter_state_changed(self, state, msg=None):
-        # NBNB TODO HACK.
-        #  Necessary because shutter states can be both 'opened', 'OPEN'. (and more?)
-        # NBNB fixme
-        #is_open = bool(state and state.lower().startswith('open'))
-        is_open = bool(state and state.name.lower().startswith('open'))
-        if self.enable_collect_conditions.get("shutter") != is_open:
-            self.enable_collect_conditions["shutter"] = is_open
+        if self.enable_collect_conditions.get("shutter") != (state.lower().startswith("open")):
+            self.enable_collect_conditions["shutter"] = (state.lower().startswith("open"))
             self.update_enable_collect()
 
     def machine_current_changed(self, value, in_range):
@@ -1151,19 +1158,15 @@ class TreeBrick(BaseWidget):
 
     def update_enable_collect(self):
         if self.current_queue_entry is not None:
-            #Do not enable/disable collect button if queue is executing
+            #Queue is running: do not enable/disable collect button
             return
 
-        # Do not allow to start xray imaging from BeamLocation and DataCollection phase
+        #Do not allow to start xray imaging from BeamLocation and DataCollection phase
         self.enable_collect_conditions["imaging"] = True
         for item in self.get_selected_items():
-            if isinstance(
-                item, queue_item.XrayImagingQueueItem
-            ) and HWR.beamline.diffractometer.get_current_phase() in (
-                "BeamLocation",
-                "DataCollection",
-            ):
-                self.enable_collect_conditions["imaging"] = False
+            if isinstance(item, queue_item.XrayImagingQueueItem) and \
+                api.diffractometer.get_current_phase() in ("BeamLocation", "DataCollection"):
+                 self.enable_collect_conditions["imaging"] = False
 
         enable_collect = all(
             item == True for item in self.enable_collect_conditions.values()
@@ -1194,12 +1197,13 @@ class TreeBrick(BaseWidget):
                                 + "(Wait till the machine current reaches 90 mA)"
                             )
                         elif key == "imaging":
-                            logging.getLogger("GUI").warning(
-                                "To start an imaging collection "
+                            logging.getLogger("GUI").warning("To start an imaging collection "
                                 + "diffractometer has to be in SampleCentering or in Transfer phase"
                             )
             self.dc_tree_widget.enable_collect_condition = enable_collect
             self.dc_tree_widget.toggle_collect_button_enabled()
+
+
 
     def save_queue(self):
         """Saves queue in the file"""

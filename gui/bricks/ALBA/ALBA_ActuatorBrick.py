@@ -51,6 +51,7 @@ STATES = {
 
 
 class ALBA_ActuatorBrick(BaseWidget):
+
     def __init__(self, *args):
         """
         Descript. :
@@ -69,7 +70,7 @@ class ALBA_ActuatorBrick(BaseWidget):
         self.add_property("out_cmd_name", "string", "")
 
         # Graphic elements ----------------------------------------------------
-        self.widget = QtImport.load_ui_file("alba_actuator.ui")
+        self.widget = QtImport.load_ui_file( "alba_actuator.ui")
 
         QtImport.QHBoxLayout(self)
 
@@ -95,20 +96,16 @@ class ALBA_ActuatorBrick(BaseWidget):
         if property_name == "mnemonic":
             if self.actuator_hwo is not None:
                 self.disconnect(
-                    self.actuator_hwo,
-                    QtImport.SIGNAL("stateChanged"),
-                    self.state_changed,
+                    self.actuator_hwo, QtImport.SIGNAL("stateChanged"), self.state_changed
                 )
 
             self.actuator_hwo = self.get_hardware_object(new_value)
             if self.actuator_hwo is not None:
                 self.setEnabled(True)
                 self.connect(
-                    self.actuator_hwo,
-                    QtImport.SIGNAL("stateChanged"),
-                    self.state_changed,
+                    self.actuator_hwo, QtImport.SIGNAL("stateChanged"), self.state_changed
                 )
-                self.actuator_hwo.re_emit_values()
+                self.actuator_hwo.update_values()
                 logging.getLogger("HWR").info(
                     "User Name is: %s" % self.actuator_hwo.getUserName()
                 )
@@ -125,10 +122,12 @@ class ALBA_ActuatorBrick(BaseWidget):
     def update(self, state=None):
         if self.actuator_hwo is not None:
             if state is None:
-                state = self.actuator_hwo.get_state()
+                state = self.actuator_hwo.getState()
                 status = self.actuator_hwo.getStatus()
                 self.widget.stateLabel.setText(status)
-                Colors.set_widget_color(self.widget.stateLabel, STATES[state])
+                Colors.set_widget_color(
+                    self.widget.stateLabel, STATES[state]
+                )
 
                 self.widget.cmdInButton.setEnabled(False)
                 self.widget.cmdOutButton.setEnabled(False)

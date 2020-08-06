@@ -413,6 +413,13 @@ class CharParametersWidget(QtImport.QWidget):
         else:
             self.opt_parameters_widget.setEnabled(False)
 
+    def tab_changed(self):
+        """
+        Descript. :
+        """
+        if self._tree_view_item:
+            self.populate_parameter_widget(self._tree_view_item)
+
     def set_enabled(self, state):
         """
         Descript. :
@@ -478,3 +485,6 @@ class CharParametersWidget(QtImport.QWidget):
         self.char_type_widget.toggle_time_dose()
         crystal = self._char.reference_image_collection.crystal
         self.acq_widget.set_energies(crystal.energy_scan_result)
+
+    def init_api(self):
+        self.acq_widget.init_api()

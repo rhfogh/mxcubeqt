@@ -17,10 +17,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
+
 from gui.utils import Icons, Colors, QtImport
 from gui.BaseComponents import BaseWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -29,6 +29,7 @@ __category__ = "General"
 
 
 class EnergyBrick(BaseWidget):
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -127,27 +128,24 @@ class EnergyBrick(BaseWidget):
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
     def run(self):
-        if HWR.beamline.energy is not None:
+        if api.energy is not None:
             self.set_new_value_limits()
-            self.connect(HWR.beamline.energy, "deviceReady", self.connected)
-            self.connect(HWR.beamline.energy, "deviceNotReady", self.disconnected)
-            self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
-            self.connect(HWR.beamline.energy, "stateChanged", self.state_changed)
-            self.connect(
-                HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
-            )
+            self.connect(api.energy, "deviceReady", self.connected)
+            self.connect(api.energy, "deviceNotReady", self.disconnected)
+            self.connect(api.energy, "energyChanged", self.energy_changed)
+            self.connect(api.energy, "stateChanged", self.state_changed)
+            self.connect(api.energy, "statusInfoChanged", self.status_info_changed)
 
-            HWR.beamline.energy.re_emit_values()
-
-            if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
-                HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
-            if HWR.beamline.energy.is_ready():
-                self.connected()
-            else:
-                self.disconnected()
+            api.energy.update_values()
+            api.energy.set_do_beam_alignment(self["doBeamAlignment"])
+            self.connected()
+            #if api.energy.isReady():
+            #    self.connected()
+            #else:
+            #    self.disconnected()
         else:
             self.disconnected()
-
+ 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "defaultMode":
             if new_value == "keV":
@@ -166,7 +164,7 @@ class EnergyBrick(BaseWidget):
 
     def connected(self):
         self.setEnabled(True)
-        tunable_energy = HWR.beamline.energy.is_tunable
+        tunable_energy = api.energy.can_move_energy()
         if tunable_energy is None:
             tunable_energy = False
         self.set_to_label.setEnabled(tunable_energy)
@@ -185,10 +183,8 @@ class EnergyBrick(BaseWidget):
         self.setEnabled(False)
 
     def do_beam_align_changed(self, state):
-        if HWR.beamline.energy is not None:
-            HWR.beamline.energy.set_do_beam_alignment(
-                self.beam_align_cbox.isChecked()
-            )
+        if api.energy is not None:
+            api.energy.set_do_beam_alignment(self.beam_align_cbox.isChecked())
 
     def energy_changed(self, energy_value, wavelength_value):
         energy_value_str = self["kevFormatString"] % energy_value
@@ -197,7 +193,7 @@ class EnergyBrick(BaseWidget):
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def state_changed(self, state):
-        self.setEnabled(HWR.beamline.energy.is_ready())
+        self.setEnabled(state == "ready")
         BaseWidget.set_status_info("status", "", "")
 
     def status_info_changed(self, status_info):
@@ -212,9 +208,9 @@ class EnergyBrick(BaseWidget):
         ):
             if self.units_combobox.currentIndex() == 0:
                 BaseWidget.set_status_info("status", "Setting energy...", "running")
-                HWR.beamline.energy.set_value(float(input_field_text))
+                api.energy.move_energy(float(input_field_text))
             else:
-                HWR.beamline.energy.set_wavelength(float(input_field_text))
+                api.energy.move_wavelength(float(input_field_text))
             self.new_value_ledit.setText("")
             Colors.set_widget_color(
                 self.new_value_ledit, Colors.LINE_EDIT_ACTIVE, QtImport.QPalette.Base
@@ -238,13 +234,13 @@ class EnergyBrick(BaseWidget):
 
     def set_new_value_limits(self):
         if self.units_combobox.currentIndex() == 0:
-            value_limits = HWR.beamline.energy.get_limits()
+            value_limits = api.energy.get_energy_limits()
             self.group_box.setTitle("Energy")
             self.new_value_ledit.setToolTip(
                 "Energy limits %.4f : %.4f keV" % (value_limits[0], value_limits[1])
             )
         else:
-            value_limits = HWR.beamline.energy.get_wavelength_limits()
+            value_limits = api.energy.get_wavelength_limits()
             self.group_box.setTitle("Wavelength")
             self.new_value_ledit.setToolTip(
                 "Wavelength limits %.4f : %.4f %s"

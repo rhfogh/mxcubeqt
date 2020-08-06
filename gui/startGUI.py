@@ -18,22 +18,25 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import sys
-import fcntl
-import tempfile
-import logging
-import platform
-from optparse import OptionParser
 
 import gevent
+import fcntl
+import tempfile
+import sys
+import os
+import logging
+import platform
+
 import gevent.monkey
 gevent.monkey.patch_all(thread=False)
+from optparse import OptionParser
+
+import api
 
 import gui
 from gui import GUISupervisor
 from gui.utils import GUILogHandler, ErrorHandler, QtImport
-from HardwareRepository import HardwareRepository as HWR
+from HardwareRepository import HardwareRepository
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -41,9 +44,9 @@ __license__ = "LGPLv3+"
 __version__ = 2
 
 
-logger = logging.getLogger()
-gui_log_handler = GUILogHandler.GUILogHandler()
-logger.addHandler(gui_log_handler)
+_logger = logging.getLogger()
+_GUIhdlr = GUILogHandler.GUILogHandler()
+_logger.addHandler(_GUIhdlr)
 
 
 def do_gevent():
@@ -73,7 +76,7 @@ class MyCustomEvent(QtImport.QEvent):
 def run(gui_config_file=None):
     """Main run method"""
 
-    default_configuration_path = "localhost:hwr"
+    default_hwr_path = "localhost:hwr"
     # path to user's home dir. (works on Win2K, XP, Unix, Mac...)
     parser = OptionParser(usage="usage: %prog <GUI definition file> [options]")
     parser.add_option(
@@ -122,7 +125,7 @@ def run(gui_config_file=None):
         action="store",
         type="string",
         help="Hardware Repository Server host:port (default"
-        + " to %s) (you can also use " % default_configuration_path
+        + " to %s) (you can also use " % default_hwr_path
         + "HARDWARE_REPOSITORY_SERVER the environment variable)",
         metavar="HOST:PORT",
         dest="hardwareRepositoryServer",
@@ -193,11 +196,6 @@ def run(gui_config_file=None):
 
     (opts, args) = parser.parse_args()
 
-    logging.getLogger("HWR").info(
-        "=============================================================================="
-    )
-    logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
-
     # get config from arguments
     log_file = opts.logFile
     log_template = opts.logTemplate
@@ -211,12 +209,12 @@ def run(gui_config_file=None):
     app_style = opts.appStyle
 
     if opts.hardwareRepositoryServer:
-        configuration_path = opts.hardwareRepositoryServer
+        hwr_path = opts.hardwareRepositoryServer
     else:
         # try to set Hardware Repository server from environment
-        configuration_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
-        if configuration_path is None:
-            configuration_path = default_configuration_path
+        hwr_path = os.environ.get("HARDWARE_REPOSITORY_SERVER")
+        if hwr_path is None:
+            hwr_path = default_hwr_path
 
     # add bricks directories and hardware objects directories from environment
     try:
@@ -258,16 +256,15 @@ def run(gui_config_file=None):
             sys.exit(1)
 
     if (
-            len(
-                os.popen(
-                    "ps -aef | grep 'python' -i | grep 'hardwareRepository'" +\
-                    "  | grep -v 'grep' | awk '{ print $3 }'"
-                )
-                .read()
-                .strip()
-                .split("\n")
+        len(
+            os.popen(
+                "ps -aef | grep 'python' -i | grep 'hardwareRepository'  | grep -v 'grep' | awk '{ print $3 }'"
             )
-            > 1
+            .read()
+            .strip()
+            .split("\n")
+        )
+        > 1
     ):
         QtImport.QMessageBox.warning(
             None,
@@ -278,11 +275,10 @@ def run(gui_config_file=None):
         #sys.exit(1)
 
     # configure modules
+    HardwareRepository.setHardwareRepositoryServer(hwr_path)
+    HardwareRepository.setUserFileDirectory(user_file_dir)
     if hwobj_directories:
-        # Must be done before init_hardware_repository
-        HWR.addHardwareObjectsDirs(hwobj_directories)
-    HWR.init_hardware_repository(configuration_path)
-    HWR.setUserFileDirectory(user_file_dir)
+        HardwareRepository.addHardwareObjectsDirs(hwobj_directories)
     if custom_bricks_directories:
         gui.add_custom_bricks_dirs(custom_bricks_directories)
 
@@ -290,7 +286,7 @@ def run(gui_config_file=None):
     if len(log_file) > 0:
         if gui_config_file:
             gui.set_logging_name(os.path.basename(gui_config_file), log_template)
-
+ 
         log_lock_filename = os.path.join(
             tempfile.gettempdir(), ".%s.lock" % os.path.basename(log_file)
         )
@@ -351,11 +347,15 @@ def run(gui_config_file=None):
     log_level = getattr(logging, opts.logLevel)
     logging.getLogger().setLevel(log_level)
     # logging.getLogger().info("\n\n\n\n")
-    logging.getLogger("HWR").info("Starting to load gui...")
+    logging.getLogger("HWR").info(
+        "================================================================================="
+    )
+    logging.getLogger("HWR").info("Starting MXCuBE v%s" % str(__version__))
     logging.getLogger("HWR").info("GUI file: %s" % (gui_config_file or "unnamed"))
+    logging.getLogger("HWR").info("Hardware repository: %s" % hwr_path)
+    logging.getLogger("HWR").info("User file directory: %s" % user_file_dir)
     if len(log_file) > 0:
         logging.getLogger("HWR").info("Log file: %s" % log_file)
-    logging.getLogger("HWR").info("User file directory: %s" % user_file_dir)
     logging.getLogger("HWR").info("System info:")
     logging.getLogger("HWR").info(
         "    - Python %s on %s" % (platform.python_version(), platform.system())
@@ -375,7 +375,7 @@ def run(gui_config_file=None):
     else:
         logging.getLogger("HWR").info("    - Matplotlib not available")
     logging.getLogger("HWR").info(
-        "------------------------------------------------------------------------------"
+        "---------------------------------------------------------------------------------"
     )
 
     QtImport.QApplication.setDesktopSettingsAware(False)
@@ -387,6 +387,7 @@ def run(gui_config_file=None):
         no_border=opts.noBorder,
     )
 
+    api.init(hwr_path)
     supervisor.set_user_file_directory(user_file_dir)
     # post event for GUI creation
     main_application.postEvent(

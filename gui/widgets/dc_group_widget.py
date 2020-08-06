@@ -39,6 +39,7 @@ class DCGroupWidget(QtImport.QWidget):
         # Slots ---------------------------------------------------------------
 
         # Hardware objects ----------------------------------------------------
+        self._beamline_setup_hwobj = None
 
         # Internal variables --------------------------------------------------
         self._data_collection = None
@@ -90,6 +91,8 @@ class DCGroupWidget(QtImport.QWidget):
             self.subwedge_table.setHorizontalHeaderItem(
                 index, QtImport.QTableWidgetItem(header)
             )
+        # self.subwedge_table.setSizePolicy(QtGui.QSizePolicy.Fixed,
+        #                                  QtGui.QSizePolicy.Fixed)
 
     def populate_widget(self, item):
         dcg_queue_item = item.get_queue_entry()
@@ -102,7 +105,7 @@ class DCGroupWidget(QtImport.QWidget):
             for child in dcg_queue_item.interleave_items:
                 dcg_child_list.append(child["data_model"])
         else:
-            for children in dcg_queue_item.get_queue_entry_list():
+            for children in dcg_queue_item._queue_entry_list:
                 if isinstance(children.get_view(), queue_item.DataCollectionQueueItem):
                     dcg_child_list.append(children.get_data_model())
                     acq_par = (
@@ -120,7 +123,7 @@ class DCGroupWidget(QtImport.QWidget):
                     )
 
         for sw in sw_list:
-            color = Colors.get_random_numpy_color()
+            color = Colors.get_random_numpy_color(alpha=50)
             sw.append(color)
 
         self.subwedge_table.setRowCount(0)

@@ -153,13 +153,8 @@ class QueueItem(QtImport.QTreeWidgetItem):
         self.previous_bg_brush = self.background(0)
         color = Colors.QUEUE_ENTRY_COLORS[color_index]
         self.bg_brush = QtImport.QBrush(color)
-        self.setBackground(0, self.bg_brush)
-        self.setBackground(1, self.bg_brush)
-
-    def restoreBackgroundColor(self):
-        self.bg_brush = self.previous_bg_brush
-        self.setBackground(0, self.bg_brush)
-        self.setBackground(1, self.bg_brush)
+        for col in range(6):
+            self.setBackground(col, self.bg_brush)
 
     def setFontBold(self, state):
         self._font_is_bold = state
@@ -241,8 +236,8 @@ class SampleQueueItem(QueueItem):
 
         if state:
             self.setIcon(0, PIN_ICON)
-            self.setBackground(0, QtImport.QBrush(Colors.PLUM))
-            self.setBackground(1, QtImport.QBrush(Colors.PLUM))
+            for col in range(6):
+                self.setBackground(col, QtImport.QBrush(Colors.PLUM))
             self.setSelected(True)
             bold_fond = self.font(1)
             bold_fond.setBold(True)
@@ -345,7 +340,7 @@ class DataCollectionQueueItem(TaskQueueItem):
               """
             for msg in dc_model.processing_msg_list:
                 if msg[2] in ("failed"):
-                    proc_msg = "<font color=#FE0000>%s: %s %s</font>" % (
+                    proc_msg = "<font color=#FE0000> %s: %s %s</font>" % (
                         msg[1],
                         msg[2],
                         msg[3],
@@ -372,6 +367,24 @@ class DataCollectionQueueItem(TaskQueueItem):
 
         self.setToolTip(0, tool_tip)
 
+    def update_processing_status(self):
+        dc_model = self.get_model()
+        for index, processing_method in enumerate(dc_model.processing_methods):
+            for processing_msg in dc_model.processing_msg_list:
+                if processing_msg[1] == processing_method:
+                    if processing_msg[2] in ("failed"):                     
+                        icon =  BALL_FAILED
+                    elif processing_msg[2] ==  "started":
+                        icon = BALL_RUNNING
+                    else:
+                        icon = BALL_FINISHED
+                    tool_tip = "%s %s : %s" % (
+                        processing_msg[0],
+                        processing_msg[1],
+                        processing_msg[2]
+                    ) 
+                    self.setToolTip(2 + index, tool_tip)
+                    self.setIcon(2 + index, icon)
 
 class CharacterisationQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
@@ -416,9 +429,15 @@ class XrayCenteringQueueItem(TaskQueueItem):
 class XrayImagingQueueItem(TaskQueueItem):
     def __init__(self, *args, **kwargs):
         TaskQueueItem.__init__(self, *args, **kwargs)
-
+ 
     def init_tool_tip(self):
-        return
+        pass
+
+    def init_processing_info(self):
+        pass
+
+    def update_processing_status(self):
+        pass
 
 MODEL_VIEW_MAPPINGS = {
     queue_model_objects.DataCollection: DataCollectionQueueItem,

@@ -19,6 +19,7 @@
 
 import copy
 
+import api
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
@@ -27,8 +28,6 @@ from gui.widgets.xray_imaging_parameters_widget import XrayImagingParametersWidg
 
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
 from HardwareRepository.HardwareObjects import queue_model_objects
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -118,11 +117,6 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
-        HWR.beamline.detector.distance.connect(
-            "valueChanged",
-            self._xray_imaging_parameters_widget.set_detector_distance,
-        )
-
     def approve_creation(self):
         return True
 
@@ -133,10 +127,22 @@ class CreateXrayImagingWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
 
         self._xray_imaging_parameters = queue_model_objects.XrayImagingParameters()
-        self._acquisition_parameters = (
-            HWR.beamline.get_default_acquisition_parameters("imaging")
+        self._acquisition_parameters = api.beamline_setup.get_default_acquisition_parameters(
+            "default_imaging_values"
         )
         self._path_template.suffix = "tiff"
+
+    def init_api(self):
+        """
+        In plate mode osciallation is start is in the middle of grid
+        """
+        CreateTaskBase.init_api(self)
+
+        self._xray_imaging_parameters_widget.init_api()
+        api.detector_distance.connect(
+            "positionChanged",
+            self._xray_imaging_parameters_widget.set_detector_distance,
+        )
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -148,7 +154,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                HWR.beamline.detector.distance.get_value()
+                api.detector_distance.get_position()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)
@@ -178,14 +184,14 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample, shape, comments=None):
+    def _create_task(self, sample, shape):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
+            snapshot = api.graphics.get_scene_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
+            cpos.snapshot_image = api.graphics.get_scene_snapshot()
  
         detector_distance_list = []
         dc_list = []
@@ -210,7 +216,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
             if do_it:
                 do_it = False
                 acq.path_template.run_number = \
-                    HWR.beamline.queue_model.get_next_run_number(
+                    api.queue_model.get_next_run_number(
                     acq.path_template)
                 acq.path_template.run_number = self._path_template.run_number 
 

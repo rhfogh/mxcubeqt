@@ -158,7 +158,7 @@ if PYMCA_IMPORTED:
                 self.elements_dict[symbol] = el
 
         def elementEnter(self, symbol, z=None, name=None):
-            b = self.eltButton[symbol]
+            b = self.eltButton[symbol[0]]
             if b.isEnabled():
                 b.setCurrent(True)
 

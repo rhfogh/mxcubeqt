@@ -14,8 +14,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  You should have received a copy of the GNU LesserGeneral Public License
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
@@ -25,7 +25,6 @@ from gui.bricks import MotorSpinBoxBrick
 """
 Controls both the light on/off (light_actuator) and intensity (motor)
 """
-
 __category__ = "General"
 
 STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
@@ -39,6 +38,7 @@ STATE_OUT, STATE_IN, STATE_MOVING, STATE_FAULT, STATE_ALARM, STATE_UNKNOWN = (
 
 
 class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
+
     def __init__(self, *args):
 
         MotorSpinBoxBrick.MotorSpinBoxBrick.__init__(self, *args)
@@ -67,12 +67,8 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             "Switches on the light and sets the intensity back to the previous setting"
         )
 
-        self.light_off_button.setSizePolicy(
-            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum
-        )
-        self.light_on_button.setSizePolicy(
-            QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum
-        )
+        self.light_off_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
+        self.light_on_button.setSizePolicy(QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Minimum)
 
     # Light off pressed: switch off lamp and set out the wago
 
@@ -82,10 +78,10 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             return
         # self.lightOffButton.setDown(True)
         if self.light_actuator_hwo is not None:
-            if self.light_actuator_hwo.get_state() != STATE_OUT:
+            if self.light_actuator_hwo.getState() != STATE_OUT:
                 if self.motor_hwobj is not None:
                     try:
-                        self.light_saved_pos = self.motor_hwobj.get_value()
+                        self.light_saved_pos = self.motor_hwobj.getPosition()
                     except BaseException:
                         logging.exception("could not get light actuator position")
                         self.light_saved_pos = None
@@ -95,8 +91,8 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                     else:
                         delta = 0.0
 
-                    light_limits = self.motor_hwobj.get_limits()
-                    self.motor_hwobj.set_value(light_limits[0] + delta)
+                    light_limits = self.motor_hwobj.getLimits()
+                    self.motor_hwobj.move(light_limits[0] + delta)
 
                 self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdOut()
@@ -109,11 +105,11 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
             self.motor_hwobj.move_out()
             return
         if self.light_actuator_hwo is not None:
-            if self.light_actuator_hwo.get_state() != STATE_IN:
+            if self.light_actuator_hwo.getState() != STATE_IN:
                 self.light_state_changed(STATE_UNKNOWN)
                 self.light_actuator_hwo.cmdIn()
                 if self.light_saved_pos is not None and self.motor_hwobj is not None:
-                    self.motor_hwobj.set_value(self.light_saved_pos)
+                    self.motor_hwobj.move(self.light_saved_pos)
             else:
                 self.light_on_button.setDown(True)
 
@@ -140,8 +136,8 @@ class LightControlBrick(MotorSpinBoxBrick.MotorSpinBoxBrick):
                 self, property_name, old_value, new_value
             )
             if self.motor_hwobj is not None:
-                if self.motor_hwobj.is_ready():
-                    limits = self.motor_hwobj.get_limits()
+                if self.motor_hwobj.isReady():
+                    limits = self.motor_hwobj.getLimits()
                     motor_range = float(limits[1] - limits[0])
                     self["delta"] = str(motor_range / 10.0)
                 else:

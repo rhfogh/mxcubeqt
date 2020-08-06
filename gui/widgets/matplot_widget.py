@@ -1,5 +1,4 @@
-# pylint: skip-file
-
+#
 #  Project: MXCuBE
 #  https://github.com/mxcube
 #
@@ -32,6 +31,10 @@ else:
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
+
+
+FONT_SIZE = 24
+plt.rc('font', size=FONT_SIZE)
 
 
 class TwoAxisPlotWidget(QtImport.QWidget):
@@ -412,7 +415,7 @@ class PolarScater(FigureCanvas):
         self.fig.canvas.draw_idle()
 
 
-class PlotWidget(QtImport.QWidget):
+class TwoDimenisonalPlotWidget(QtImport.QWidget):
 
     mouseMovedSignal = QtImport.pyqtSignal(float, float)
     mouseClickedSignal = QtImport.pyqtSignal(float, float)
@@ -458,8 +461,7 @@ class PlotWidget(QtImport.QWidget):
         dbl_click = False
         if hasattr(mouse_event, "dblclick"):
             dbl_click = mouse_event.dblclick
-        #if mouse_event.xdata and mouse_event.ydata:
-        if True: 
+        if mouse_event.xdata and mouse_event.ydata:
             if dbl_click:
                 self.mouseDoubleClickedSignal.emit(mouse_event.xdata, mouse_event.ydata)
             else:

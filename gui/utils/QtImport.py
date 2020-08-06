@@ -114,120 +114,13 @@ elif "--pyqt3" in sys.argv:
 #
 if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
     try:
-        from PyQt5.QtCore import (
-            pyqtSignal,
-            pyqtSlot,
-            PYQT_VERSION_STR,
-            Qt,
-            QCoreApplication,
-            QDir,
-            QEvent,
-            QEventLoop,
-            QObject,
-            QPoint,
-            QPointF,
-            QRect,
-            QRectF,
-            QRegExp,
-            QSize,
-            QT_VERSION_STR,
-            QTimer,
-        )
-        from PyQt5.QtWidgets import (
-            QAbstractItemView,
-            QAction,
-            QActionGroup,
-            QApplication,
-            QButtonGroup,
-            QCheckBox,
-            QColorDialog,
-            QComboBox,
-            QDesktopWidget,
-            QDial,
-            QDialog,
-            QDoubleSpinBox,
-            QFileDialog,
-            QFrame,
-            QGraphicsItem,
-            QGraphicsPixmapItem,
-            QGraphicsScene,
-            QGraphicsView,
-            QGridLayout,
-            QGroupBox, 
-            QHBoxLayout,
-            QHeaderView,
-            QInputDialog,
-            QLabel,
-            QLayout,
-            QLineEdit,
-            QListView,
-            QListWidget,
-            QListWidgetItem,
-            QMainWindow,
-            QMenu,
-            QMenuBar,
-            QMessageBox,
-            QProgressBar,
-            QProgressDialog,
-            QPushButton,
-            QRadioButton,
-            QScrollArea,
-            QScrollBar,
-            QSizePolicy,
-            QSlider,
-            QSpacerItem,
-            QSpinBox,
-            QSplashScreen,
-            QSplitter,
-            QStackedWidget,
-            QStatusBar,
-            QTabWidget,
-            QTableView,
-            QTableWidget,
-            QTableWidgetItem,
-            QTextBrowser,
-            QTextEdit,
-            QToolBar,
-            QToolBox,
-            QToolButton,
-            QToolTip,
-            QTreeView,
-            QTreeWidget,
-            QTreeWidgetItem,
-            QTreeWidgetItemIterator,
-            QVBoxLayout,
-            QWhatsThis,
-            QWidget,
-        )
-        from PyQt5.QtGui import (
-            QBrush,
-            QColor,
-            QContextMenuEvent,
-            QCursor,
-            QDoubleValidator,
-            QFocusEvent,
-            QFont,
-            QKeyEvent,
-            QKeySequence,
-            QIcon,
-            QImage,
-            QIntValidator,
-            QLinearGradient,
-            QMouseEvent,
-            QPainter,
-            QPainterPath,
-            QPalette,
-            QPen,
-            QPixmap,
-            QPolygon,
-            QRegExpValidator,
-            QValidator
-        )
-        from PyQt5.uic import loadUi
+        from PyQt5.QtCore import *
+        from PyQt5.QtGui import *
+        from PyQt5.QtWidgets import *
+        from PyQt5.QtPrintSupport import *
+        from PyQt5.uic import *
 
-        QStringList = list
         getQApp = QCoreApplication.instance
-        qApp = QCoreApplication.instance  
 
         qt_imported = True
         qt_variant = "PyQt5"
@@ -235,14 +128,18 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
         _ver = PYQT_VERSION_STR.split(".")
         ver = _ver + ["0"] * (3 - len(_ver))
         pyqt_version_no = list(map(int, ver))[:3]
+    except BaseException:
+        pass
+
+    try:
+        from PyQt5.QtWebKit import *
     except ImportError:
         pass
 
     try:
-        from PyQt5.QtWebKit import QWebPage
-    except ImportError:
+        from PyQt5.QtSvg import *
+    except BaseException:
         pass
-
 #
 # PyQt4
 #
@@ -255,6 +152,19 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
     #   !! this means the classes below will not exist !!
     # but code is guaranteed to be compatible
     try:
+        """
+        import sip
+        api2_classes = [
+            'QData','QDateTime','QString','QTextStream',
+            'QTime','QUrl', 'QVariant',
+        ]
+        for cl in api2_classes:
+            try:
+                sip.setapi(cl,2)
+            except:
+                pass
+        """
+
         from PyQt4.QtCore import (
             pyqtSignal,
             pyqtSlot,
@@ -280,14 +190,11 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             qApp,
             QAbstractItemView,
             QAction,
-            QActionGroup,
             QApplication,
             QBrush,
             QButtonGroup,
             QCheckBox,
             QColor,
-            QColorDialog,
-            QContextMenuEvent,
             QComboBox,
             QCursor,
             QDesktopWidget,
@@ -299,7 +206,6 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QFileDialog,
             QFont,
             QFrame,
-            QFocusEvent,
             QGraphicsItem,
             QGraphicsPixmapItem,
             QGraphicsScene,
@@ -308,11 +214,10 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QGroupBox,
             QHBoxLayout,
             QHeaderView,
-            QKeyEvent,
             QKeySequence,
             QIcon,
             QImage,
-            QInputDialog,
+            QImageWriter,
             QIntValidator,
             QLabel,
             QLayout,
@@ -325,13 +230,13 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QMenu,
             QMenuBar,
             QMessageBox,
-            QMouseEvent,
             QPainter,
             QPainterPath,
             QPalette,
             QPen,
             QPixmap,
             QPolygon,
+            QPrintDialog,
             QProgressBar,
             QProgressDialog,
             QPushButton,
@@ -364,7 +269,6 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QValidator,
             QVBoxLayout,
             QWidget,
-            QWhatsThis,
         )
         from PyQt4.uic import loadUi
 

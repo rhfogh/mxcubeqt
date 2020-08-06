@@ -17,14 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 from gui.utils import QtImport
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.mca_spectrum_widget import McaSpectrumWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -113,8 +112,8 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if HWR.beamline.xrf_spectrum is None:
-            HWR.beamline.xrf_spectrum.connect(
+        if api.xrf_spectrum is not None:
+            api.xrf_spectrum.connect(
                 "xrfSpectrumFinished", self.spectrum_finished
             )
 
@@ -131,6 +130,10 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         if str(new_value).isdigit():
             self.xrf_spectrum_model.set_count_time(float(new_value))
 
+    def tab_changed(self):
+        if self._tree_view_item:
+            self.populate_widget(self._tree_view_item)
+
     def populate_widget(self, item):
         self._tree_view_item = item
         self.xrf_spectrum_model = item.get_model()
@@ -140,13 +143,14 @@ class XRFSpectrumParametersWidget(QtImport.QWidget):
         self.other_parameters_gbox.setEnabled(not executed)
         # self.mca_spectrum_widget.setEnabled(executed)
 
+        self.mca_spectrum_widget.clear()
         if executed:
             result = self.xrf_spectrum_model.get_spectrum_result()
             self.mca_spectrum_widget.set_data(
                 result.mca_data, result.mca_calib, result.mca_config
             )
-        else:
-            self.mca_spectrum_widget.clear()
+        #else:
+        #    self.mca_spectrum_widget.clear()
 
         self.data_path_widget.update_data_model(self.xrf_spectrum_model.path_template)
         self.count_time_ledit.setText(str(self.xrf_spectrum_model.count_time))

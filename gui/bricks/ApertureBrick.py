@@ -46,9 +46,9 @@ Apertures are allowed according the bam focusing mode.
 """
 
 try:
-    unichr
-except NameError:
-    unichr = chr
+    uni_chr = unichr
+except:
+    uni_chr = chr
 
 from gui.utils import Colors, QtImport
 from gui.BaseComponents import BaseWidget
@@ -121,7 +121,7 @@ class ApertureBrick(BaseWidget):
                     self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
                 )
                 self.disconnect(
-                    self.aperture_hwobj, "valueChanged", self.position_changed
+                    self.aperture_hwobj, "positionChanged", self.position_changed
                 )
 
             self.aperture_hwobj = self.get_hardware_object(new_value)
@@ -132,9 +132,9 @@ class ApertureBrick(BaseWidget):
                     self.aperture_hwobj, "diameterIndexChanged", self.diameter_changed
                 )
                 self.connect(
-                    self.aperture_hwobj, "valueChanged", self.position_changed
+                    self.aperture_hwobj, "positionChanged", self.position_changed
                 )
-                self.aperture_hwobj.re_emit_values()
+                self.aperture_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
@@ -147,10 +147,10 @@ class ApertureBrick(BaseWidget):
         self.aperture_hwobj.set_position(self.aperture_position_combo.currentIndex())
 
     def init_aperture(self):
-        aperture_size_list = self.aperture_hwobj.get_diameter_size_list()
+        aperture_size_list = self.aperture_hwobj.get_diameter_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
-            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
+            self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, uni_chr(956)))
 
         aperture_position_list = self.aperture_hwobj.get_position_list()
         self.aperture_position_combo.clear()

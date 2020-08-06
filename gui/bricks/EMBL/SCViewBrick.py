@@ -50,10 +50,6 @@ class SCViewBrick(BaseWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
-        status_widget = QtImport.QWidget(self)
-        status_label = QtImport.QLabel("Status: ", status_widget)
-        self.status_ledit = QtImport.QLineEdit(status_widget)
-         
         self.camera_live_cbx = QtImport.QCheckBox("Live view", self)
         self.camera_live_cbx.setChecked(False)
 
@@ -75,16 +71,11 @@ class SCViewBrick(BaseWidget):
         sc_scene.addItem(self.sc_camera_pixmap_item)
 
         # Layout --------------------------------------------------------------
-        _status_widget_hlayout = QtImport.QHBoxLayout(status_widget)
-        _status_widget_hlayout.addWidget(status_label)
-        _status_widget_hlayout.addWidget(self.status_ledit)
-
         _camera_widget_hlayout = QtImport.QHBoxLayout(camera_widget)
         _camera_widget_hlayout.addWidget(self.axis_view)
         _camera_widget_hlayout.addWidget(self.sc_view)
 
         _main_vlayout = QtImport.QVBoxLayout(self)
-        _main_vlayout.addWidget(status_widget)
         _main_vlayout.addWidget(self.camera_live_cbx)
         _main_vlayout.addWidget(camera_widget)
         _main_vlayout.addWidget(self.progress_bar)
@@ -96,33 +87,33 @@ class SCViewBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
         self.camera_live_cbx.stateChanged.connect(self.camera_live_state_changed)
 
-        if api.sample_changer is not None:  
-            self.connect(
-                api.sample_changer,
-                SampleChanger.STATUS_CHANGED_EVENT,
-                self.sample_changer_status_changed,
-            )
-            self.connect(api.sample_changer, "progressInit", self.init_progress)
-            self.connect(api.sample_changer, "progressStep", self.step_progress)
-            self.connect(api.sample_changer, "progressStop", self.stop_progress)
+        # Api
+        self.connect(
+            api.sample_changer,
+            SampleChanger.STATUS_CHANGED_EVENT,
+            self.sample_changer_status_changed,
+        )
+
+        self.connect(api.sample_changer, "progressInit", self.init_progress)
+        self.connect(api.sample_changer, "progressStep", self.step_progress)
+        self.connect(api.sample_changer, "progressStop", self.stop_progress)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_axis_camera":
             self.axis_camera = self.get_hardware_object(new_value)
             image_dimensions = self.axis_camera.get_image_dimensions()
-            self.axis_view.setFixedSize(image_dimensions[0], image_dimensions[1])
+            self.axis_view.setFixedSize(image_dimensions[0] + 5, image_dimensions[1] + 5)
             self.connect(self.axis_camera, "imageReceived", self.axis_camera_frame_received)
         elif property_name == "hwobj_sc_camera":
             self.sc_camera = self.get_hardware_object(new_value)
             image_dimensions = self.sc_camera.get_image_dimensions()
-            self.sc_view.setFixedSize(image_dimensions[0], image_dimensions[1])
+            self.sc_view.setFixedSize(image_dimensions[0] + 5, image_dimensions[1] + 5)
             self.connect(self.sc_camera, "imageReceived", self.sc_camera_frame_received)
             
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def camera_live_state_changed(self, state):
-        print state
         self.axis_camera.set_video_live(state)
         self.sc_camera.set_video_live(state)
 
@@ -133,22 +124,15 @@ class SCViewBrick(BaseWidget):
         self.sc_camera_pixmap_item.setPixmap(camera_frame)
 
     def sample_changer_status_changed(self, status):
-        self.status_ledit.setText(status)
-        if status == "Loading":
-            self.camera_live_cbx.setEnabled(False)
-            Colors.set_widget_color(
-                 self.status_ledit, Colors.LIGHT_GREEN, QtImport.QPalette.Base
-            )
-            self.axis_camera.set_video_live(True)
-            self.sc_camera.set_video_live(True)
-        else:
+        if status == "Ready":
             self.camera_live_cbx.setEnabled(True)
-            Colors.set_widget_color(
-                 self.status_ledit, Colors.WHITE, QtImport.QPalette.Base
-            )
             if not self.camera_live_cbx.isChecked():
                 self.axis_camera.set_video_live(False)
                 self.sc_camera.set_video_live(False)
+        else:
+            self.camera_live_cbx.setEnabled(False)
+            self.axis_camera.set_video_live(True)
+            self.sc_camera.set_video_live(True)
 
     def stop_progress(self, *args):
         self.progress_bar.reset()

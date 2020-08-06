@@ -17,10 +17,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 from gui.utils import Icons, QtImport
 from gui.BaseComponents import BaseWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -29,6 +28,7 @@ __category__ = "Graphics"
 
 
 class GraphicsManagerBrick(BaseWidget):
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -48,7 +48,9 @@ class GraphicsManagerBrick(BaseWidget):
 
         # Graphic elements ----------------------------------------------------
         self.main_groupbox = QtImport.QGroupBox("Graphics items", self)
-        self.manager_widget = QtImport.load_ui_file("graphics_manager_layout.ui")
+        self.manager_widget = QtImport.load_ui_file(
+            "graphics_manager_layout.ui"
+        )
 
         # Layout --------------------------------------------------------------
         _groupbox_vlayout = QtImport.QVBoxLayout(self)
@@ -126,14 +128,10 @@ class GraphicsManagerBrick(BaseWidget):
         self.main_groupbox_toggled(False)
         self.main_groupbox.setToolTip("Click to open/close item manager")
 
-        self.connect(HWR.beamline.sample_view, "shapeCreated", self.shape_created)
-        self.connect(HWR.beamline.sample_view, "shapeDeleted", self.shape_deleted)
-        self.connect(HWR.beamline.sample_view, "shapeSelected", self.shape_selected)
-        self.connect(
-            HWR.beamline.sample_view,
-            "centringInProgress",
-            self.centring_in_progress_changed
-        )
+        self.connect(api.graphics, "shapeCreated", self.shape_created)
+        self.connect(api.graphics, "shapeDeleted", self.shape_deleted)
+        self.connect(api.graphics, "shapeSelected", self.shape_selected)
+        self.connect(api.graphics, "centringInProgress", self.centring_in_progress_changed)
 
     def shape_created(self, shape, shape_type):
         """
@@ -212,9 +210,7 @@ class GraphicsManagerBrick(BaseWidget):
 
     def shape_selected(self, shape, selected_state):
         if shape in self.__shape_map:
-            self.__shape_map[shape].setData(
-                4, QtImport.Qt.DisplayRole, str(selected_state)
-            )
+            self.__shape_map[shape].setData(4, QtImport.Qt.DisplayRole, str(selected_state))
             self.__shape_map[shape].setSelected(selected_state)
             if self.__point_map.get(shape):
                 self.__point_map[shape].setSelected(selected_state)
@@ -223,7 +219,7 @@ class GraphicsManagerBrick(BaseWidget):
             if self.__grid_map.get(shape):
                 self.__grid_map[shape].setSelected(selected_state)
             self.manager_widget.change_color_button.setEnabled(
-                bool(HWR.beamline.sample_view.get_selected_shapes())
+                len(api.graphics.get_selected_shapes()) > 0
             )
 
     def centring_in_progress_changed(self, centring_in_progress):
@@ -245,7 +241,7 @@ class GraphicsManagerBrick(BaseWidget):
     def change_color_clicked(self):
         color = QtImport.QColorDialog.getColor()
         if color.isValid():
-            for item in HWR.beamline.sample_view.get_selected_shapes():
+            for item in api.graphics.get_selected_shapes():
                 item.set_base_color(color)
 
     def display_all_button_clicked(self):
@@ -259,22 +255,22 @@ class GraphicsManagerBrick(BaseWidget):
             treewidget_item.setData(3, QtImport.Qt.DisplayRole, "False")
 
     def clear_all_button_clicked(self):
-        HWR.beamline.sample_view.clear_all()
+        api.graphics.clear_all()
 
     def create_point_start_button_clicked(self):
-        HWR.beamline.sample_view.start_centring(tree_click=True)
+        api.graphics.start_centring(tree_click=True)
 
     def create_point_accept_button_clicked(self):
-        HWR.beamline.sample_view.start_centring()
+        api.graphics.start_centring()
 
     def create_line_button_clicked(self):
-        HWR.beamline.sample_view.create_line()
+        api.graphics.create_line()
 
     def draw_grid_button_clicked(self):
-        HWR.beamline.sample_view.create_grid(self.get_spacing())
+        api.graphics.create_grid(self.get_spacing())
 
     def show_shape_treewidget_popup(self, item, point, col):
-        QtImport.QMenu(self.manager_widget.shapes_treewidget)
+        menu = QtImport.QMenu(self.manager_widget.shapes_treewidget)
 
     def get_spacing(self):
         spacing = [0, 0]

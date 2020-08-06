@@ -45,13 +45,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>32767</width>
-            <height>27</height>
+            <width>33267</width>
+            <height>32</height>
            </size>
           </property>
           <property name="toolTip">
@@ -70,13 +70,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -92,13 +92,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>32767</width>
-            <height>27</height>
+            <width>33267</width>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -120,13 +120,13 @@
           <property name="minimumSize">
            <size>
             <width>410</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>32767</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -142,13 +142,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -183,13 +183,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>32767</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -199,19 +199,16 @@
         </item>
         <item row="4" column="3">
          <widget class="QPushButton" name="browse_button">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>75</width>
-            <height>27</height>
+            <width>100</width>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -231,13 +228,13 @@
           <property name="minimumSize">
            <size>
             <width>50</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>50</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="frame">
@@ -260,13 +257,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>150</width>
-            <height>27</height>
+            <height>32</height>
            </size>
           </property>
          </widget>

@@ -15,13 +15,14 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
+
+
+import api
 
 from gui.BaseComponents import BaseWidget
 from gui.utils import Icons, Colors, QtImport
 from gui.widgets.matplot_widget import TwoAxisPlotWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 STATES = {"unknown": Colors.GRAY, "ready": Colors.LIGHT_BLUE, "error": Colors.LIGHT_RED}
@@ -41,7 +42,7 @@ class MachineInfoBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Internal values -----------------------------------------------------
-        self.graphics_initialized = False
+        self.graphics_initialized = None
         self.value_label_list = []
 
         # Properties (name, type, default value, comment)----------------------
@@ -67,26 +68,27 @@ class MachineInfoBrick(BaseWidget):
 
     def run(self):
         """Method called when user changes a property in the gui builder"""
-        if HWR.beamline.machine_info is not None:
+        if api.machine_info is not None:
             self.setEnabled(True)
-            self.connect(HWR.beamline.machine_info, "valuesChanged", self.set_value)
-            HWR.beamline.machine_info.re_emit_values()
+            self.connect(api.machine_info, "valuesChanged", self.set_value)
+            api.machine_info.update_values()
         else:
             self.setEnabled(False)
 
-    def set_value(self, values_dict):
+    def set_value(self, values_list):
         """Slot connected to the valuesChanged signal
            At first time initializes gui by adding necessary labels.
            If the gui is initialized then update labels with values
         """
-        if not self.graphics_initialized:
-            for item in values_dict.values():
+
+        if self.graphics_initialized is None:
+            for item in values_list:
                 temp_widget = CustomInfoWidget(self)
                 temp_widget.init_info(item, self["maxPlotPoints"])
                 self.value_label_list.append(temp_widget)
                 self.main_vlayout.addWidget(temp_widget)
         self.graphics_initialized = True
-        for index, value in enumerate(values_dict.values()):
+        for index, value in enumerate(values_list):
             self.value_label_list[index].update_info(value)
 
 

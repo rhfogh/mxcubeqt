@@ -52,7 +52,7 @@ Depending of the beam focusing mode user can enter gap sizes by using spinboxes.
 
 try:
     uni_chr = unichr
-except NameError:
+except:
     uni_chr = chr
 
 from gui.utils import Colors, Icons, QtImport
@@ -224,7 +224,7 @@ class SlitsBrick(BaseWidget):
 
                 self.main_gbox.setEnabled(True)
                 self.initiate_spinboxes()
-                self.slitbox_hwobj.re_emit_values()
+                self.slitbox_hwobj.update_values()
             else:
                 self.main_gbox.setEnabled(False)
         else:

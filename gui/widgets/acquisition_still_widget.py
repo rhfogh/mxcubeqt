@@ -19,12 +19,12 @@
 
 """AcquisitionStillWidget is customized for ssx type acquisitions"""
 
+import api
+
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
 from HardwareRepository.HardwareObjects import queue_model_objects
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -140,15 +140,13 @@ class AcquisitionStillWidget(QtImport.QWidget):
         self.num_img_validator = QtImport.QIntValidator(
             1, 9999999, self.acq_widget_layout.num_images_ledit
         )
-        self.hare_num_validator = QtImport.QIntValidator(
-            1, 9999999, self.acq_widget_layout.hare_num_ledit
-        )
 
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = api.beamline_setup.get_acquisition_limit_values()
 
-        tpl = limits_dict.get("exposure_time")
-        if tpl:
-            self.exp_time_validator.setRange(tpl[0], tpl[1], 6)
+        if "exposure_time" in limits_dict:
+            limits = tuple(map(float, limits_dict["exposure_time"].split(",")))
+            (lower, upper) = limits
+            self.exp_time_validator.setRange(lower, upper, 6)
 
         self._acquisition_mib.bind_value_update(
             "exp_time",
@@ -171,17 +169,10 @@ class AcquisitionStillWidget(QtImport.QWidget):
             self.num_images_per_trigger_validator,
         )
 
-        self._acquisition_mib.bind_value_update(
-            "hare_num",
-            self.acq_widget_layout.hare_num_ledit,
-            int,
-            self.hare_num_validator,
-        )
-
-
-        tpl = limits_dict.get("number_of_images")
-        if tpl:
-            self.num_img_validator.setRange(tpl[0], tpl[1])
+        if "number_of_images" in limits_dict:
+            limits = tuple(map(float, limits_dict["number_of_images"].split(",")))
+            (lower, upper) = limits
+            self.num_img_validator.setRange(lower, upper)
 
         self._acquisition_mib.bind_value_update(
             "num_images",
@@ -217,7 +208,6 @@ class AcquisitionStillWidget(QtImport.QWidget):
         self.init_detector_roi_modes()
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
-        self.update_exp_time_limits()
 
     def update_osc_total_range(self):
         """
@@ -387,7 +377,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         Initiates detetor ROI modes. Available modes are added to the combobox
         :return: None
         """
-        roi_modes = HWR.beamline.detector.get_roi_modes()
+        roi_modes = api.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -421,7 +411,7 @@ class AcquisitionStillWidget(QtImport.QWidget):
         :param roi_mode_index: int
         :return:
         """
-        HWR.beamline.detector.set_roi_mode(roi_mode_index)
+        api.detector.set_roi_mode(roi_mode_index)
 
     def update_osc_range_per_frame_limits(self):
         """
@@ -431,9 +421,11 @@ class AcquisitionStillWidget(QtImport.QWidget):
         return
 
     def update_exp_time_limits(self):
-        self.update_detector_exp_time_limits(
-            HWR.beamline.detector.get_exposure_time_limits()
-        )
+        """
+        Updates exposure time limits
+        :return: None
+        """
+        return
 
     def update_osc_start(self, value):
         """

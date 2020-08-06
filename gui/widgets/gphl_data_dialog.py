@@ -28,8 +28,6 @@ from HardwareRepository import ConvertUtils
 from gui.utils import Colors, QtImport
 from gui.utils.paramsgui import FieldsWidget
 
-from HardwareRepository import HardwareRepository as HWR
-
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
@@ -169,7 +167,7 @@ class GphlDataDialog(QtImport.QDialog):
 
     def cancel_button_click(self):
         self.reject()
-        HWR.beamline.gphl_workflow.abort("Manual abort")
+        self.parent()._workflow_hwobj.abort("Manual abort")
 
     def open_dialog(self, field_list, async_result):
 

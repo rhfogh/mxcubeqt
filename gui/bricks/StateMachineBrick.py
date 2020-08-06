@@ -88,12 +88,8 @@ class StateMachineBrick(BaseWidget):
         self.graph_graphics_view.setFixedSize(900, 600)
         self.graph_graphics_scene.setSceneRect(0, 0, 900, 600)
         self.graph_graphics_view.setScene(self.graph_graphics_scene)
-        self.graph_graphics_view.setHorizontalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff
-        )
-        self.graph_graphics_view.setVerticalScrollBarPolicy(
-            QtImport.Qt.ScrollBarAlwaysOff
-        )
+        self.graph_graphics_view.setHorizontalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
+        self.graph_graphics_view.setVerticalScrollBarPolicy(QtImport.Qt.ScrollBarAlwaysOff)
         self.graph_graphics_view.setDragMode(QtImport.QGraphicsView.RubberBandDrag)
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.Antialiasing)
         self.graph_graphics_view.setRenderHint(QtImport.QPainter.TextAntialiasing)
@@ -113,7 +109,7 @@ class StateMachineBrick(BaseWidget):
                 )
                 self.init_state_machine()
                 self.init_state_graph()
-                self.state_machine_hwobj.re_emit_values()
+                self.state_machine_hwobj.update_values()
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 

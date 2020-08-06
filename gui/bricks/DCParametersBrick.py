@@ -17,14 +17,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 from gui.BaseComponents import BaseWidget
 from gui.utils import html_template, QtImport
 from gui.widgets.dc_parameters_widget import DCParametersWidget
 from gui.widgets.image_tracking_widget import ImageTrackingWidget
 from gui.widgets.advanced_results_widget import AdvancedResultsWidget
 from gui.widgets.snapshot_widget import SnapshotWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -72,13 +71,15 @@ class DCParametersBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
+        self.parameters_widget.init_api()
+        self.advance_results_widget.init_api()
 
     def populate_dc_parameter_widget(self, item):
-        self.parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+        self.parameters_widget._data_path_widget._base_image_dir = (
+            api.session.get_base_image_directory()
         )
-        self.parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+        self.parameters_widget._data_path_widget._base_process_dir = (
+            api.session.get_base_process_directory()
         )
 
         data_collection = item.get_model()
@@ -104,7 +105,7 @@ class DCParametersBrick(BaseWidget):
             self.parameters_widget.setEnabled(True)
 
         self.parameters_widget.populate_widget(item)
-        self.advance_results_widget.populate_widget(item)
+        self.advance_results_widget.populate_widget(item, data_collection)
 
     def populate_results(self, data_collection):
         if data_collection.html_report[-4:] == "html":

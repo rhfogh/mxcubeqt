@@ -46,22 +46,23 @@ import os
 import logging
 import numpy as np
 
-from gui.utils import QtImport
-pymca_imported = False
+PYMCA_IMPORTED = False
 try:
-    if QtImport.qt_variant == "PyQt5":
-        from PyMca5.PyMca import McaAdvancedFit
-        from PyMca5.PyMca import ConfigDict
-    else:
+    from PyMca5.PyMca import McaAdvancedFit
+    from PyMca5.PyMca import ConfigDict
+    PYMCA_IMPORTED = 5
+except ImportError:
+    try:
         from PyMca import McaAdvancedFit
         from PyMca import ConfigDict
-    pymca_imported = True
-except BaseException:
-    pass
+        PYMCA_IMPORTED = 4
+    except ImportError:
+        pass
 
-if not pymca_imported:
+if not PYMCA_IMPORTED:
     from gui.widgets.matplot_widget import TwoAxisPlotWidget
 
+from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
 
 
@@ -75,7 +76,7 @@ class McaSpectrumWidget(BaseWidget):
 
         self.define_slot("set_data", ())
 
-        if pymca_imported:
+        if PYMCA_IMPORTED:
             self.mcafit_widget = McaAdvancedFit.McaAdvancedFit(self)
             self.mcafit_widget.dismissButton.hide()
         else:
@@ -87,16 +88,17 @@ class McaSpectrumWidget(BaseWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
     def set_data(self, data, calib, config):
+        print data, calib, config
         try:
             configured = False
-            if os.path.exists(config.get("file", "")) and pymca_imported:
+            if os.path.exists(config.get("file", "")) and PYMCA_IMPORTED:
                 self._configure(config)
                 configured = True
             data = np.array(data)
             x = np.array(data[:, 0]).astype(np.float)
             y = np.array(data[:, 1]).astype(np.float)
-            xmin = float(config["min"])
-            xmax = float(config["max"])
+            #xmin = float(config["min"])
+            #xmax = float(config["max"])
             # self.mcafit_widget.refreshWidgets()
             calib = np.ravel(calib).tolist()
             """kw = {}
@@ -104,13 +106,13 @@ class McaSpectrumWidget(BaseWidget):
             kw['xmin'] = xmin
             kw['xmax'] = xmax
             kw['calibration'] = calib"""
-            self.mcafit_widget.setdata(x, y)
-            if pymca_imported:
-                # elf.mcafit.setdata(x, y, **kw)# xmin=xmin, xmax=xmax,
-                # calibration=calib)
+            if PYMCA_IMPORTED:
                 self.mcafit_widget._energyAxis = False
+                self.mcafit_widget.setData(x, y, xmin=float(config["min"]), xmax=float(config["max"]), calibration=calib)
                 self.mcafit_widget.toggleEnergyAxis()
-                self.mcafit_widget.setdata(x, y)
+                self.mcafit_widget.refreshWidgets()
+
+            """
             # result = self._fit()
             # pyarch file name and directory
             pf = config["legend"].split(".")
@@ -119,8 +121,8 @@ class McaSpectrumWidget(BaseWidget):
             outdir = config["htmldir"]
             sourcename = config["legend"]
 
-            if pymca_imported:
-                result = self._fit()
+            if PYMCA_IMPORTED:
+                result = self.mcafit_widget.fit()
                 if configured:
                     report = McaAdvancedFit.QtMcaAdvancedFitReport.QtMcaAdvancedFitReport(
                         None,
@@ -134,6 +136,7 @@ class McaSpectrumWidget(BaseWidget):
 
                     text = report.getText()
                     report.writeReport(text=text)
+            """
 
         except BaseException:
             logging.getLogger("HWR").exception("McaSpectrumWidget: problem fitting")

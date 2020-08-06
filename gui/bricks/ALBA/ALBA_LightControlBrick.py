@@ -49,6 +49,7 @@ STATES = {
 
 
 class ALBA_LightControlBrick(BaseWidget):
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -58,7 +59,9 @@ class ALBA_LightControlBrick(BaseWidget):
         self.on_color = Colors.color_to_hexa(Colors.LIGHT_GREEN)
         self.off_color = Colors.color_to_hexa(Colors.LIGHT_GRAY)
         self.fault_color = Colors.color_to_hexa(Colors.LIGHT_RED)
-        self.unknown_color = Colors.color_to_hexa(Colors.DARK_GRAY)
+        self.unknown_color = Colors.color_to_hexa(
+            Colors.DARK_GRAY
+        )
 
         # Hardware objects ----------------------------------------------------
         self.light_ho = None
@@ -118,12 +121,12 @@ class ALBA_LightControlBrick(BaseWidget):
                 self.connect(
                     self.light_ho, QtImport.SIGNAL("stateChanged"), self.state_changed
                 )
-                self.light_ho.re_emit_values()
+                self.light_ho.update_values()
                 self.setToolTip(
                     "Control of %s (light level and on/off switch."
                     % self.light_ho.getUserName()
                 )
-                self.set_level_limits(self.light_ho.get_limits())
+                self.set_level_limits(self.light_ho.getLimits())
                 self.set_label(self.light_ho.getUserName())
             else:
                 self.setEnabled(False)

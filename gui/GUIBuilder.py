@@ -35,8 +35,7 @@ from gui.utils import Icons, ConnectionEditor, PropertyEditor, GUIDisplay, QtImp
 from gui.bricks import LogViewBrick
 from gui.BaseLayoutItems import ContainerCfg
 
-from HardwareRepository import HardwareRepository as HWR
-from HardwareRepository.ConvertUtils import string_types
+from HardwareRepository import HardwareRepository
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -670,7 +669,7 @@ class GUIEditorWindow(QtImport.QWidget):
         self.tree_widget.setDragEnabled(True)
         self.tree_widget.setAcceptDrops(True)
 
-        if isinstance(icon, string_types):
+        if isinstance(icon, str):
             new_treewidget_item.setIcon(0, Icons.load_icon(icon))
         self.tree_widget.setCurrentItem(new_treewidget_item)
         self.tree_widget.scrollToItem(
@@ -818,7 +817,7 @@ class GUIEditorWindow(QtImport.QWidget):
                     parent = parent_ref()
                     if parent is None:
                         return
-                    parent.child_property_changed(
+                    parent.childPropertyChanged(
                         item_name, property_name, old_value, new_value
                     )
 
@@ -1197,7 +1196,9 @@ class GUIPreviewWindow(QtImport.QWidget):
                 "Window preview: %s%s" % (container_cfg["name"], title)
             )
 
-        self.window_preview.draw_preview(container_cfg, window_id)
+        self.window_preview.draw_preview(
+            container_cfg, window_id, container_ids, selected_item
+        )
 
     def update_window(self, container_cfg, window_id, container_ids, selected_item):
         """Updates gui"""
@@ -1208,7 +1209,10 @@ class GUIPreviewWindow(QtImport.QWidget):
             self.window_preview_box.setTitle(
                 "Window preview: %s%s" % (container_cfg["name"], title)
             )
-        self.window_preview.update_preview(selected_item)
+
+        self.window_preview.update_preview(
+            container_cfg, window_id, container_ids, selected_item
+        )
 
     def add_window_widget(self, window_cfg):
         """Refresh preview after adding a window"""
@@ -1500,7 +1504,7 @@ class GUIBuilder(QtImport.QMainWindow):
                     ):
                         try:
                             hwr_server = (
-                                HWR.getHardwareRepository().serverAddress
+                                HardwareRepository.getHardwareRepository().serverAddress
                             )
                         except BaseException:
                             hwr_server = ""
@@ -1622,7 +1626,7 @@ class GUIBuilder(QtImport.QMainWindow):
         terminal = os.environ["TERM"] or "xterm"
 
         try:
-            hwr_server = HWR.getHardwareRepository().serverAddress
+            hwr_server = HardwareRepository.getHardwareRepository().serverAddress
         except BaseException:
             logging.getLogger().error(
                 "Sorry, could not find Hardware Repository server"

@@ -15,16 +15,16 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 
-from gui.utils import QtImport
+import api
+from gui.utils import queue_item, QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.acquisition_widget import AcquisitionWidget
-
-from HardwareRepository import HardwareRepository as HWR
+from HardwareRepository.HardwareObjects import queue_model_objects
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -78,6 +78,9 @@ class AdvancedParametersWidget(QtImport.QWidget):
         self._acq_widget.acq_widget_layout.energies_combo.hide()
         self._acq_widget.acq_widget_layout.shutterless_cbx.hide()
 
+    def init_api(self):
+        self._acq_widget.init_api()
+
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
 
@@ -86,13 +89,19 @@ class AdvancedParametersWidget(QtImport.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = HWR.beamline.queue_model.get_next_run_number(path_template)
+        run_number = api.queue_model.get_next_run_number(
+            path_template
+        )
 
         self._data_path_widget.set_run_number(run_number)
         self._data_path_widget.set_prefix(path_template.base_prefix)
         model = self._tree_view_item.get_model()
         model.set_name(path_template.get_prefix())
         self._tree_view_item.setText(0, model.get_name())
+
+    def tab_changed(self):
+        if self._tree_view_item:
+            self.populate_widget(self._tree_view_item, None)
 
     def populate_widget(self, tree_view_item, data_collection):
         self._tree_view_item = tree_view_item
@@ -115,6 +124,9 @@ class AdvancedParametersWidget(QtImport.QWidget):
         # on that both models upto date, we need to refactor this part
         # so that both models are set before taking ceratin actions.
         # This workaround, works for the time beeing.
+        self._data_path_widget._data_model = self._data_collection.acquisitions[
+            0
+        ].path_template
         self._data_path_widget.update_data_model(
             self._data_collection.acquisitions[0].path_template
         )

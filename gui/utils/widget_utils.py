@@ -22,7 +22,6 @@ from gui.utils import Colors, QtImport
 from HardwareRepository.dispatcher import dispatcher
 from HardwareRepository.ConvertUtils import string_types
 
-
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 
@@ -60,20 +59,21 @@ class DataModelInputBinder(object):
             self.__validated(
                 field_name, validator, self.bindings[field_name][0], new_value
             )
-            if isinstance(widget, QtImport.QLineEdit):
-                if type_fn is float and validator:
-                    widget.setText(
-                        "{:g}".format(
-                            round(float(origin_value), validator.decimals())
+            if True:
+                if isinstance(widget, QtImport.QLineEdit):
+                    if type_fn is float and validator:
+                        widget.setText(
+                            "{:g}".format(
+                                round(float(origin_value), validator.decimals())
+                            )
                         )
-                    )
-            try:
-                setattr(self.__model, field_name, type_fn(origin_value))
-            except ValueError:
-                if origin_value != "":
-                    raise
-            else:
-                dispatcher.send("model_update", self.__model, field_name, self)
+                try:
+                    setattr(self.__model, field_name, type_fn(origin_value))
+                except ValueError:
+                    if origin_value != "":
+                        raise
+                else:
+                    dispatcher.send("model_update", self.__model, field_name, self)
 
     def __ledit_text_edited(self, field_name, widget, new_value, type_fn, validator):
         self.bindings[field_name][3] = True
@@ -153,11 +153,10 @@ class DataModelInputBinder(object):
 
             if isinstance(widget, QtImport.QLineEdit): 
                 if type_fn is float and validator:
-                    if getattr(self.__model, field_name):
-                        value = float(getattr(self.__model, field_name))
-                        widget.setText(
-                            "{:g}".format(round(float(value), validator.decimals()))
-                        )
+                    value = float(getattr(self.__model, field_name))
+                    widget.setText(
+                        "{:g}".format(round(float(value), validator.decimals()))
+                    )
                 elif type_fn is int and validator:
                     value = int(getattr(self.__model, field_name))
                     widget.setText("%d" % value)
@@ -191,8 +190,7 @@ class DataModelInputBinder(object):
             )
             if type_fn is float and validator:
                 pattern = "%." + str(validator.decimals()) + "f"
-                if getattr(self.__model, field_name):
-                    widget.setText(pattern % float(getattr(self.__model, field_name)))
+                widget.setText(pattern % float(getattr(self.__model, field_name)))
             else:
                 widget.setText(str(getattr(self.__model, field_name)))
 
@@ -239,15 +237,16 @@ class DataModelInputBinder(object):
             validator = item[1][1]
 
             # if validator:
-            if isinstance(widget, QtImport.QLineEdit):
-                if not self.__validated(key, validator, widget, widget.text()):
-                    result.append(key)
-            elif isinstance(widget, QtImport.QComboBox):
-                pass
-            elif isinstance(widget, QtImport.QCheckBox) or isinstance(
-                widget, QtImport.QRadioButton
-            ):
-                pass
+            if True:
+                if isinstance(widget, QtImport.QLineEdit):
+                    if not self.__validated(key, validator, widget, widget.text()):
+                        result.append(key)
+                elif isinstance(widget, QtImport.QComboBox):
+                    pass
+                elif isinstance(widget, QtImport.QCheckBox) or isinstance(
+                    widget, QtImport.QRadioButton
+                ):
+                    pass
         return result
 
     def clear_edit(self):

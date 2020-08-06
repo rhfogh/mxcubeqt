@@ -159,7 +159,7 @@ class ConfirmDialog(QtImport.QDialog):
                     0
                 ].acquisition_parameters
             elif isinstance(item, queue_item.XrayImagingQueueItem):
-                acq_parameters = item_model.acquisition.acquisition_parameters
+                acq_parameters = item_model.acquisitions[0].acquisition_parameters
 
             path_template = item_model.get_path_template()
 

@@ -15,14 +15,12 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
-from gui.utils import QtImport
 from gui.BaseComponents import BaseWidget
+from gui.utils import Icons, QtImport
 from gui.utils.sample_changer_helper import SampleChanger
 from gui.widgets.plate_navigator_widget import PlateNavigatorWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -35,6 +33,7 @@ class PlateManipulatorBrick(BaseWidget):
         BaseWidget.__init__(self, *args)
 
         # Hardware objects ----------------------------------------------------
+        self.plate_manipulator_hwobj = None
 
         # Internal values -----------------------------------------------------
         self.num_cols = None
@@ -45,6 +44,7 @@ class PlateManipulatorBrick(BaseWidget):
         self.xtal_map = None
 
         # Properties ----------------------------------------------------------
+        self.add_property("mnemonic", "string", "")
         self.add_property("icons", "string", "")
 
         # Signals -------------------------------------------------------------
@@ -80,17 +80,30 @@ class PlateManipulatorBrick(BaseWidget):
         self.xtal_image_graphics_pixmap = QtImport.QGraphicsPixmapItem()
         self.xtal_image_graphicsscene.addItem(self.xtal_image_graphics_pixmap)
 
-        if HWR.beamline.plate_manipulator is not None:
-            self.connect(HWR.beamline.plate_manipulator,
-                         SampleChanger.INFO_CHANGED_EVENT,
-                         self.plate_navigator_widget.refresh_plate_location,
-            )
+    def property_changed(self, property_name, old_value, new_value):
+        if property_name == "mnemonic":
+            if self.plate_manipulator_hwobj is not None:
+                self.disconnect(
+                    self.plate_manipulator_hwobj,
+                    SampleChanger.INFO_CHANGED_EVENT,
+                    self.plate_navigator_widget.refresh_plate_location,
+                )
 
+            self.plate_manipulator_hwobj = self.get_hardware_object(new_value)
+
+            if self.plate_manipulator_hwobj is not None:
+                self.connect(
+                    self.plate_manipulator_hwobj,
+                    SampleChanger.INFO_CHANGED_EVENT,
+                    self.plate_navigator_widget.refresh_plate_location,
+                )
+        else:
+            BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def search_button_clicked(self):
-        if HWR.beamline.plate_manipulator is not None:
-            # processing_plan = HWR.beamline.plate_manipulator.
-            self.plate_content = HWR.beamline.plate_manipulator.sync_with_crims(
+        if self.plate_manipulator_hwobj:
+            # processing_plan = self.plate_manipulator_hwobj.
+            self.plate_content = self.plate_manipulator_hwobj.sync_with_crims(
                 self.plate_widget.barcode_ledit.text()
             )
             if self.plate_content:
@@ -107,12 +120,12 @@ class PlateManipulatorBrick(BaseWidget):
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            HWR.beamline.plate_manipulator.load(xtal_item),
+            self.plate_manipulator_hwobj.load(xtal_item),
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
-        if HWR.beamline.plate_manipulator:
-            HWR.beamline.plate_manipulator.abort()
+        if self.plate_manipulator_hwobj:
+            self.plate_manipulator_hwobj.abort()
 
     def xtal_treewidget_current_item_changed(self, current_item):
         xtal_item = self.xtal_map.get(current_item)
@@ -138,7 +151,10 @@ class PlateManipulatorBrick(BaseWidget):
         )
         root_item.setExpanded(True)
         for xtal in self.plate_content.plate.xtal_list:
+            xtal_address = "%s:%d" % (xtal.row, xtal.column + 1)
             cell_treewidget_item = None
+            # cell_treewidget_item = self.plate_widget.xtal_treewidget.\
+            #    findItems(xtal_address, QtCore.Qt.MatchExactly, 0)[0]
             if not cell_treewidget_item:
                 cell_treewidget_item = root_item
 

@@ -19,6 +19,7 @@
 
 import string
 import logging
+import time
 import sys
 import os
 
@@ -32,6 +33,7 @@ __category__ = "Sample changer"
 
 
 class CatsMaintBrick(BaseWidget):
+
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
@@ -41,7 +43,9 @@ class CatsMaintBrick(BaseWidget):
 
         self.expert_mode = False
 
-        self.widget = QtImport.load_ui_file("catsmaint_widget.ui")
+        self.widget = QtImport.load_ui_file(
+             "catsmaint_widget.ui"
+        )
 
         QtImport.QHBoxLayout(self)
         self.layout().addWidget(self.widget)
@@ -113,14 +117,10 @@ class CatsMaintBrick(BaseWidget):
                 self.disconnect(self.device, "barcodeChanged", self.update_barcode)
                 self.disconnect(self.device, "toolStateChanged", self.update_tool_state)
                 self.disconnect(
-                    self.device,
-                    sample_changer_helper.SampleChanger.STATUS_CHANGED_EVENT,
-                    self.update_status,
+                    self.device, sample_changer_helper.SampleChanger.STATUS_CHANGED_EVENT, self.update_status
                 )
                 self.disconnect(
-                    self.device,
-                    sample_changer_helper.SampleChanger.STATE_CHANGED_EVENT,
-                    self.update_state,
+                    self.device, sample_changer_helper.SampleChanger.STATE_CHANGED_EVENT, self.update_state
                 )
 
             # load the new hardware object
@@ -139,14 +139,10 @@ class CatsMaintBrick(BaseWidget):
                 self.connect(self.device, "lid3StateChanged", self.update_lid3_state)
                 self.connect(self.device, "toolStateChanged", self.update_tool_state)
                 self.connect(
-                    self.device,
-                    sample_changer_helper.SampleChanger.STATUS_CHANGED_EVENT,
-                    self.update_status,
+                    self.device, sample_changer_helper.SampleChanger.STATUS_CHANGED_EVENT, self.update_status
                 )
                 self.connect(
-                    self.device,
-                    sample_changer_helper.SampleChanger.STATE_CHANGED_EVENT,
-                    self.update_state,
+                    self.device, sample_changer_helper.SampleChanger.STATE_CHANGED_EVENT, self.update_state
                 )
 
     def set_expert_mode(self, expert):
@@ -545,7 +541,9 @@ class CatsCommandDialog(QtImport.QDialog):
         layout.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(layout)
-        self.widget = QtImport.load_ui_file("catscommand_dialog.ui")
+        self.widget = QtImport.load_ui_file(
+             "catscommand_dialog.ui"
+        )
 
         layout.addWidget(self.widget)
 

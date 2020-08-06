@@ -232,7 +232,7 @@ class DuoStateBrick(BaseWidget):
                 self.main_gbox.show()
 
                 if self["username"] == "":
-                    self["username"] = self.wrapper_hwobj.username
+                    self["username"] = self.wrapper_hwobj.userName()
 
                 help_text = self["setin"] + " the " + self["username"].lower()
                 self.set_in_button.setToolTip(help_text)
@@ -240,7 +240,7 @@ class DuoStateBrick(BaseWidget):
                 self.set_out_button.setToolTip(help_text)
                 self.main_gbox.setTitle(self["username"])
                 self.wrapper_hwobj.duoStateChangedSignal.connect(self.stateChanged)
-                self.wrapper_hwobj.get_state()
+                self.wrapper_hwobj.getState()
             else:
                 self.wrapper_hwobj = None
                 # self.main_gbox.hide()
@@ -273,11 +273,11 @@ class DuoStateBrick(BaseWidget):
 
         # elif property_name=='in':
         #    if self.wrapper_hwobj is not None:
-        #        self.stateChanged(self.wrapper_hwobj.get_state())
+        #        self.stateChanged(self.wrapper_hwobj.getState())
 
         # elif property_name=='out':
         #    if self.wrapper_hwobj is not None:
-        #        self.stateChanged(self.wrapper_hwobj.get_state())
+        #        self.stateChanged(self.wrapper_hwobj.getState())
 
         elif property_name == "setin":
             icons = self["icons"]
@@ -308,7 +308,7 @@ class DuoStateBrick(BaseWidget):
         elif property_name == "username":
             if new_value == "":
                 if self.wrapper_hwobj is not None:
-                    name = self.wrapper_hwobj.username
+                    name = self.wrapper_hwobj.userName()
                     if name != "":
                         self["username"] = name
                         return
@@ -389,8 +389,8 @@ class WrapperHO(QtImport.QObject):
         # self.setIn = new.instancemethod(lambda self: None, self)
         self.setIn = lambda self: None
         self.setOut = self.setIn
-        # self.get-State = new.instancemethod(lambda self: "unknown", self)
-        self.get_state = lambda self: "unknown"
+        # self.getState = new.instancemethod(lambda self: "unknown", self)
+        self.getState = lambda self: "unknown"
         self.dev = hardware_obj
         try:
             sClass = str(self.dev.__class__)
@@ -407,7 +407,7 @@ class WrapperHO(QtImport.QObject):
         initFunc()
         self.setIn = getattr(self, "setIn%s" % self.devClass)
         self.setOut = getattr(self, "setOut%s" % self.devClass)
-        self.get_state = getattr(self, "getState%s" % self.devClass)
+        self.getState = getattr(self, "getState%s" % self.devClass)
 
     def __getstate__(self):
         dict = self.__dict__.copy()
@@ -419,21 +419,19 @@ class WrapperHO(QtImport.QObject):
     def __setstate__(self, dict):
         self.__dict__ = dict.copy()
         try:
-            # Python2
+            #Python2 
             import new
-
             self.setIn = new.instancemethod(lambda self: None, self)
             self.setOut = self.setIn
-            self.get_state = new.instancemethod(lambda self: "unknown", self)
-        except ImportError:
+            self.getState = new.instancemethod(lambda self: "unknown", self)
+        except:
             import types
-
             self.setIn = types.MethodType(lambda self: None, self)
             self.setOut = self.setIn
-            self.get_state = types.MethodType(lambda self: "unknown", self)
+            self.getState = types.MethodType(lambda self: "unknown", self)
 
     def userName(self):
-        return self.dev.username
+        return self.dev.userName()
 
     # WagoPneu HO methods
     def initWagoPneu(self):
@@ -521,7 +519,7 @@ class WrapperHO(QtImport.QObject):
             self.duoStateChangedSignal.emit(state)
 
     def position_changed_spec_motor_wspec_positions(self, pos_name, pos):
-        if self.dev.get_state() != self.dev.READY:
+        if self.dev.getState() != self.dev.READY:
             return
         state = "error"
         if self.positions is not None:
@@ -533,9 +531,9 @@ class WrapperHO(QtImport.QObject):
     def get_state_spec_motor_wspec_positions(self):
         if self.positions is None:
             return "error"
-        curr_pos = self.dev.get_current_position_name()
+        curr_pos = self.dev.getCurrentPositionName()
         if curr_pos is None:
-            state = self.dev.get_state()
+            state = self.dev.getState()
             try:
                 state = WrapperHO.MOTOR_WSTATE[state]
             except IndexError:
@@ -550,18 +548,18 @@ class WrapperHO(QtImport.QObject):
     def new_predefined_spec_motor_wspec_positions(self):
         self.positions = self.dev.getPredefinedPositionsList()
         self.position_changed_spec_motor_wspec_positions(
-            self.dev.get_current_position_name(), self.dev.get_value()
+            self.dev.getCurrentPositionName(), self.dev.getPosition()
         )
 
     # Procedure HO methods
     def init_procedure(self):
-        cmds = self.dev.get_commands()
+        cmds = self.dev.getCommands()
 
         self.set_in_cmd = None
         self.set_out_cmd = None
 
         try:
-            channel = self.dev.get_channel_object("dev_state")
+            channel = self.dev.getChannelObject("dev_state")
         except KeyError:
             channel = None
         self.stateChannel = channel

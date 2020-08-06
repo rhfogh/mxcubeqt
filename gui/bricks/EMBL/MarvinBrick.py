@@ -19,16 +19,15 @@
 
 """EMBL specific brick to control Marvin SC"""
 
-from gui.utils import Colors, QtImport
-from gui.BaseComponents import BaseWidget
+import api
 
-from HardwareRepository import HardwareRepository as HWR
+from gui.utils import Colors, Icons, QtImport
+from gui.BaseComponents import BaseWidget
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
 __category__ = "EMBL"
 
-PUCK_COUNT = 19
 
 class MarvinBrick(BaseWidget):
     """
@@ -76,6 +75,17 @@ class MarvinBrick(BaseWidget):
         self.status_list_gbox = QtImport.QGroupBox("Status list", self)
         self.status_table = QtImport.QTableWidget(self)
 
+        self.base_to_center_button.setVisible(False)
+        self.center_to_base_button.setVisible(False)
+
+        self.error_msg_dialog = QtImport.QDialog(self)
+        self.error_msg_dialog.setWindowTitle("Sample changer error")
+        #self.error_msg_dialog.setWindowIcon(Icons.load_icon("")
+        self.reset_error_label = QtImport.QLabel("test", self.error_msg_dialog)
+        self.reset_error_label.setFixedSize(400, 50)
+        self.reset_error_button = QtImport.QPushButton("Reset error", self.error_msg_dialog)
+        self.reset_error_button.setFixedWidth(100)
+
         # Layout --------------------------------------------------------------
         _status_gbox_gridlayout = QtImport.QGridLayout(self.status_gbox)
         _status_gbox_gridlayout.addWidget(
@@ -122,6 +132,10 @@ class MarvinBrick(BaseWidget):
         _main_vlayout.setSpacing(2)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
+        _error_msgbox_vlayout = QtImport.QVBoxLayout(self.error_msg_dialog)
+        _error_msgbox_vlayout.addWidget(self.reset_error_label)
+        _error_msgbox_vlayout.addWidget(self.reset_error_button)
+
         # SizePolicies --------------------------------------------------------
 
         # Qt signal/slot connections ------------------------------------------
@@ -130,6 +144,7 @@ class MarvinBrick(BaseWidget):
         self.base_to_center_button.clicked.connect(base_to_center_clicked)
         self.center_to_base_button.clicked.connect(center_to_base_clicked)
         self.dry_gripper_button.clicked.connect(dry_gripper_clicked)
+        self.reset_error_button.clicked.connect(self.reset_error)
 
         # Other ---------------------------------------------------------------
         self.mounted_sample_ledit.setFixedWidth(80)
@@ -137,15 +152,15 @@ class MarvinBrick(BaseWidget):
         self.focus_mode_ledit.setFixedWidth(80)
 
         self.puck_switches_table.setRowCount(1)
-        self.puck_switches_table.setColumnCount(PUCK_COUNT)
+        self.puck_switches_table.setColumnCount(17)
         self.puck_switches_table.verticalHeader().hide()
         self.puck_switches_table.horizontalHeader().hide()
         self.puck_switches_table.setRowHeight(0, 28)
         self.puck_switches_table.setFixedHeight(28)
         self.puck_switches_table.setShowGrid(True)
-        self.puck_switches_table.setFixedWidth(33 * PUCK_COUNT + 4)
+        self.puck_switches_table.setFixedWidth(33 * 17 + 4)
 
-        for col_index in range(PUCK_COUNT):
+        for col_index in range(17):
             temp_item = QtImport.QTableWidgetItem(str(col_index + 1))
             temp_item.setFlags(QtImport.Qt.ItemIsEnabled)
             temp_item.setBackground(Colors.WHITE)
@@ -157,27 +172,21 @@ class MarvinBrick(BaseWidget):
             ["Property", "Description", "Value"]
         )
 
-        self.puck_switches_gbox.setSizePolicy(
-            QtImport.QSizePolicy.Preferred, QtImport.QSizePolicy.Fixed
-        )
+        self.puck_switches_gbox.setSizePolicy(QtImport.QSizePolicy.Preferred,
+                                              QtImport.QSizePolicy.Fixed)
         self.init_tables()
-        self.connect(
-            HWR.beamline.sample_changer,
-            "statusListChanged",
-            self.status_list_changed
-        )
-        self.connect(
-            HWR.beamline.sample_changer, "infoDictChanged", self.info_dict_changed
-        )
+        self.connect(api.sample_changer, "statusListChanged", self.status_list_changed)
+        self.connect(api.sample_changer, "infoDictChanged", self.info_dict_changed)
+        self.connect(api.sample_changer, "errorStatusChanged", self.error_status_changed)
 
-        HWR.beamline.sample_changer.re_emit_values()
+        api.sample_changer.update_values()
 
     def init_tables(self):
         """
         Inits table with status info
         :return:
         """
-        self.status_str_desc = HWR.beamline.sample_changer.get_status_str_desc()
+        self.status_str_desc = api.sample_changer.get_status_str_desc()
         self.index_dict = {}
         self.status_table.setRowCount(len(self.status_str_desc))
         for row, key in enumerate(self.status_str_desc.keys()):
@@ -268,37 +277,61 @@ class MarvinBrick(BaseWidget):
         self.open_lid_button.setDisabled(info_dict.get("lid_opened", True))
         self.close_lid_button.setEnabled(info_dict.get("lid_opened", False))
 
+    def error_status_changed(self, in_error_state, msg):
+        print in_error_state, msg
+        if in_error_state:
+            """
+            if self.error_msg_dialog is None:
+                self.error_msg_dialog = QtImport.QMessageBox(self)
+                self.error_msg_dialog.setIcon(QtImport.QMessageBox.Warning)
+                self.error_msg_dialog.setWindowTitle("Sample changer error")
+                self.error_msg_dialog.addButton("Ok", QtImport.QMessageBox.AcceptRole)
+
+            self.error_msg_dialog.setText(msg)
+            if self.error_msg_dialog.show() == QtImport.QMessageBox.AcceptRole:
+                api.sample_changer.reset_error()
+            """
+            self.reset_error_label.setText(msg)
+            self.error_msg_dialog.show()
+        else:
+            if self.error_msg_dialog is not None:
+                self.error_msg_dialog.close()
+
+    def reset_error(self):
+        self.error_msg_dialog.close()
+        api.sample_changer.reset_error()
+
 def open_lid_clicked():
     """
     Opens SC lid
     :return:
     """
-    HWR.beamline.sample_changer.open_lid()
+    api.sample_changer.open_lid()
 
 def close_lid_clicked():
     """
     Closes SC lid
     :return:
     """
-    HWR.beamline.sample_changer.close_lid()
+    api.sample_changer.close_lid()
 
 def base_to_center_clicked():
     """
     Calls base-to-center function
     :return:
     """
-    HWR.beamline.sample_changer.base_to_center()
+    api.sample_changer.base_to_center()
 
 def center_to_base_clicked():
     """
     Calls center-to-base function
     :return:
     """
-    HWR.beamline.sample_changer.center_to_base()
+    api.sample_changer.center_to_base()
 
 def dry_gripper_clicked():
     """
     Calls dry-gripper function
     :return:
     """
-    HWR.beamline.sample_changer.dry_gripper()
+    api.sample_changer.dry_gripper()

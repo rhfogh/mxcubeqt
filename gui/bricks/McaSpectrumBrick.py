@@ -41,6 +41,7 @@ __category__ = "General"
 
 
 class McaSpectrumBrick(BaseWidget):
+
     def __init__(self, *args):
         BaseWidget.__init__(self, *args)
 

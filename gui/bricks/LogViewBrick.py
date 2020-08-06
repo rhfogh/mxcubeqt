@@ -64,6 +64,7 @@ The email feedback feature allows users to report any problem : an email
 is sent to the recipients specified in the emailAddresses property.
 """
 import os
+import sys
 import logging
 
 # import email.Utils
@@ -250,10 +251,7 @@ class Submitfeedback(QtImport.QWidget):
                 logging.getLogger().error(str(error_dict))
 
             QtImport.QMessageBox.information(
-                self,
-                "Thank you!",
-                "Your comments have been submitted.",
-                QtImport.QMessageBox.Ok,
+                self, "Thank you!", "Your comments have been submitted.", QtImport.QMessageBox.Ok
             )
             self.message_textedit.clear()
 

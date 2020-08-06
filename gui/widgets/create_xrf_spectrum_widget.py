@@ -15,20 +15,19 @@
 #  GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with MXCuBE. If not, see <http://www.gnu.org/licenses/>.
+#  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
 import logging
 
+import api
+
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
-from gui.widgets.comments_widget import CommentsWidget
 
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects.QtGraphicsLib import GraphicsItemPoint
-
-from HardwareRepository import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -66,8 +65,6 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         )
         self.adjust_transmission_cbox.setChecked(True)
 
-        self._comments_widget = CommentsWidget(self)
-
         # Layout --------------------------------------------------------------
         _parameters_gbox_hlayout = QtImport.QHBoxLayout(_parameters_gbox)
         _parameters_gbox_hlayout.addWidget(_count_time_label)
@@ -80,13 +77,11 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._data_path_widget)
         _main_vlayout.addWidget(_parameters_gbox)
-        _main_vlayout.addWidget(self._comments_widget)
         _main_vlayout.setSpacing(6)
         _main_vlayout.setContentsMargins(2, 2, 2, 2)
         _main_vlayout.addStretch(0)
 
         # SizePolicies --------------------------------------------------------
-        self._comments_widget.setFixedHeight(100)
 
         # Qt signal/slot connections ------------------------------------------
         self._data_path_widget.pathTemplateChangedSignal.connect(
@@ -148,18 +143,18 @@ class CreateXRFSpectrumWidget(CreateTaskBase):
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
 
-    def _create_task(self, sample, shape, comments=None):
+    def _create_task(self, sample, shape):
         data_collections = []
 
         if self.count_time is not None:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = HWR.beamline.sample_view.get_scene_snapshot()
+                cpos.snapshot_image = api.graphics.get_scene_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = HWR.beamline.sample_view.get_scene_snapshot(shape)
+                    snapshot = api.graphics.get_scene_snapshot(shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot

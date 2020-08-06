@@ -17,10 +17,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import api
 from gui.utils import Colors, Icons, QtImport
 from gui.BaseComponents import BaseWidget
-
-from HardwareRepository import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -84,16 +83,11 @@ class DoorInterlockBrick(BaseWidget):
         self.state_label.setToolTip("Shows the current door state")
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
-        self.connect(
-            HWR.beamline.hutch_interlock,
-            "doorInterlockStateChanged",
-            self.state_changed
-        )
-        HWR.beamline.hutch_interlock.re_emit_values()
+        self.connect(api.door_interlock, "doorInterlockStateChanged", self.state_changed)
+        api.door_interlock.update_values()
 
     def unlock_doors(self):
-        self.unlock_door_button.setEnabled(False)
-        HWR.beamline.hutch_interlock.unlock_door_interlock()
+        api.door_interlock.unlock_door_interlock()
 
     def updateLabel(self, label):
         self.main_groupbox.setTitle(label)
