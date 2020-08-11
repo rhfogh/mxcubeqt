@@ -32,7 +32,6 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects.queue_model_enumerables import States
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -70,13 +69,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
 
         self._data_path_widget = DataPathWidget(
-            self, "create_dc_path_widget", layout="vertical"
+            self,
+            "create_dc_path_widget",
+            data_model=self._path_template,
+            layout="vertical"
         )
         data_path_layout = self._data_path_widget.data_path_layout
-        data_path_layout.file_name_label.hide()
-        data_path_layout.file_name_value_label.hide()
-        data_path_layout.run_number_label.hide()
-        data_path_layout.run_number_ledit.hide()
+        data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
@@ -101,7 +100,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
-        self.gphl_data_dialog.continueClickedSignal.connect(self.data_acquired)
 
     def initialise_workflows(self):
 
@@ -124,25 +122,25 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # if reset or name != self._previous_workflow:
         xx0 = self._workflow_cbox
         xx0.setCurrentIndex(xx0.findText(name))
-        self.init_models()
-        self._data_path_widget.update_data_model(self._path_template)
+        # self.init_models()
+        # self._data_path_widget.update_data_model(self._path_template)
 
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
-        if strategy_type == "transcal":
+        if strategy_type.startswith("transcal"):
             # NB Once we do not have to set unique prefixes, this should be readOnly
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_acq_widget.hide()
-        elif strategy_type == "diffractcal":
+        elif strategy_type.startswith("diffractcal"):
             # TODO update this
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
-            self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
+            # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
             self._gphl_diffractcal_widget.hide()
@@ -152,28 +150,27 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if prefix is not None:
             self.current_prefix = prefix
 
-    def data_acquired(self):
-        """Data gathered from popup, continue execution"""
-        pass
+    def get_default_directory(self, tree_item=None, sub_dir=''):
+        # Add placeholder for enactment number
+        if sub_dir:
+            sub_dir += "_000"
+        #
+        return super(CreateGphlWorkflowWidget, self).get_default_directory(
+            tree_item=tree_item, sub_dir=sub_dir
+        )
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
         wf_model = tree_item.get_model()
 
-        if isinstance(tree_item, queue_item.SampleQueueItem):
-            self.init_models()
+        if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
+            if tree_item.get_model().is_executed():
+                self.setDisabled(True)
+            else:
+                self.setDisabled(False)
 
-        else:
-            if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
-                if tree_item.get_model().is_executed():
-                    self.setDisabled(True)
-                else:
-                    self.setDisabled(False)
-
-                if wf_model.get_path_template():
-                    self._path_template = wf_model.get_path_template()
-
-                self._data_path_widget.update_data_model(self._path_template)
+            if wf_model.get_path_template():
+                self._path_template = wf_model.get_path_template()
 
             elif isinstance(tree_item, queue_item.BasketQueueItem):
                 self.setDisabled(False)
@@ -187,17 +184,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def _init_models(self):
         pass
 
-    def continue_button_click(self, sample_items, checked_items):
-        """Intercepts the datacollection continue_button click for parameter setting"""
-        tree_brick = self._tree_brick
-        if tree_brick:
-            for item in checked_items:
-                model = item.get_model()
-                if isinstance(model, queue_model_objects.GphlWorkflow):
-                    dialog = tree_brick.dc_tree_widget.confirm_dialog
-                    ss0 = dialog.conf_dialog_layout.take_snapshots_combo.currentText()
-                    model.set_snapshot_count(int(ss0) if ss0 else 0)
-
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape):
@@ -208,19 +194,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template.compression = False
 
         workflow_hwobj = api.gphl_workflow
-        if workflow_hwobj.get_state() == States.OFF:
+        if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
             # We will be setting up the connection now - time to connect to quit
             QtImport.QApplication.instance().aboutToQuit.connect(
                 workflow_hwobj.shutdown
             )
 
-            tree_brick = self._tree_brick
-            if tree_brick:
-                tree_brick.dc_tree_widget.confirm_dialog.continueClickedSignal.connect(
-                    self.continue_button_click
-                )
-
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
+        wf.path_template = self._path_template
         wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
@@ -237,9 +218,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             pass
 
         elif strategy_type.startswith("diffractcal"):
-            sample_name = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
-            wf.set_emulate_sample_name(sample_name)
-            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(sample_name)
+            ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
+            crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
             wf.set_space_group(crystal_data.space_group)
             wf.set_cell_parameters(
                 tuple(
@@ -247,10 +227,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     for tag in ("a", "b", "c", "alpha", "beta", "gamma")
                 )
             )
-            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
+            val = self._gphl_diffractcal_widget.get_parameter_value(
+                "relative_rad_sensitivity"
+            )
+            wf.set_relative_rad_sensitivity(val)
             # The entire strategy runs as a 'characterisation'
             wf.set_characterisation_budget_fraction(1.0)
+            wf.set_decay_limit(
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            )
         else:
             # Coulds be native_... phasing_... etc.
 
@@ -271,9 +256,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
             wf.set_crystal_system(crystal_system)
-            wf.set_beam_energies(wf_parameters["beam_energies"])
-            tag = self._gphl_acq_param_widget.get_parameter_value("dose_budget")
-            wf.set_dose_budget(api.gphl_workflow.dose_budgets.get(tag))
             val = self._gphl_acq_param_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )
@@ -282,6 +264,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
                 / 100.0
             )
+            wf.set_decay_limit(
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            )
+        beam_energy_tags = wf_parameters.get("beam_energy_tags")
+        if beam_energy_tags:
+            wf.set_beam_energy_tags(beam_energy_tags)
 
         tasks.append(wf)
 

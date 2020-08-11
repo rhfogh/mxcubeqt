@@ -368,7 +368,8 @@ class FieldsWidget(QtImport.QWidget):
 
         current_row = 0
         col_incr = 0
-        pad = ""
+        pad1 = " " * 2
+        pad2 = " " * 5
         for field in fields:
             # should not happen but lets just skip them
             if field["type"] != "message" and "uiLabel" not in field:
@@ -396,25 +397,36 @@ class FieldsWidget(QtImport.QWidget):
                         QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(widget)
+                if col_incr:
+                    # Add empty column, for separation purposes
+                    empty = QtImport.QLabel(pad1, self)
+                    self.layout().addWidget(
+                        empty, current_row, col_incr, QtImport.Qt.AlignLeft
+                    )
+
+                col = col_incr + 1 if col_incr else col_incr
                 if field["type"] == "boolean":
                     self.layout().addWidget(
-                        widget, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
+                        widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
                     )
                 else:
+                    pad = pad2 if col_incr else ""
                     label = QtImport.QLabel(pad + field["uiLabel"], self)
                     self.layout().addWidget(
-                        label, current_row, 0 + col_incr, QtImport.Qt.AlignLeft
+                        label, current_row, col, QtImport.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        widget, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
+                        widget, current_row, 1 + col, QtImport.Qt.AlignLeft
                     )
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
                 # Increment column
-                col_incr += 2
-                current_row = 0
-                pad = " " * 5
+                if col_incr:
+                    col_incr += 3
+                else:
+                    col_incr += 2
+                    current_row = 0
         self.update()
 
     def set_values(self, values):
