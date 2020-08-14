@@ -93,6 +93,7 @@ def init(hwr_path):
             error_count += 1
 
     for role in ADDITIONAL_HWOBJ_ROLES:
+        print ('@~@~ ADDITIONAL', role,  hasattr(beamline_setup, "%s_hwobj" % role))
         if hasattr(beamline_setup, "%s_hwobj" % role):
             setattr(sys.modules[__name__], role, getattr(beamline_setup, "%s_hwobj" % role))
         else:
