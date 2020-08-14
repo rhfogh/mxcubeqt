@@ -88,7 +88,6 @@ class McaSpectrumWidget(BaseWidget):
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
     def set_data(self, data, calib, config):
-        print data, calib, config
         try:
             configured = False
             if os.path.exists(config.get("file", "")) and PYMCA_IMPORTED:

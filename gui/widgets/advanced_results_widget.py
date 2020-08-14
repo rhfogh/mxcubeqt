@@ -72,10 +72,8 @@ class AdvancedResultsWidget(QtImport.QWidget):
         executed = data_collection.is_executed()
         self.heat_map_widget.set_associated_data_collection(data_collection)
 
-        print executed, data_collection
         if executed:
             processing_results = data_collection.get_parallel_processing_result()
-            print 'set results'
             if processing_results is not None:
                 self.heat_map_widget.set_results(processing_results)
                 self.heat_map_widget.update_results(True)

@@ -29,7 +29,6 @@ except ImportError:
     except ImportError:
         pass
 
-print PYMCA_IMPORTED
 if not PYMCA_IMPORTED:
     from gui.widgets.matplot_widget import TwoAxisPlotWidget as PlotWidget
 

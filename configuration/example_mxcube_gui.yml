@@ -196,7 +196,7 @@
             - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
               name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
             - {comment: '', default_value: '', hidden: false, name: mnemonicList,
-              old_value: '', type: string, value: /collect-mockup /sample-changer-mockup}
+              old_value: '', type: string, value: /mxcollect /sc-mockup}
             type: ProgressBarBrick
           connections: []
           name: login_vbox
@@ -670,8 +670,8 @@
                       - {comment: Allow to control brick in slave mode, default_value: 0,
                         hidden: false, name: instanceAllowConnected, old_value: 0,
                         type: boolean, value: 0}
-                      - {comment: '', default_value: /sample-view, hidden: false, name: mnemonic,
-                        old_value: /sample-view, type: string, value: /sample-view}
+                      - {comment: '', default_value: /graphics, hidden: false, name: mnemonic,
+                        old_value: /sample-view, type: string, value: /graphics}
                       type: CameraBrick
                     - children: []
                       connections: []
@@ -1479,7 +1479,7 @@
                   hidden: false, name: instanceAllowConnected, old_value: 0, type: boolean,
                   value: 0}
                 - {comment: '', default_value: '', hidden: false, name: mnemonic,
-                  old_value: '', type: string, value: /sample-changer-mockup}
+                  old_value: '', type: string, value: /sc-mockup}
                 - {comment: '', default_value: 0, hidden: false, name: showSelectButton,
                   old_value: 0, type: boolean, value: 0}
                 - {comment: '', default_value: 0, hidden: false, name: singleClickSelection,
@@ -2601,7 +2601,7 @@
           hidden: false, name: kevFormatString, old_value: '##.####', type: formatString,
           value: '###.####'}
         type: EnergyBrick
-      - brick: {class: TransmissionBrick, name: transmission_brick}
+      - brick: {class: AttenuatorsBrick, name: transmission_brick}
         children: []
         connections: []
         name: transmission_brick
@@ -2623,7 +2623,7 @@
           name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        type: TransmissionBrick
+        type: AttenuatorsBrick
       - brick: {class: ResolutionBrick, name: resolution_brick}
         children: []
         connections: []
@@ -2696,60 +2696,6 @@
         - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
           name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
         type: DoorInterlockBrick
-      - brick: {class: ShutterBrick, name: shutter_brick}
-        children: []
-        connections: []
-        name: shutter_brick
-        properties:
-        - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
-          name: fixedHeight, old_value: -1, type: integer, value: -1}
-        - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
-          old_value: -1, type: integer, value: -1}
-        - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',
-          type: string, value: '11'}
-        - {comment: Draw a frame around the widget, default_value: 0, hidden: false,
-          name: frame, old_value: 0, type: boolean, value: 0}
-        - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
-          type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: hwobj_shutter, old_value: '',
-          type: string, value: /safety-shutter-mockup}
-        - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
-          name: instanceAllowAlways, old_value: 0, type: boolean, value: 0}
-        - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
-          name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
-        type: ShutterBrick
-      - brick: {class: InstanceListBrick, name: instance_list_brick}
-        children: []
-        connections: []
-        name: instance_list_brick
-        properties:
-        - {comment: '', default_value: '', hidden: false, name: controlEmails, old_value: '',
-          type: string, value: ''}
-        - {comment: Set fixed height in pixels, default_value: -1, hidden: false,
-          name: fixedHeight, old_value: -1, type: integer, value: -1}
-        - {comment: Set fixed width in pixels, default_value: -1, hidden: false, name: fixedWidth,
-          old_value: -1, type: integer, value: -1}
-        - {comment: '', default_value: '11', hidden: false, name: fontSize, old_value: '11',
-          type: string, value: '9'}
-        - {comment: Draw a frame around the widget, default_value: 0, hidden: false,
-          name: frame, old_value: 0, type: boolean, value: 1}
-        - {comment: '', default_value: 30, hidden: false, name: giveControlTimeout,
-          old_value: 30, type: integer, value: 30}
-        - {comment: Hide widget, default_value: 0, hidden: false, name: hide, old_value: 0,
-          type: boolean, value: 0}
-        - {comment: '', default_value: '', hidden: false, name: hwobj_hutch_trigger,
-          old_value: '', type: string, value: /door-interlock-mockup}
-        - {comment: '', default_value: /instanceconnection, hidden: false, name: hwobj_instance_connection,
-          old_value: /instanceconnection, type: string, value: /instanceconnection}
-        - {comment: '', default_value: /xml-rpc-server, hidden: false, name: hwobj_xmlrpc_server,
-          old_value: /xml-rpc-server, type: string, value: /xml-rpc-server}
-        - {comment: '', default_value: 0, hidden: false, name: initializeServer, old_value: 0,
-          type: boolean, value: 0}
-        - {comment: Allow to control brick in all modes, default_value: 0, hidden: false,
-          name: instanceAllowAlways, old_value: 0, type: boolean, value: 1}
-        - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
-          name: instanceAllowConnected, old_value: 0, type: boolean, value: 1}
-        type: InstanceListBrick
       connections: []
       name: right_info_hbox
       properties:
@@ -3123,7 +3069,7 @@
       - {comment: Allow to control brick in slave mode, default_value: 0, hidden: false,
         name: instanceAllowConnected, old_value: 0, type: boolean, value: 0}
       - {comment: '', default_value: '', hidden: false, name: mnemonic, old_value: '',
-        type: string, value: /sample-changer-mockup}
+        type: string, value: /sc-mockup}
       - {comment: '', default_value: 0, hidden: false, name: showSelectButton, old_value: 0,
         type: boolean, value: 0}
       - {comment: '', default_value: 0, hidden: false, name: singleClickSelection,
