@@ -421,12 +421,12 @@ class FieldsWidget(QtImport.QWidget):
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
+                current_row = 0
                 # Increment column
                 if col_incr:
                     col_incr += 3
                 else:
                     col_incr += 2
-                    current_row = 0
         self.update()
 
     def set_values(self, values):
