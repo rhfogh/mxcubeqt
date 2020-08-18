@@ -852,7 +852,6 @@ class CreateTaskBase(QtImport.QWidget):
         acq_path_template.base_prefix = acq_path_template.base_prefix.replace(
             "%u", user_name
         )
-        acq_path_template.base_prefix
 
         # acq_path_template.suffix = api.beamline_setup.suffix
 

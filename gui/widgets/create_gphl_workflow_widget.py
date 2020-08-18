@@ -96,6 +96,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         # Qt signal/slot connections ------------------------------------------
         self._workflow_cbox.currentIndexChanged.connect(self.workflow_selected)
+        self._data_path_widget.pathTemplateChangedSignal.connect(
+            self.path_template_changed
+        )
 
         # set up popup data dialog
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
@@ -191,7 +194,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         path_template = self._create_path_template(sample, self._path_template)
         path_template.num_files = 0
-        path_template.compression = False
+        # path_template.compression = False
 
         workflow_hwobj = api.gphl_workflow
         if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
