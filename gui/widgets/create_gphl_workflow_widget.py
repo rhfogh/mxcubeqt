@@ -74,6 +74,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             data_model=self._path_template,
             layout="vertical"
         )
+        self._data_path_widget._base_image_dir = (
+            api.session.get_base_image_directory()
+        )
+        self._data_path_widget._base_process_dir = (
+            api.session.get_base_process_directory()
+        )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.folder_ledit.setReadOnly(True)
@@ -118,6 +124,29 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             workflow_hwobj.connect(
                 "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
             )
+
+    def init_data_path_model(self):
+        # Initialize the path_template of the widget to default
+        # values read from the beamline setup
+        # if self._data_path_widget:
+        #     self._data_path_widget._base_image_dir = (
+        #         api.session.get_base_image_directory()
+        #     )
+        #     self._data_path_widget._base_process_dir = (
+        #         api.session.get_base_process_directory()
+        #     )
+
+        (data_directory, proc_directory) = self.get_default_directory()
+        self._path_template = api.beamline_setup.get_default_path_template()
+        self._path_template.directory = data_directory
+        self._path_template.process_directory = proc_directory
+        self._path_template.base_prefix = self.get_default_prefix()
+        self._path_template.run_number = api.queue_model.get_next_run_number(
+            self._path_template
+        )
+        self._path_template.compression = self._enable_compression
+        # else:
+        #     self._path_template = queue_model_objects.PathTemplate()
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
