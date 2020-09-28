@@ -79,7 +79,7 @@ class TaskToolBoxWidget(QWidget):
         self.tool_box.addItem(self.discrete_page, "Standard Collection")
         self.tool_box.addItem(self.char_page, "Characterisation")
         # Not implemented yet @ XALOC
-        # self.tool_box.addItem(self.helical_page, "Helical Collection")
+        self.tool_box.addItem(self.helical_page, "Helical Collection")
         # self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         # self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
         #if self.gphl_workflow_page is not None:

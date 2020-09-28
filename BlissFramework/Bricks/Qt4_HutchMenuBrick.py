@@ -94,7 +94,6 @@ class Qt4_HutchMenuBrick(BlissWidget):
         self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
 
-        self.create_line_button.hide()
         self.draw_grid_button.hide()
 
         # Layout -------------------------------------------------------------- 
