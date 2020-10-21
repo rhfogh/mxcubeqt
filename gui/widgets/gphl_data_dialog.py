@@ -263,3 +263,4 @@ class GphlDataDialog(QtImport.QDialog):
 
         self.show()
         self.setEnabled(True)
+        self.update()

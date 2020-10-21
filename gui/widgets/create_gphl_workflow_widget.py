@@ -82,7 +82,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
-        data_path_layout.folder_ledit.setReadOnly(True)
+        # data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
@@ -128,13 +128,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def init_data_path_model(self):
         # Initialize the path_template of the widget to default
         # values read from the beamline setup
-        # if self._data_path_widget:
-        #     self._data_path_widget._base_image_dir = (
-        #         api.session.get_base_image_directory()
-        #     )
-        #     self._data_path_widget._base_process_dir = (
-        #         api.session.get_base_process_directory()
-        #     )
+        if self._data_path_widget:
+            self._data_path_widget._base_image_dir = (
+                api.session.get_base_image_directory()
+            )
+            self._data_path_widget._base_process_dir = (
+                api.session.get_base_process_directory()
+            )
 
         (data_directory, proc_directory) = self.get_default_directory()
         self._path_template = api.beamline_setup.get_default_path_template()
@@ -233,7 +233,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
 
         wf = queue_model_objects.GphlWorkflow(workflow_hwobj)
-        wf.path_template = self._path_template
         wf_type = ConvertUtils.text_type(self._workflow_cbox.currentText())
         wf.set_type(wf_type)
 
