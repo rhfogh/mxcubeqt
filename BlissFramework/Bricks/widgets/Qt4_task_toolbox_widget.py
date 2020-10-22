@@ -425,7 +425,11 @@ class TaskToolBoxWidget(QWidget):
         self.create_task_button_click()
         collect_items = []
         for item in self.tree_brick.dc_tree_widget.get_collect_items():
-            if isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
+            # if isinstance(item, Qt4_queue_item.SampleCentringQueueItem):
+            # Solved bug reported in PR407
+            if isinstance(item, (Qt4_queue_item.SampleCentringQueueItem,
+                                 Qt4_queue_item.OpticalCentringQueueItem,
+                                 Qt4_queue_item.XrayCenteringQueueItem)):
                 item.setOn(False)
                 item.setText(1, "Skipped")
                 item.get_model().set_executed(True)
