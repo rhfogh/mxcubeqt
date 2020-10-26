@@ -297,7 +297,12 @@ class TaskToolBoxWidget(QtImport.QWidget):
             if not isinstance(items[0], queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(True)
             if isinstance(items[0], queue_item.DataCollectionQueueItem):
-                if data_model.is_helical():
+                if data_model.get_parent().get_display_name().startswith("GPhL"):
+                    # NBNB This is clunky,
+                    # Should be doe properly, but requires refactoring of
+                    # 'EXPERIMENT_TYPE' enum and its use
+                    self.tool_box.setCurrentWidget(self.gphl_workflow_page)
+                elif data_model.is_helical():
                     self.tool_box.setCurrentWidget(self.helical_page)
                 elif data_model.is_mesh():
                     self.tool_box.setCurrentWidget(self.advanced_page)
