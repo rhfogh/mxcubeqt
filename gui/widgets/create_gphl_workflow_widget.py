@@ -136,18 +136,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._data_path_widget._base_process_dir = (
                 api.session.get_base_process_directory()
             )
+            self._path_template.run_number = api.queue_model.get_next_run_number(
+                self._path_template
+            )
+        else:
+            self._path_template = queue_model_objects.PathTemplate()
 
         (data_directory, proc_directory) = self.get_default_directory()
         self._path_template = api.beamline_setup.get_default_path_template()
         self._path_template.directory = data_directory
         self._path_template.process_directory = proc_directory
         self._path_template.base_prefix = self.get_default_prefix()
-        self._path_template.run_number = api.queue_model.get_next_run_number(
-            self._path_template
-        )
         self._path_template.compression = self._enable_compression
-        # else:
-        #     self._path_template = queue_model_objects.PathTemplate()
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
@@ -179,9 +179,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.show()
 
-        prefix = parameters.get("prefix")
-        if prefix is not None:
-            self.current_prefix = prefix
+        self.current_prefix = parameters.get("prefix")
 
     def get_default_directory(self, tree_item=None, sub_dir=''):
         # Add placeholder for enactment number
@@ -240,8 +238,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if self.current_prefix:
             path_template.base_prefix = self.current_prefix
         wf.path_template = path_template
-        wf.set_name(wf.path_template.get_prefix())
-        wf.set_number(wf.path_template.run_number)
+        wf.set_name(path_template.get_prefix())
+        wf.set_number(path_template.run_number)
 
         wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
         strategy_type = wf_parameters.get("strategy_type")
