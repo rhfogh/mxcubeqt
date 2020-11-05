@@ -231,24 +231,24 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         validator = QtImport.QDoubleValidator(0, 100, 4, widget)
         self._widget_data[field_name] = (widget, float, validator, 1.0)
 
-        row += 1
-        field_name = "decay_limit"
-        label_name = self._get_label_name(field_name)
-        label_str = "Signal decay limit (%)"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QLineEdit()
-        widget.setReadOnly(True)
-        widget.setEnabled(False)
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
-        self._widget_data[field_name] = (
-            widget,
-            float,
-            validator,
-            api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
-        )
+        # row += 1
+        # field_name = "decay_limit"
+        # label_name = self._get_label_name(field_name)
+        # label_str = "Signal decay limit (%)"
+        # label = QtImport.QLabel(label_str, _parameters_widget)
+        # _parameters_widget.layout().addWidget(label, row, 0)
+        # self._widget_data[label_name] = (label, str, None, label_str)
+        # widget = QtImport.QLineEdit()
+        # widget.setReadOnly(True)
+        # widget.setEnabled(False)
+        # _parameters_widget.layout().addWidget(widget, row, 1)
+        # validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        # self._widget_data[field_name] = (
+        #     widget,
+        #     float,
+        #     validator,
+        #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+        # )
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)
@@ -350,6 +350,18 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._widget_data[field_name] = (widget, str, None, 0)
 
         row += 1
+        field_name = "relative_rad_sensitivity"
+        label_name = self._get_label_name(field_name)
+        label_str = "Rel. radiation sensitivity"
+        label = QtImport.QLabel(label_str, _parameters_widget)
+        _parameters_widget.layout().addWidget(label, row, 0)
+        self._widget_data[label_name] = (label, str, None, label_str)
+        widget = QtImport.QLineEdit()
+        _parameters_widget.layout().addWidget(widget, row, 1)
+        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        self._widget_data[field_name] = (widget, float, validator, 1.0)
+
+        row += 1
         field_name = "characterisation_strategy"
         label_name = self._get_label_name(field_name)
         label_str = "Characterisation strategy :"
@@ -364,36 +376,24 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         )
         self._pulldowns[field_name] = strategy_names
 
-        row += 1
-        field_name = "relative_rad_sensitivity"
-        label_name = self._get_label_name(field_name)
-        label_str = "Rel. radiation sensitivity"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QLineEdit()
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
-        self._widget_data[field_name] = (widget, float, validator, 1.0)
-
-        row += 1
-        field_name = "decay_limit"
-        label_name = self._get_label_name(field_name)
-        label_str = "Signal decay limit (%)"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QLineEdit()
-        widget.setReadOnly(True)
-        widget.setEnabled(False)
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        validator = QtImport.QDoubleValidator(0, 100, 4, widget)
-        self._widget_data[field_name] = (
-            widget,
-            float,
-            validator,
-            api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
-        )
+        # row += 1
+        # field_name = "decay_limit"
+        # label_name = self._get_label_name(field_name)
+        # label_str = "Signal decay limit (%)"
+        # label = QtImport.QLabel(label_str, _parameters_widget)
+        # _parameters_widget.layout().addWidget(label, row, 0)
+        # self._widget_data[label_name] = (label, str, None, label_str)
+        # widget = QtImport.QLineEdit()
+        # widget.setReadOnly(True)
+        # widget.setEnabled(False)
+        # _parameters_widget.layout().addWidget(widget, row, 1)
+        # validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        # self._widget_data[field_name] = (
+        #     widget,
+        #     float,
+        #     validator,
+        #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+        # )
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)

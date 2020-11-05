@@ -263,9 +263,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_relative_rad_sensitivity(val)
             # The entire strategy runs as a 'characterisation'
             wf.set_characterisation_budget_fraction(1.0)
-            wf.set_decay_limit(
-                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
-            )
+            # wf.set_decay_limit(
+            #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            # )
         else:
             # Coulds be native_... phasing_... etc.
 
@@ -294,9 +294,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
                 / 100.0
             )
-            wf.set_decay_limit(
-                api.gphl_workflow.getProperty("default_decay_limit", 0.25)
-            )
+            # wf.set_decay_limit(
+            #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)
+            # )
         beam_energy_tags = wf_parameters.get("beam_energy_tags")
         if beam_energy_tags:
             wf.set_beam_energy_tags(beam_energy_tags)
