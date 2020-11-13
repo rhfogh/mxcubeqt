@@ -132,7 +132,7 @@ class TextEdit(QtImport.QTextEdit):
 
 
 class Combo(QtImport.QComboBox):
-    """STandard ComboBox (pulldown) widget"""
+    """Standard ComboBox (pulldown) widget"""
 
     def __init__(self, parent, options):
         QtImport.QComboBox.__init__(self, parent)
@@ -339,6 +339,7 @@ class CheckBox(QtImport.QCheckBox):
 # Mapping of type fields to Classes
 WIDGET_CLASSES = {
     "combo": Combo,
+    "dblcombo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
     "floatstring": FloatString,
@@ -406,6 +407,11 @@ class FieldsWidget(QtImport.QWidget):
 
                 col = col_incr + 1 if col_incr else col_incr
                 if field["type"] == "boolean":
+                    self.layout().addWidget(
+                        widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
+                    )
+                elif field["type"].startswith("dbl"):
+                    # DOuble width widget, no label
                     self.layout().addWidget(
                         widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
                     )
