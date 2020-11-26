@@ -466,6 +466,11 @@ class TreeBrick(BaseWidget):
                     )
                     self.sample_changer_widget.details_button.setText("Show SC-details")
 
+                # Specifically to intialise emulation samples in mock mode
+                # Very crude and hacky, but avoids changes in production mode, at least
+                if api.lims is not None and  "Mock" in api.lims.__class__.__name__:
+                    self.refresh_sample_list()
+
             if (
                 api.plate_manipulator is not None
                 and api.diffractometer.in_plate_mode()

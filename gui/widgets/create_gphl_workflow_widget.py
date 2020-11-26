@@ -59,14 +59,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # Graphic elements ----------------------------------------------------
         self._workflow_type_widget = QtImport.QGroupBox("Workflow type", self)
 
+        # NB widget must start out hidden,
+        # so as to be shown when workflow type is initialiesd
         self._workflow_cbox = QtImport.QComboBox(self._workflow_type_widget)
         self._gphl_acq_widget = QtImport.QGroupBox("Acquisition", self)
         self._gphl_acq_param_widget = GphlAcquisitionWidget(
             self._gphl_acq_widget, "gphl_acquisition_parameter_widget"
         )
+        self._gphl_acq_param_widget.hide()
         self._gphl_diffractcal_widget = GphlDiffractcalWidget(
             self._gphl_acq_widget, "gphl_diffractcal_widget"
         )
+        self._gphl_diffractcal_widget.hide()
 
         self._data_path_widget = DataPathWidget(
             self,
@@ -163,21 +167,25 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if strategy_type.startswith("transcal"):
             # NB Once we do not have to set unique prefixes, this should be readOnly
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
+            self._gphl_diffractcal_widget.hide()
+            self._gphl_acq_param_widget.hide()
             self._gphl_acq_widget.hide()
         elif strategy_type.startswith("diffractcal"):
             # TODO update this
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            self._gphl_diffractcal_widget.populate_widget()
             self._gphl_acq_widget.show()
-            self._gphl_diffractcal_widget.show()
+            if self._gphl_diffractcal_widget.isHidden():
+                self._gphl_diffractcal_widget.populate_widget()
+                self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
         else:
             # acquisition type strategy
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
-            self._gphl_acq_param_widget.populate_widget()
             self._gphl_acq_widget.show()
+            if self._gphl_acq_param_widget.isHidden():
+                self._gphl_acq_param_widget.populate_widget()
+                self._gphl_acq_param_widget.show()
             self._gphl_diffractcal_widget.hide()
-            self._gphl_acq_param_widget.show()
 
         self.current_prefix = parameters.get("prefix")
 
@@ -192,21 +200,49 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
-        wf_model = tree_item.get_model()
+        model = tree_item.get_model()
 
         if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
-            if tree_item.get_model().is_executed():
+            if model.is_executed():
                 self.setDisabled(True)
             else:
                 self.setDisabled(False)
 
-            if wf_model.get_path_template():
-                self._path_template = wf_model.get_path_template()
+            if model.get_path_template():
+                self._path_template = model.get_path_template()
 
             elif isinstance(tree_item, queue_item.BasketQueueItem):
                 self.setDisabled(False)
             elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
                 self.setDisabled(True)
+        elif isinstance(tree_item, queue_item.SampleQueueItem):
+            crystals = model.crystals
+            if crystals:
+                space_group = crystals[0].space_group
+                if space_group:
+                    self._gphl_acq_param_widget.set_parameter_value(
+                        "crystal_system", ""
+                    )
+                    self._gphl_acq_param_widget._refresh_interface(
+                        "crystal_system", None
+                    )
+                    self._gphl_acq_param_widget.set_parameter_value(
+                        "space_group", space_group
+                    )
+            diffraction_plan = model.diffraction_plan
+            if diffraction_plan:
+                # It is not clear if diffraction_plan is a dict or an object,
+                # and if so which kind
+                if hasattr(diffraction_plan, "radiationSensitivity"):
+                    radiationSensitivity = diffraction_plan.radiationSensitivity
+                else:
+                    radiationSensitivity = diffraction_plan.get("radiationSensitivity")
+
+                if radiationSensitivity:
+                    self._gphl_acq_param_widget.set_parameter_value(
+                        "relative_rad_sensitivity", radiationSensitivity
+                    )
+
 
     def init_models(self):
         CreateTaskBase.init_models(self)

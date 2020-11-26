@@ -411,7 +411,7 @@ class FieldsWidget(QtImport.QWidget):
                         widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
                     )
                 elif field["type"].startswith("dbl"):
-                    # DOuble width widget, no label
+                    # Double width widget, no label
                     self.layout().addWidget(
                         widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
                     )
