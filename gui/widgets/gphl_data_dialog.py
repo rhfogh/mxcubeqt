@@ -170,6 +170,16 @@ class GphlDataDialog(QtImport.QDialog):
         self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
         # self.clearWState(QtImport.WState_Polished)
 
+    def keyPressEvent(self, event):
+        """This should disable having Qt interpret {Rerutn> as [Continue] """
+        if ((not event.modifiers() and
+             event.key() == QtImport.Qt.Key_Return) or
+            (event.modifiers() == QtImport.Qt.KeypadModifier and
+             event.key() == QtImport.Qt.Key_Enter)):
+            event.accept()
+        else:
+            super(QtImport.Dialog, self).keyPressEvent(event)
+
     def continue_button_click(self):
         result = {}
         if self.parameter_gbox.isVisible():

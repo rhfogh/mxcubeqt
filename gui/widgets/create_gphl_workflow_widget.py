@@ -22,6 +22,7 @@ from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
 import api
+import logging
 
 from gui.utils import queue_item, QtImport
 from gui.widgets.create_task_base import CreateTaskBase
@@ -242,6 +243,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     self._gphl_acq_param_widget.set_parameter_value(
                         "relative_rad_sensitivity", radiationSensitivity
                     )
+
+                if hasattr(diffraction_plan, "observedResolution"):
+                    observedResolution = diffraction_plan.observedResolution
+                else:
+                    observedResolution = diffraction_plan.get("observedResolution")
+
+                if observedResolution:
+                    logging.getLogger("user_level_log").warning(
+                        "Diffraction plan observed resolution is %.3f A, "
+                        % observedResolution
+                    )
+
 
 
     def init_models(self):
