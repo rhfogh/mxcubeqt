@@ -196,7 +196,7 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result.set(StopIteration)
         self._async_result = None
 
-    def open_dialog(self, field_list, async_result):
+    def open_dialog(self, field_list, async_result, parameter_update_function):
 
         msg = "GPhL Workflow waiting for input, verify parameters and press continue."
         logging.getLogger("user_level_log").info(msg)
@@ -259,14 +259,8 @@ class GphlDataDialog(QtImport.QDialog):
             self.params_widget = FieldsWidget(
                 fields=parameters, parent=self.parameter_gbox
             )
-
-            values = {}
-            for dd0 in field_list:
-                name = dd0["variableName"]
-                value = dd0.get("defaultValue")
-                if value is not None:
-                    dd0[name] = value
-            self.params_widget.set_values(values)
+            if parameter_update_function:
+                parameter_update_function(self.params_widget)
             self.parameter_gbox.show()
         else:
             self.parameter_gbox.hide()

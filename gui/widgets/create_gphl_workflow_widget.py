@@ -165,13 +165,13 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
-        if strategy_type.startswith("transcal"):
+        if strategy_type =="transcal":
             # NB Once we do not have to set unique prefixes, this should be readOnly
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.hide()
             self._gphl_acq_widget.hide()
-        elif strategy_type.startswith("diffractcal"):
+        elif strategy_type == "diffractcal":
             # TODO update this
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
             self._gphl_acq_widget.show()
@@ -293,10 +293,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
         strategy_type = wf_parameters.get("strategy_type")
         wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
-        if strategy_type.startswith("transcal"):
+        if strategy_type == "transcal":
             pass
 
-        elif strategy_type.startswith("diffractcal"):
+        elif strategy_type == "diffractcal":
             ss0 = self._gphl_diffractcal_widget.get_parameter_value("test_crystal")
             crystal_data = self._gphl_diffractcal_widget.test_crystals.get(ss0)
             wf.set_space_group(crystal_data.space_group)
