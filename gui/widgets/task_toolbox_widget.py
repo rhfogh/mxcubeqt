@@ -299,7 +299,7 @@ class TaskToolBoxWidget(QtImport.QWidget):
             is_gphl = False
             obj = data_model
             while obj and not isinstance(obj, queue_model_objects.Sample):
-                if  data_model.get_display_name().startswith("GPhL"):
+                if  isinstance(obj, queue_model_objects.GphlWorkflow):
                     is_gphl = True
                     break
                 obj = obj.get_parent()
