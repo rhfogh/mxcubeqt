@@ -83,6 +83,9 @@ class GphlSetupWidget(QtImport.QWidget):
         _parameters_widget = self._parameters_widget = QtImport.QWidget(self)
         QtImport.QGridLayout(_parameters_widget)
         _parameters_widget.layout().setColumnStretch(2, 1)
+        _parameters_widget.layout().setMargin(0)
+        _parameters_widget.layout().setSpacing(0)
+        # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
 
         # Layout --------------------------------------------------------------
         # This seems to be necessary to make widget visible
@@ -90,6 +93,9 @@ class GphlSetupWidget(QtImport.QWidget):
         _main_vlayout.addWidget(_parameters_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        # _main_vlayout.addStretch(0)
+        # _main_vlayout.setSpacing(6)
+        # _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
     def setEnabled(self, value):
         super(GphlSetupWidget, self).setEnabled(value)

@@ -203,6 +203,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         model = tree_item.get_model()
 
+        if self._tree_brick.dc_tree_widget.collecting:
+            # We do not want reset after collection has started
+            return
+
         if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
             if model.is_executed():
                 self.setDisabled(True)
