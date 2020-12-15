@@ -31,6 +31,7 @@ import api
 
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
+from gui.utils.paramsgui import make_widget
 
 from HardwareRepository.HardwareObjects import queue_model_enumerables
 from HardwareRepository.dispatcher import dispatcher
@@ -295,6 +296,117 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
             label = self._widget_data["test_crystal_parameters"][0]
             label.setText(QtImport.QString(label_str2))
+
+class GphlRuntimeWidget(QtImport.QWidget):
+    def __init__(self, parent, name="gphl_runtime_widget", data_object=None):
+        QtImport.QWidget.__init__(self, parent)
+        if name is not None:
+            self.setObjectName(name)
+
+        self._data_object = data_object
+
+        # Internal variables -------------------------------------------------
+
+
+        # Graphic elements ----------------------------------------------------
+        _parameters_widget = self._parameters_widget = QtImport.QWidget(self)
+        QtImport.QGridLayout(_parameters_widget)
+        _parameters_widget.layout().setColumnStretch(2, 1)
+        _parameters_widget.layout().setMargin(0)
+        _parameters_widget.layout().setSpacing(0)
+        # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
+
+        # Layout --------------------------------------------------------------
+        # This seems to be necessary to make widget visible
+        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout.addWidget(_parameters_widget)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        # _main_vlayout.addStretch(0)
+        # _main_vlayout.setSpacing(6)
+        # _main_vlayout.setContentsMargins(2, 2, 2, 2)
+
+        if data_object is not None:
+            self.populate_widget(data_object)
+
+        self._fields = OrderedDict(
+            (
+                (
+                    "dose_budget",
+                     {
+                        "label": "Total dose budget (MGy)",
+                        "getter": "get_dose_budget",
+                         "options":{
+                            "variableName":"dose_consumed",
+                             "decimals":2,
+                             "type":"floatstring",
+                             "readOnly":True,
+                         }
+                     }
+                ),
+                (
+                    "dose_consumed",
+                    {
+                        "label": "Acq. dose budget (MGy)",
+                        "getter": "get_dose_consumed",
+                        "options":{
+                            "variableName":"dose_consumed",
+                            "decimals":2,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+                (
+                    "exposure_time",
+                    {
+                        "label": "Exposure tiume (s)",
+                        "getter": "get_exposure_time",
+                        "options":{
+                            "variableName":"exposure_time",
+                            "decimals":4,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+                (
+                    "image_width",
+                    {
+                        "label": "Oscillation range",
+                        "getter": "get_image_width",
+                        "options":{
+                            "variableName":"image_width",
+                            "decimals":2,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+            )
+        )
+
+        row = 0
+        for tag,dd0 in self._fields.items():
+            label = QtImport.QLabel(dd0["label"], _parameters_widget)
+            _parameters_widget.layout().addWidget(
+                label, row, 0, QtImport.Qt.AlignLeft
+            )
+            widget = make_widget(_parameters_widget, dd0["options"])
+            _parameters_widget.layout().addWidget(
+                widget, row, 1, QtImport.Qt.AlignLeft
+            )
+            dd0["widget"] = widget
+            row += 1
+
+    def populate_widget(self, data_object, **kwargs):
+
+        self._data_object = data_object
+
+        for tag, dd0 in self._fields.items():
+            value = getattr(data_object, dd0["getter"])() or 0
+            dd0["widget"].set_value(value)
+
 
 
 class GphlAcquisitionWidget(GphlSetupWidget):

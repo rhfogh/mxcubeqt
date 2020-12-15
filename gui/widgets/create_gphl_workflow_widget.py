@@ -29,6 +29,7 @@ from gui.widgets.create_task_base import CreateTaskBase
 from gui.widgets.data_path_widget import DataPathWidget
 from gui.widgets.gphl_acquisition_widget import GphlAcquisitionWidget
 from gui.widgets.gphl_acquisition_widget import GphlDiffractcalWidget
+from gui.widgets.gphl_acquisition_widget import GphlRuntimeWidget
 from gui.widgets.gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
@@ -73,6 +74,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         )
         self._gphl_diffractcal_widget.hide()
 
+        self._gphl_runtime_widget = GphlRuntimeWidget(
+            self._gphl_acq_widget, "gphl_runtime_widge"
+        )
+
         self._data_path_widget = DataPathWidget(
             self,
             "create_dc_path_widget",
@@ -96,6 +101,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         _gphl_acq_vlayout = QtImport.QVBoxLayout(self._gphl_acq_widget)
         _gphl_acq_vlayout.addWidget(self._gphl_acq_param_widget)
         _gphl_acq_vlayout.addWidget(self._gphl_diffractcal_widget)
+        _gphl_acq_vlayout.addWidget(self._gphl_runtime_widget)
         _main_vlayout = QtImport.QVBoxLayout(self)
         _main_vlayout.addWidget(self._workflow_type_widget)
         _main_vlayout.addWidget(self._data_path_widget)
@@ -130,6 +136,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             workflow_hwobj.connect(
                 "gphlParametersNeeded", self.gphl_data_dialog.open_dialog
             )
+            workflow_hwobj.connect(
+                "gphlStartAcquisition", self.gphl_start_acquisition
+            )
+            workflow_hwobj.connect(
+                "gphlDoneAcquisition", self.gphl_done_acquisition
+            )
 
     def init_data_path_model(self):
         # Initialize the path_template of the widget to default
@@ -154,6 +166,18 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self._path_template.base_prefix = self.get_default_prefix()
         self._path_template.compression = self._enable_compression
 
+    def gphl_start_acquisition(self, workflow_model):
+        """Change tab to runtime display"""
+        self._gphl_diffractcal_widget.hide()
+        self._gphl_acq_param_widget.hide()
+        self._gphl_runtime_widget.populate_widget(workflow_model)
+        self._gphl_runtime_widget.show()
+
+
+    def gphl_done_acquisition(self, workflow_model):
+        """Change tab back to acquisition display"""
+        self.workflow_selected()
+
     def workflow_selected(self):
         # necessary as this comes in as a QString object
         name = ConvertUtils.text_type(self._workflow_cbox.currentText())
@@ -170,6 +194,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_diffractcal_widget.hide()
             self._gphl_acq_param_widget.hide()
+            self._gphl_runtime_widget.hide()
             self._gphl_acq_widget.hide()
         elif strategy_type == "diffractcal":
             # TODO update this
@@ -179,6 +204,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._gphl_diffractcal_widget.populate_widget()
                 self._gphl_diffractcal_widget.show()
             self._gphl_acq_param_widget.hide()
+            self._gphl_runtime_widget.hide()
         else:
             # acquisition type strategy
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(True)
@@ -187,6 +213,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._gphl_acq_param_widget.populate_widget()
                 self._gphl_acq_param_widget.show()
             self._gphl_diffractcal_widget.hide()
+            self._gphl_runtime_widget.hide()
 
         self.current_prefix = parameters.get("prefix")
 
