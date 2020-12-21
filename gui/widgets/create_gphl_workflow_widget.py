@@ -349,9 +349,17 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_space_group(
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
-            wf.set_characterisation_strategy(
-                self._gphl_acq_param_widget.get_parameter_value("characterisation_strategy")
+            # If fixed to default
+            characterisation_strategy = (
+                api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
             )
+            # # If selected in UI
+            # characterisation_strategy = (
+            #     self._gphl_acq_param_widget.get_parameter_value(
+            #         "characterisation_strategy"
+            #     )
+            # )
+            wf.set_characterisation_strategy(characterisation_strategy)
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
             if tag:
