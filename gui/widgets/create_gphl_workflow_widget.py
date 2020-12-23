@@ -350,15 +350,17 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
             # If fixed to default
-            characterisation_strategy = (
-                api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
-            )
-            # # If selected in UI
-            # characterisation_strategy = (
-            #     self._gphl_acq_param_widget.get_parameter_value(
-            #         "characterisation_strategy"
-            #     )
-            # )
+            if  api.gphl_workflow.getProperty("advanced_mode", False):
+                # # If selected in UI
+                characterisation_strategy = (
+                    self._gphl_acq_param_widget.get_parameter_value(
+                        "characterisation_strategy"
+                    )
+                )
+            else:
+                characterisation_strategy = (
+                    api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
+                )
             wf.set_characterisation_strategy(characterisation_strategy)
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
@@ -379,6 +381,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
                 / 100.0
             )
+            if  api.gphl_workflow.getProperty("advanced_mode", False):
+                val = self._gphl_acq_param_widget.get_parameter_value(
+                    "decay_limit"
+                )
+                wf.set_decay_limit(val)
         beam_energy_tags = wf_parameters.get("beam_energy_tags")
         if beam_energy_tags:
             wf.set_beam_energy_tags(beam_energy_tags)

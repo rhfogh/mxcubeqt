@@ -478,42 +478,41 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         validator = QtImport.QDoubleValidator(0, 100, 4, widget)
         self._widget_data[field_name] = (widget, float, validator, 1.0)
+        if api.gphl_workflow.getProperty("advanced_mode", False):
+            # ADVANCED - not currently used
+            row += 1
+            field_name = "characterisation_strategy"
+            label_name = self._get_label_name(field_name)
+            label_str = "Characterisation strategy :"
+            label = QtImport.QLabel(label_str, _parameters_widget)
+            _parameters_widget.layout().addWidget(label, row, 0)
+            self._widget_data[label_name] = (label, str, None, label_str)
+            widget = QtImport.QComboBox()
+            _parameters_widget.layout().addWidget(widget, row, 1)
+            self._widget_data[field_name] = (widget, str, None, 0)
+            strategy_names = (
+                api.gphl_workflow.getProperty("characterisation_strategies").split()
+            )
+            self._pulldowns[field_name] = strategy_names
 
-        # ADVANCED - not currently used
-        # row += 1
-        # field_name = "characterisation_strategy"
-        # label_name = self._get_label_name(field_name)
-        # label_str = "Characterisation strategy :"
-        # label = QtImport.QLabel(label_str, _parameters_widget)
-        # _parameters_widget.layout().addWidget(label, row, 0)
-        # self._widget_data[label_name] = (label, str, None, label_str)
-        # widget = QtImport.QComboBox()
-        # _parameters_widget.layout().addWidget(widget, row, 1)
-        # self._widget_data[field_name] = (widget, str, None, 0)
-        # strategy_names = (
-        #     api.gphl_workflow.getProperty("characterisation_strategies").split()
-        # )
-        # self._pulldowns[field_name] = strategy_names
-
-        # ADVANCED - not currently used
-        # row += 1
-        # field_name = "decay_limit"
-        # label_name = self._get_label_name(field_name)
-        # label_str = "Signal decay limit (%)"
-        # label = QtImport.QLabel(label_str, _parameters_widget)
-        # _parameters_widget.layout().addWidget(label, row, 0)
-        # self._widget_data[label_name] = (label, str, None, label_str)
-        # widget = QtImport.QLineEdit()
-        # widget.setReadOnly(True)
-        # widget.setEnabled(False)
-        # _parameters_widget.layout().addWidget(widget, row, 1)
-        # validator = QtImport.QDoubleValidator(0, 100, 4, widget)
-        # self._widget_data[field_name] = (
-        #     widget,
-        #     float,
-        #     validator,
-        #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
-        # )
+            row += 1
+            field_name = "decay_limit"
+            label_name = self._get_label_name(field_name)
+            label_str = "Signal decay limit (%)"
+            label = QtImport.QLabel(label_str, _parameters_widget)
+            _parameters_widget.layout().addWidget(label, row, 0)
+            self._widget_data[label_name] = (label, str, None, label_str)
+            widget = QtImport.QLineEdit()
+            widget.setReadOnly(True)
+            widget.setEnabled(False)
+            _parameters_widget.layout().addWidget(widget, row, 1)
+            validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+            self._widget_data[field_name] = (
+                widget,
+                float,
+                validator,
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+            )
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)
