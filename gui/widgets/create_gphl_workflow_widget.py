@@ -153,18 +153,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._data_path_widget._base_process_dir = (
                 api.session.get_base_process_directory()
             )
-            self._path_template.run_number = api.queue_model.get_next_run_number(
-                self._path_template
-            )
-        else:
-            self._path_template = queue_model_objects.PathTemplate()
 
         (data_directory, proc_directory) = self.get_default_directory()
         self._path_template = api.beamline_setup.get_default_path_template()
         self._path_template.directory = data_directory
         self._path_template.process_directory = proc_directory
         self._path_template.base_prefix = self.get_default_prefix()
-        self._path_template.compression = self._enable_compression
+        self._path_template.run_number = api.queue_model.get_next_run_number(
+            self._path_template
+        )
 
     def gphl_start_acquisition(self, workflow_model):
         """Change tab to runtime display"""
@@ -230,11 +227,16 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         CreateTaskBase.single_item_selection(self, tree_item)
         model = tree_item.get_model()
 
-        if self._tree_brick.dc_tree_widget.collecting:
+        if isinstance(tree_item, queue_item.DataCollectionQueueItem):
+            self._path_template = tree_item.get_model().acquisitions[0].path_template
+            self._data_path_widget.update_data_model(self._path_template)
+
+
+        elif self._tree_brick.dc_tree_widget.collecting:
             # We do not want reset after collection has started
             return
 
-        if isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
+        elif isinstance(tree_item, queue_item.GphlWorkflowQueueItem):
             if model.is_executed():
                 self.setDisabled(True)
             else:
@@ -242,12 +244,17 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
             if model.get_path_template():
                 self._path_template = model.get_path_template()
+            self._data_path_widget.update_data_model(self._path_template)
 
-            elif isinstance(tree_item, queue_item.BasketQueueItem):
-                self.setDisabled(False)
-            elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-                self.setDisabled(True)
+        elif isinstance(tree_item, queue_item.BasketQueueItem):
+            self.setDisabled(False)
+
         elif isinstance(tree_item, queue_item.SampleQueueItem):
+            # (data_directory, proc_directory) = self.get_default_directory(
+            #     tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
+            # )
+            # self._path_template.directory = data_directory
+            # self._path_template.process_directory = proc_directory
             crystals = model.crystals
             if crystals:
                 space_group = crystals[0].space_group
@@ -286,6 +293,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                         % observedResolution
                     )
 
+        elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+            self.setDisabled(True)
+
 
 
     def init_models(self):
@@ -302,7 +312,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         path_template = self._create_path_template(sample, self._path_template)
         path_template.num_files = 0
-        # path_template.compression = False
 
         workflow_hwobj = api.gphl_workflow
         if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:

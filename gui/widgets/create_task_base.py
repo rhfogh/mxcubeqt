@@ -402,12 +402,11 @@ class CreateTaskBase(QtImport.QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
-        sample_item = self.get_sample_item(tree_item)
+        sample_data_model = self.get_sample_item(tree_item).get_model()
         if self._data_path_widget:
             self._data_path_widget.enable_macros = False
 
         if isinstance(tree_item, queue_item.SampleQueueItem):
-            sample_data_model = sample_item.get_model()
             self._path_template = deepcopy(self._path_template)
 
             self._acquisition_parameters.centred_position.snapshot_image = None
@@ -418,14 +417,14 @@ class CreateTaskBase(QtImport.QWidget):
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(
-                    tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
-                )
+                self._path_template.base_prefix = prefix
 
                 # TODO create templates to customize this
+                # (data_directory, proc_directory) = self.get_default_directory(
+                #     tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
+                # )
                 # self._path_template.directory = data_directory
                 # self._path_template.process_directory = proc_directory
-                self._path_template.base_prefix = prefix
             elif api.session.get_group_name() != "":
                 base_dir = api.session.get_base_image_directory()
                 # Update with group name as long as user didn't specify
@@ -457,7 +456,6 @@ class CreateTaskBase(QtImport.QWidget):
             if self._acq_widget:
                 self._update_etr()
                 self._acq_widget.use_kappa(True)
-                sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(
