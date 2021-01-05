@@ -357,13 +357,14 @@ class CreateTaskBase(QtImport.QWidget):
             sub_dir = group_name + "/" + sub_dir
 
         if tree_item:
-            item = self.get_sample_item(tree_item)
+            # item = self.get_sample_item(tree_item)
             if isinstance(tree_item, queue_item.BasketQueueItem):
                 sub_dir += str(tree_item.get_model().get_location())
-            else:
-                if isinstance(tree_item, queue_item.SampleQueueItem):
-                    if item.get_model().lims_id == -1:
-                        sub_dir += ""
+            # Code below is a no-op. What was intended???
+            # else:
+            #     if isinstance(tree_item, queue_item.SampleQueueItem):
+            #         if item.get_model().lims_id == -1:
+            #             sub_dir += ""
 
         data_directory = api.session.get_image_directory(sub_dir)
 

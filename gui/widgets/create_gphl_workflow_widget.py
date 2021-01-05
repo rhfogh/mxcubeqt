@@ -93,7 +93,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.run_number_ledit.setEnabled(False)
-        # data_path_layout.folder_ledit.setReadOnly(True)
+        data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
@@ -250,11 +250,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            # (data_directory, proc_directory) = self.get_default_directory(
-            #     tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
-            # )
-            # self._path_template.directory = data_directory
-            # self._path_template.process_directory = proc_directory
+            # Reset directory to default (and folder edt field to empty)
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
             crystals = model.crystals
             if crystals:
                 space_group = crystals[0].space_group
