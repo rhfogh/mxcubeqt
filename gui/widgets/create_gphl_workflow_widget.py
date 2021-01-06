@@ -255,9 +255,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             (data_directory, proc_directory) = self.get_default_directory()
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
-            self._path_template.base_prefix = self.get_default_prefix(
-                tree_item.get_model()
-            )
+
+            if not model.has_lims_data() and not api.session.get_group_name():
+                # When noprefix is set, verride prefix setting;
+                # globally we cannot set location as name, apparently, but here we can
+                self._path_template.base_prefix = (
+                    model.get_name() or api.session.get_proposal()
+                )
+                self._data_path_widget.update_data_model(self._path_template)
             crystals = model.crystals
             space_group = ""
             if crystals:
