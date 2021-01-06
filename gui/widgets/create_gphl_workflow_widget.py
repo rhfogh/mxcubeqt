@@ -34,6 +34,7 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
 from HardwareRepository.HardwareObjects import queue_model_objects
+from HardwareRepository.HardwareObjects import queue_model_enumerables
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -254,19 +255,24 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             (data_directory, proc_directory) = self.get_default_directory()
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix(
+                tree_item.get_model()
+            )
             crystals = model.crystals
+            space_group = ""
             if crystals:
-                space_group = crystals[0].space_group
-                if space_group:
-                    self._gphl_acq_param_widget.set_parameter_value(
-                        "crystal_system", ""
-                    )
-                    self._gphl_acq_param_widget._refresh_interface(
-                        "crystal_system", None
-                    )
-                    self._gphl_acq_param_widget.set_parameter_value(
-                        "space_group", space_group
-                    )
+                spg = crystals[0].space_group
+                if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
+                    space_group = spg
+            self._gphl_acq_param_widget.set_parameter_value(
+                "crystal_system", ""
+            )
+            self._gphl_acq_param_widget._refresh_interface(
+                "crystal_system", None
+            )
+            self._gphl_acq_param_widget.set_parameter_value(
+                "space_group", space_group
+            )
             diffraction_plan = model.diffraction_plan
             if diffraction_plan:
                 # It is not clear if diffraction_plan is a dict or an object,
