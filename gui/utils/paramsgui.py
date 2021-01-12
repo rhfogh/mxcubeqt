@@ -369,11 +369,18 @@ class FieldsWidget(QtImport.QWidget):
 
         current_row = 0
         col_incr = 0
-        pad1 = " " * 2
-        pad2 = " " * 5
+        # pad1: width of empty separating columns
+        pad1 = " " * 4
+        # Extra padding in front of columns 2, 3, ...
+        # to offset space for boolean widgets
+        pad2 = ""
         for field in fields:
             # should not happen but lets just skip them
-            if field["type"] != "message" and "uiLabel" not in field:
+            if (
+                field["type"] != "message"
+                and "uiLabel" not in field
+                and not field["type"].startswith("dbl")
+            ):
                 continue
 
             # hack until the 'real' xml gets implemented server side
