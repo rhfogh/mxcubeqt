@@ -121,7 +121,7 @@ def setLogFile(filename):
     _logger.removeHandler(_hdlr)
         
     #_hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 10 files max.
-    _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
+    _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=20)
     os.chmod(filename, 0o666)
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
