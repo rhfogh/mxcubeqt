@@ -157,7 +157,6 @@ class DataPathWidget(QWidget):
         """
         base_image_dir = self._base_image_dir
         base_proc_dir = self._base_process_dir
-        new_sub_dir = str(new_value).strip(' ')
 
         cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
@@ -167,6 +166,7 @@ class DataPathWidget(QWidget):
                 available_chars += "%"
             new_value = ''.join(i for i in str(new_value) if i in available_chars)
 
+        new_sub_dir = str(new_value).strip(" ")
         self.data_path_layout.folder_ledit.setText(new_value)
         self.data_path_layout.folder_ledit.setCursorPosition(cursor_pos)
 

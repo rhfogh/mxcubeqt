@@ -134,6 +134,7 @@ class CreateTaskBase(QWidget):
             self.update_selection()
 
     def set_beamline_setup(self, bl_setup_hwobj):
+        print ('@~@~ set_beamline_setup')
         self._beamline_setup_hwobj = bl_setup_hwobj
         self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
@@ -155,6 +156,7 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.resolution_hwobj.update_values()
             bl_setup_hwobj.detector_hwobj.update_values()
         except AttributeError as ex:
+            print ('@~@~ set_beamline_setup in exception')
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
        
@@ -165,6 +167,7 @@ class CreateTaskBase(QWidget):
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
+        print ('@~@~ set_beamline_setup _session_hwobj is', self._session_hwobj)
         self.init_models()
 
     def set_osc_start(self, new_value):
@@ -332,13 +335,14 @@ class CreateTaskBase(QWidget):
             sub_dir = group_name + '/' + sub_dir
 
         if tree_item:
-            item = self.get_sample_item(tree_item)
+            # item = self.get_sample_item(tree_item)
             if isinstance(tree_item, Qt4_queue_item.BasketQueueItem):
                 sub_dir += str(tree_item.get_model().get_location())
-            else:
-                if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-                    if item.get_model().lims_id == -1:
-                        sub_dir += ''
+            # Code below is a no-op. What was intended???
+            # else:
+            #     if isinstance(tree_item, queue_item.SampleQueueItem):
+            #         if item.get_model().lims_id == -1:
+            #             sub_dir += ""
             
         data_directory = self._session_hwobj.\
                          get_image_directory(sub_dir)
@@ -379,13 +383,12 @@ class CreateTaskBase(QWidget):
         self.selection_changed(self._current_selected_items)
 
     def single_item_selection(self, tree_item):
-        sample_item = self.get_sample_item(tree_item)
+        sample_data_model = self.get_sample_item(tree_item).get_model()
         if self._data_path_widget:
             self._data_path_widget.enable_macros = False
         
 
         if isinstance(tree_item, Qt4_queue_item.SampleQueueItem):
-            sample_data_model = sample_item.get_model()
             self._path_template = copy.deepcopy(self._path_template)
             self._acquisition_parameters = copy.deepcopy(self._acquisition_parameters)
 
@@ -393,13 +396,13 @@ class CreateTaskBase(QWidget):
             # to set the data path. Or has a specific user group set.
 
             # Default XALOC prefix
-            logging.getLogger("HWR").debug("*** CreateTaskBase.single_item_selection: sample is %s" % sample_item.get_model().get_display_name())
+            logging.getLogger("HWR").debug("*** CreateTaskBase.single_item_selection: sample is %s" % sample_data_model.get_display_name())
 
-            prefix = self.get_default_prefix(sample_item.get_model())
 
             # XALOC specific
             if True:
             # if sample_data_model.lims_id != -1:
+                prefix = self.get_default_prefix(sample_data_model)
                 (data_directory, proc_directory) = self.get_default_directory( \
                     tree_item, sub_dir=prefix)
 
@@ -444,7 +447,7 @@ class CreateTaskBase(QWidget):
             if self._acq_widget:
                 self._update_etr()
                 self._acq_widget.use_kappa(True)
-                sample_data_model = sample_item.get_model()
+                # sample_data_model = sample_item.get_model()
                 energy_scan_result = sample_data_model.crystals[0].energy_scan_result
                 self._acq_widget.set_energies(energy_scan_result)
                 self._acq_widget.update_data_model(self._acquisition_parameters,
@@ -749,7 +752,6 @@ class CreateTaskBase(QWidget):
             replace('%s', str(sample.name))
         acq_path_template.base_prefix = acq_path_template.base_prefix.\
             replace('%u', user_name)
-        acq_path_template.base_prefix
 
         #acq_path_template.suffix = bl_setup.suffix
 

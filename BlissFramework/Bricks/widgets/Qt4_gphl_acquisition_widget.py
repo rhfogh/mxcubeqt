@@ -20,25 +20,22 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 """GPhL bespoke input widget. Built from DataCollectParametersWidget"""
-from __future__ import division, absolute_import
+from __future__ import division
+# from __future__ import absolute_import
 from __future__ import print_function, unicode_literals
 
 import logging
 from collections import namedtuple
-
-import queue_model_enumerables_v1 as queue_model_enumerables
+from collections import OrderedDict
 
 import api
 
 import QtImport
-from widgets.Qt4_widget_utils import DataModelInputBinder
+from Qt4_widget_utils import DataModelInputBinder
+from BlissFramework.Bricks.Qt4_paramsgui import make_widget
 
+import queue_model_enumerables_v1 as queue_model_enumerables
 from HardwareRepository.dispatcher import dispatcher
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
 __category__ = "TaskToolbox_Tabs"
 
@@ -88,6 +85,9 @@ class GphlSetupWidget(QtImport.QWidget):
         _parameters_widget = self._parameters_widget = QtImport.QWidget(self)
         QtImport.QGridLayout(_parameters_widget)
         _parameters_widget.layout().setColumnStretch(2, 1)
+        _parameters_widget.layout().setMargin(0)
+        _parameters_widget.layout().setSpacing(0)
+        # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
 
         # Layout --------------------------------------------------------------
         # This seems to be necessary to make widget visible
@@ -95,6 +95,9 @@ class GphlSetupWidget(QtImport.QWidget):
         _main_vlayout.addWidget(_parameters_widget)
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        # _main_vlayout.addStretch(0)
+        # _main_vlayout.setSpacing(6)
+        # _main_vlayout.setContentsMargins(2, 2, 2, 2)
 
     def setEnabled(self, value):
         super(GphlSetupWidget, self).setEnabled(value)
@@ -133,7 +136,6 @@ class GphlSetupWidget(QtImport.QWidget):
 
             else:
                 widget.setCurrentIndex(widget.findText(default_label))
-
 
     def set_parameter_value(self, name, value):
         """Set value - NB ComboBoxes are set by text, not index"""
@@ -226,21 +228,6 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         self._widget_data[label_name] = (label, str, None, label_str)
 
         row += 1
-        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
-        field_name = "dose_budget"
-        label_name = self._get_label_name(field_name)
-        label_str = "Dose budget (MGy) :"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QComboBox()
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
-        self._pulldown_defaults[field_name] = default_dose_budget_label
-        indx = self._pulldowns[field_name].index(default_dose_budget_label)
-        self._widget_data[field_name] = (widget, str, None, indx)
-
-        row += 1
         field_name = "relative_rad_sensitivity"
         label_name = self._get_label_name(field_name)
         label_str = "Rel. radiation sensitivity"
@@ -251,6 +238,25 @@ class GphlDiffractcalWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         validator = QtImport.QDoubleValidator(0, 100, 4, widget)
         self._widget_data[field_name] = (widget, float, validator, 1.0)
+
+        # row += 1
+        # field_name = "decay_limit"
+        # label_name = self._get_label_name(field_name)
+        # label_str = "Signal decay limit (%)"
+        # label = QtImport.QLabel(label_str, _parameters_widget)
+        # _parameters_widget.layout().addWidget(label, row, 0)
+        # self._widget_data[label_name] = (label, str, None, label_str)
+        # widget = QtImport.QLineEdit()
+        # widget.setReadOnly(True)
+        # widget.setEnabled(False)
+        # _parameters_widget.layout().addWidget(widget, row, 1)
+        # validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+        # self._widget_data[field_name] = (
+        #     widget,
+        #     float,
+        #     validator,
+        #     api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+        # )
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)
@@ -291,6 +297,117 @@ class GphlDiffractcalWidget(GphlSetupWidget):
 
             label = self._widget_data["test_crystal_parameters"][0]
             label.setText(QtImport.QString(label_str2))
+
+class GphlRuntimeWidget(QtImport.QWidget):
+    def __init__(self, parent, name="gphl_runtime_widget", data_object=None):
+        QtImport.QWidget.__init__(self, parent)
+        if name is not None:
+            self.setObjectName(name)
+
+        self._data_object = data_object
+
+        # Internal variables -------------------------------------------------
+
+
+        # Graphic elements ----------------------------------------------------
+        _parameters_widget = self._parameters_widget = QtImport.QWidget(self)
+        QtImport.QGridLayout(_parameters_widget)
+        _parameters_widget.layout().setColumnStretch(2, 1)
+        _parameters_widget.layout().setMargin(0)
+        _parameters_widget.layout().setSpacing(0)
+        # _parameters_widget.layout().setContentsMargins(0, 0, 0, 0)
+
+        # Layout --------------------------------------------------------------
+        # This seems to be necessary to make widget visible
+        _main_vlayout = QtImport.QVBoxLayout(self)
+        _main_vlayout.addWidget(_parameters_widget)
+        _main_vlayout.setSpacing(0)
+        _main_vlayout.setContentsMargins(0, 0, 0, 0)
+        # _main_vlayout.addStretch(0)
+        # _main_vlayout.setSpacing(6)
+        # _main_vlayout.setContentsMargins(2, 2, 2, 2)
+
+        if data_object is not None:
+            self.populate_widget(data_object)
+
+        self._fields = OrderedDict(
+            (
+                (
+                    "dose_budget",
+                     {
+                        "label": "Total dose budget (MGy)",
+                        "getter": "get_dose_budget",
+                         "options":{
+                            "variableName":"dose_consumed",
+                             "decimals":2,
+                             "type":"floatstring",
+                             "readOnly":True,
+                         }
+                     }
+                ),
+                (
+                    "dose_consumed",
+                    {
+                        "label": "Acq. dose budget (MGy)",
+                        "getter": "get_dose_consumed",
+                        "options":{
+                            "variableName":"dose_consumed",
+                            "decimals":2,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+                (
+                    "exposure_time",
+                    {
+                        "label": "Exposure tiume (s)",
+                        "getter": "get_exposure_time",
+                        "options":{
+                            "variableName":"exposure_time",
+                            "decimals":4,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+                (
+                    "image_width",
+                    {
+                        "label": "Oscillation range",
+                        "getter": "get_image_width",
+                        "options":{
+                            "variableName":"image_width",
+                            "decimals":2,
+                            "type":"floatstring",
+                            "readOnly":True,
+                        }
+                    }
+                ),
+            )
+        )
+
+        row = 0
+        for tag,dd0 in self._fields.items():
+            label = QtImport.QLabel(dd0["label"], _parameters_widget)
+            _parameters_widget.layout().addWidget(
+                label, row, 0, QtImport.Qt.AlignLeft
+            )
+            widget = make_widget(_parameters_widget, dd0["options"])
+            _parameters_widget.layout().addWidget(
+                widget, row, 1, QtImport.Qt.AlignLeft
+            )
+            dd0["widget"] = widget
+            row += 1
+
+    def populate_widget(self, data_object, **kwargs):
+
+        self._data_object = data_object
+
+        for tag, dd0 in self._fields.items():
+            value = getattr(data_object, dd0["getter"])() or 0
+            dd0["widget"].set_value(value)
+
 
 
 class GphlAcquisitionWidget(GphlSetupWidget):
@@ -352,37 +469,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         self._widget_data[field_name] = (widget, str, None, 0)
 
         row += 1
-        field_name = "characterisation_strategy"
-        label_name = self._get_label_name(field_name)
-        label_str = "Characterisation strategy :"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QComboBox()
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        self._widget_data[field_name] = (widget, str, None, 0)
-        strategy_names = (
-            api.gphl_workflow.getProperty("characterisation_strategies").split()
-        )
-        self._pulldowns[field_name] = strategy_names
-
-        row += 1
-        default_dose_budget_label = api.gphl_workflow.default_dose_budget_label
-        field_name = "dose_budget"
-        label_name = self._get_label_name(field_name)
-        label_str = "Dose budget (MGy) :"
-        label = QtImport.QLabel(label_str, _parameters_widget)
-        _parameters_widget.layout().addWidget(label, row, 0)
-        self._widget_data[label_name] = (label, str, None, label_str)
-        widget = QtImport.QComboBox()
-        _parameters_widget.layout().addWidget(widget, row, 1)
-        self._widget_data[field_name] = (widget, str, None, 0)
-        self._pulldowns[field_name] = list(api.gphl_workflow.dose_budgets)
-        self._pulldown_defaults[field_name] = default_dose_budget_label
-        indx = self._pulldowns[field_name].index(default_dose_budget_label)
-        self._widget_data[field_name] = (widget, str, None, indx)
-
-        row += 1
         field_name = "relative_rad_sensitivity"
         label_name = self._get_label_name(field_name)
         label_str = "Rel. radiation sensitivity"
@@ -393,6 +479,41 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget.layout().addWidget(widget, row, 1)
         validator = QtImport.QDoubleValidator(0, 100, 4, widget)
         self._widget_data[field_name] = (widget, float, validator, 1.0)
+        if api.gphl_workflow.getProperty("advanced_mode", False):
+            # ADVANCED - not currently used
+            row += 1
+            field_name = "characterisation_strategy"
+            label_name = self._get_label_name(field_name)
+            label_str = "Characterisation strategy :"
+            label = QtImport.QLabel(label_str, _parameters_widget)
+            _parameters_widget.layout().addWidget(label, row, 0)
+            self._widget_data[label_name] = (label, str, None, label_str)
+            widget = QtImport.QComboBox()
+            _parameters_widget.layout().addWidget(widget, row, 1)
+            self._widget_data[field_name] = (widget, str, None, 0)
+            strategy_names = (
+                api.gphl_workflow.getProperty("characterisation_strategies").split()
+            )
+            self._pulldowns[field_name] = strategy_names
+
+            row += 1
+            field_name = "decay_limit"
+            label_name = self._get_label_name(field_name)
+            label_str = "Signal decay limit (%)"
+            label = QtImport.QLabel(label_str, _parameters_widget)
+            _parameters_widget.layout().addWidget(label, row, 0)
+            self._widget_data[label_name] = (label, str, None, label_str)
+            widget = QtImport.QLineEdit()
+            widget.setReadOnly(True)
+            widget.setEnabled(False)
+            _parameters_widget.layout().addWidget(widget, row, 1)
+            validator = QtImport.QDoubleValidator(0, 100, 4, widget)
+            self._widget_data[field_name] = (
+                widget,
+                float,
+                validator,
+                api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+            )
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)

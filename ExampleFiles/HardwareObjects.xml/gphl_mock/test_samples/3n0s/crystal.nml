@@ -13,11 +13,8 @@
 ! CELL_A_AXIS     =   45.4388774540983       -38.1381724703247     -40.8159730711413,
 ! CELL_B_AXIS     =   59.0862367748296       -24.6250714568120      88.7879681458296,
 ! CELL_C_AXIS     =  -55.6840853942609       -41.5456791482591      25.5338146653523,
- ! to achieve polar angles tt,ff, use tt, ff, -90 (for omega X axis)
- ! or tt, ff, 0 (for omega Y axis).
- ! NB phi values will  NOT be correct (rotating around wrong axis)
- ! and sign of angles may be wrong
- U_MAT_ANG_DEG   = 90.0, 30.0, -90.0
+ ! Should get unique b axis and orthogonal axis in range
+ U_MAT_ANG_DEG   = 0.0  30.0  30.0
  U_MAT_SD_DEG    = 3*0.04
  ! highest inherent res of hkli data: 2.141
  ! L/R at lambda=1A ca. 2.0

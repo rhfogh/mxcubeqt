@@ -83,16 +83,16 @@ class FloatString(LineEdit):
             self.validator.setTop(val)
         self.update_function = options.get("update_function")
 
-        self.textChanged.connect(self.input_field_changed)
+        self.editingFinished.connect(self.input_field_changed)
 
-    def input_field_changed(self, input_field_text):
+    def input_field_changed(self):
         """UI update function triggered by field value changes"""
-        if self.update_function is not None:
-            self.update_function(self.parent())
         if (
-            self.validator.validate(input_field_text, 0)[0]
+            self.validator.validate(self.text(), 0)[0]
             == QtImport.QValidator.Acceptable
         ):
+            if self.update_function is not None:
+                self.update_function(self.parent())
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
             )
@@ -133,7 +133,7 @@ class TextEdit(QtImport.QTextEdit):
 
 
 class Combo(QtImport.QComboBox):
-    """STandard ComboBox (pulldown) widget"""
+    """Standard ComboBox (pulldown) widget"""
 
     def __init__(self, parent, options):
         QtImport.QComboBox.__init__(self, parent)
@@ -340,6 +340,7 @@ class CheckBox(QtImport.QCheckBox):
 # Mapping of type fields to Classes
 WIDGET_CLASSES = {
     "combo": Combo,
+    "dblcombo": Combo,
     "spinbox": IntSpinBox,
     "text": LineEdit,
     "floatstring": FloatString,
@@ -369,10 +370,18 @@ class FieldsWidget(QtImport.QWidget):
 
         current_row = 0
         col_incr = 0
-        pad = ""
+        # pad1: width of empty separating columns
+        pad1 = " " * 4
+        # Extra padding in front of columns 2, 3, ...
+        # to offset space for boolean widgets
+        pad2 = ""
         for field in fields:
             # should not happen but lets just skip them
-            if field["type"] != "message" and "uiLabel" not in field:
+            if (
+                field["type"] != "message"
+                and "uiLabel" not in field
+                and not field["type"].startswith("dbl")
+            ):
                 continue
 
             # hack until the 'real' xml gets implemented server side
@@ -397,28 +406,43 @@ class FieldsWidget(QtImport.QWidget):
                         QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(widget)
+                if col_incr:
+                    # Add empty column, for separation purposes
+                    empty = QtImport.QLabel(pad1, self)
+                    self.layout().addWidget(
+                        empty, current_row, col_incr, QtImport.Qt.AlignLeft
+                    )
+
+                col = col_incr + 1 if col_incr else col_incr
                 if field["type"] == "boolean":
                     self.layout().addWidget(
-                        widget, current_row, 0 + col_incr, 1, 2, QtImport.Qt.AlignLeft
+                        widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
+                    )
+                elif field["type"].startswith("dbl"):
+                    # Double width widget, no label
+                    self.layout().addWidget(
+                        widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
                     )
                 else:
+                    pad = pad2 if col_incr else ""
                     label = QtImport.QLabel(pad + field["uiLabel"], self)
                     self.layout().addWidget(
-                        label, current_row, 0 + col_incr, QtImport.Qt.AlignLeft
+                        label, current_row, col, QtImport.Qt.AlignLeft
                     )
                     self.layout().addWidget(
-                        widget, current_row, 1 + col_incr, QtImport.Qt.AlignLeft
+                        widget, current_row, 1 + col, QtImport.Qt.AlignLeft
                     )
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
-                # Increment column
-                col_incr += 2
                 current_row = 0
-                pad = " " * 5
-        self.update()
+                # Increment column
+                if col_incr:
+                    col_incr += 3
+                else:
+                    col_incr += 2
 
-    def set_values(self, values):
+    def set_values(self, **values):
         """Set values for all fields from values dictionary"""
         for field in self.field_widgets:
             if field.get_name() in values:
@@ -428,10 +452,13 @@ class FieldsWidget(QtImport.QWidget):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-    def update(self):
-        """Call update functions"""
-        for field in self.field_widgets:
-            if hasattr(field, 'update_function'):
-                update_function = field.update_function
-                if update_function:
-                    update_function(self)
+    # def update(self):
+    #     """Call update functions
+    #
+    #     NB as update functions may interfere with each other,
+    #     this should NOT be called without careful consideration"""
+    #     for field in self.field_widgets:
+    #         if hasattr(field, 'update_function'):
+    #             update_function = field.update_function
+    #             if update_function:
+    #                 update_function(self)

@@ -156,6 +156,7 @@ class TaskToolBoxWidget(QWidget):
             self.tool_box.widget(i).enable_compression(status)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
+        print ('@~@~ Qt4_task_toolbox_widget set_beamline_setup')
         self._beamline_setup_hwobj = beamline_setup_hwobj
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)
@@ -295,10 +296,22 @@ class TaskToolBoxWidget(QWidget):
             data_model = items[0].get_model()
             title = "<b>%s</b>" % data_model.get_display_name()
 
+            # Checkif this is a GPhL workflow.
+            # Clunky but ought to work
+            is_gphl = False
+            obj = data_model
+            while obj and not isinstance(obj, queue_model_objects.Sample):
+                if  isinstance(obj, queue_model_objects.GphlWorkflow):
+                    is_gphl = True
+                    break
+                obj = obj.get_parent()
+
             logging.getLogger("HWR").debug("*** TaskToolBoxWidget.selection_changed: %s" % title)
             if not isinstance(items[0], Qt4_queue_item.DataCollectionGroupQueueItem):
                 self.create_task_button.setEnabled(True)
-            if isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
+            if is_gphl:
+                self.tool_box.setCurrentWidget(self.gphl_workflow_page)
+            elif isinstance(items[0], Qt4_queue_item.DataCollectionQueueItem):
                 if data_model.is_helical():
                     self.tool_box.setCurrentWidget(self.helical_page)
                 elif data_model.is_mesh():
@@ -311,8 +324,6 @@ class TaskToolBoxWidget(QWidget):
                 self.tool_box.setCurrentWidget(self.energy_scan_page)
             elif isinstance(items[0], Qt4_queue_item.XRFSpectrumQueueItem):
                 self.tool_box.setCurrentWidget(self.xrf_spectrum_page)
-            elif isinstance(items[0], Qt4_queue_item.GphlWorkflowQueueItem):
-                self.tool_box.setCurrentWidget(self.gphl_workflow_page)
             elif isinstance(items[0], Qt4_queue_item.GenericWorkflowQueueItem):
                 self.tool_box.setCurrentWidget(self.workflow_page)
             elif isinstance(items[0], Qt4_queue_item.XrayCenteringQueueItem):

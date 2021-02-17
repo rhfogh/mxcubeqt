@@ -20,6 +20,7 @@
 import os
 import logging
 from collections import namedtuple
+import api
 
 from QtImport import *
 
@@ -446,6 +447,11 @@ class Qt4_TreeBrick(BlissWidget):
                     self.dc_tree_widget.populate_tree_widget(sc_basket_list, sc_sample_list, 
                          self.dc_tree_widget.sample_mount_method)
                     self.sample_changer_widget.details_button.setText("Show SC-details")
+
+                # Specifically to intialise emulation samples in mock mode
+                # Very crude and hacky, but avoids changes in production mode, at least
+                if api.lims is not None and  "Mock" in api.lims.__class__.__name__:
+                    self.refresh_sample_list()
  
             if self.plate_manipulator_hwobj is not None and \
                self.diffractometer_hwobj.in_plate_mode():
