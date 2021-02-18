@@ -10,7 +10,7 @@ sys.path.insert(0, MXCUBE_ROOT)
 MXCUBE_GUI_FILE = os.environ.get('MXCUBE_GUI_FILE')
 if not MXCUBE_GUI_FILE:
     MXCUBE_GUI_FILE = os.path.join(MXCUBE_ROOT,
-                                   "ExampleFiles/example_mxcube_qt4.json")
+                                   "ExampleFiles/example_mxcube_qt4.yml")
 if not os.environ.get('HARDWARE_REPOSITORY_SERVER'):
     hr_server = os.path.join(MXCUBE_ROOT,
                              "ExampleFiles/HardwareObjects.xml")

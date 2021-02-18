@@ -40,7 +40,7 @@ class CreateHelicalWidget(CreateTaskBase):
 
         if not name:
             self.setObjectName("create_helical_widget")
-        self.init_models() 
+        self.init_models()
          
         # Hardware objects ----------------------------------------------------
 
@@ -121,12 +121,12 @@ class CreateHelicalWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
   
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_helical_values")
+            has_shutter_less = self._beamline_setup_hwobj. \
+                detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
 
     def set_beamline_setup(self, bl_setup_hwobj):
         CreateTaskBase.set_beamline_setup(self, bl_setup_hwobj)

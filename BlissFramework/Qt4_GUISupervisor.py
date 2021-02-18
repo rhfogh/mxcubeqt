@@ -210,7 +210,8 @@ class GUISupervisor(QWidget):
                         if gui_config_file.endswith(".json"):
                             raw_config = json.load(gui_file) 
                         elif gui_config_file.endswith(".yml"):
-                            raw_config = yaml.load(gui_file, Loader=yaml.FullLoader)
+                            # raw_config = yaml.load(gui_file, Loader=yaml.FullLoader)
+                            raw_config = yaml.load(gui_file)
                         else:
                             raw_config = eval(gui_file.read())
                     except:

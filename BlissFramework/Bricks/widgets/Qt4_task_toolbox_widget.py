@@ -82,9 +82,9 @@ class TaskToolBoxWidget(QWidget):
         self.tool_box.addItem(self.helical_page, "Helical Collection")
         # self.tool_box.addItem(self.energy_scan_page, "Energy Scan")
         # self.tool_box.addItem(self.xrf_spectrum_page, "XRF Spectrum")
-        #if self.gphl_workflow_page is not None:
-        #    self.tool_box.addItem(self.gphl_workflow_page,
-        #                          "GPhL Workflows")
+        if self.gphl_workflow_page is not None:
+           self.tool_box.addItem(self.gphl_workflow_page,
+                                 "GPhL Workflows")
         # self.tool_box.addItem(self.advanced_page, "Advanced")
         # self.tool_box.addItem(self.xray_imaging_page, "Xray Imaging")
 
@@ -156,7 +156,6 @@ class TaskToolBoxWidget(QWidget):
             self.tool_box.widget(i).enable_compression(status)
 
     def set_beamline_setup(self, beamline_setup_hwobj):
-        print ('@~@~ Qt4_task_toolbox_widget set_beamline_setup')
         self._beamline_setup_hwobj = beamline_setup_hwobj
         for i in range(0, self.tool_box.count()):
             self.tool_box.widget(i).set_beamline_setup(beamline_setup_hwobj)

@@ -23,6 +23,8 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
+import logging
+
 from HardwareRepository import ConvertUtils
 
 import QtImport
@@ -49,6 +51,7 @@ class SelectionTable(QtImport.QTableWidget):
         self.setColumnCount(len(header))
         self.setSelectionMode(QtImport.QTableWidget.SingleSelection)
         self.setHorizontalHeaderLabels(header)
+        self.horizontalHeader().setDefaultAlignment(QtImport.Qt.AlignLeft)
         self.setSizePolicy(
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
@@ -67,6 +70,9 @@ class SelectionTable(QtImport.QTableWidget):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
+        selectRow = None
+        no_colours = not colours or not any(colours)
+        colour = None
         for rowNum, text in enumerate(values):
             wdg = QtImport.QLineEdit(self)
             wdg.setFont(QtImport.QFont("Courier"))
@@ -75,15 +81,24 @@ class SelectionTable(QtImport.QTableWidget):
             if colours:
                 colour = colours[rowNum]
                 if colour:
+                    # Currently colours are either None or light green
                     Colors.set_widget_color(
                         wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
-                    # wdg.setBackground(getattr(QtImport.QColor, colour))
             self.setCellWidget(rowNum, colNum, wdg)
+            if "*" in text and colour or no_colours:
+                selectRow = rowNum
+        if selectRow is not None:
+            self.setCurrentCell(selectRow, 0)
+
 
     def get_value(self):
         """Get value - list of cell contents for selected row"""
         row_id = self.currentRow()
+        if not self.cellWidget(row_id, 0):
+            logging.getLogger("user_log").warning(
+                "Select a row of the table, and then press [Continue]"
+            )
         return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
 
 
@@ -156,6 +171,16 @@ class GphlDataDialog(QtImport.QDialog):
         self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
         # self.clearWState(QtImport.WState_Polished)
 
+    def keyPressEvent(self, event):
+        """This should disable having Qt interpret {Rerutn> as [Continue] """
+        if ((not event.modifiers() and
+             event.key() == QtImport.Qt.Key_Return) or
+            (event.modifiers() == QtImport.Qt.KeypadModifier and
+             event.key() == QtImport.Qt.Key_Enter)):
+            event.accept()
+        else:
+            super(QtImport.Dialog, self).keyPressEvent(event)
+
     def continue_button_click(self):
         result = {}
         if self.parameter_gbox.isVisible():
@@ -167,10 +192,15 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result = None
 
     def cancel_button_click(self):
+        logging.getLogger("HWR").debug("GPhL Data dialog abort pressed.")
         self.reject()
-        self.parent()._workflow_hwobj.abort("Manual abort")
+        self._async_result.set(StopIteration)
+        self._async_result = None
 
-    def open_dialog(self, field_list, async_result):
+    def open_dialog(self, field_list, async_result, parameter_update_function):
+
+        msg = "GPhL Workflow waiting for input, verify parameters and press continue."
+        logging.getLogger("user_level_log").info(msg)
 
         self._async_result = async_result
 
@@ -230,17 +260,12 @@ class GphlDataDialog(QtImport.QDialog):
             self.params_widget = FieldsWidget(
                 fields=parameters, parent=self.parameter_gbox
             )
-
-            values = {}
-            for dd0 in field_list:
-                name = dd0["variableName"]
-                value = dd0.get("defaultValue")
-                if value is not None:
-                    dd0[name] = value
-            self.params_widget.set_values(values)
+            if parameter_update_function:
+                parameter_update_function(self.params_widget)
             self.parameter_gbox.show()
         else:
             self.parameter_gbox.hide()
 
         self.show()
         self.setEnabled(True)
+        self.update()

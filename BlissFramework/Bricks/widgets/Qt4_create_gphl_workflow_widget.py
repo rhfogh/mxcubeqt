@@ -35,8 +35,11 @@ from Qt4_gphl_acquisition_widget import GphlRuntimeWidget
 from Qt4_gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
-from HardwareRepository.HardwareObjects import queue_model_objects_v1 as queue_model_objects
-from HardwareRepository.HardwareObjects import queue_model_enumerables_v1 as queue_model_enumerables
+import queue_model_objects_v1 as queue_model_objects
+import queue_model_enumerables_v1 as queue_model_enumerables
+
+# from HardwareRepository.HardwareObjects import queue_model_objects_v1 as queue_model_objects
+# from HardwareRepository.HardwareObjects import queue_model_enumerables_v1 as queue_model_enumerables
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"

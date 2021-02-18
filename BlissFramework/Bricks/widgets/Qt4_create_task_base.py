@@ -25,6 +25,8 @@ from copy import deepcopy
 
 from QtImport import *
 
+import api
+
 import Qt4_queue_item
 import Qt4_GraphicsManager
 import queue_model_objects_v1 as queue_model_objects
@@ -49,26 +51,31 @@ class CreateTaskBase(QWidget):
     pathTempleConflictSignal = pyqtSignal(bool)
 
     def __init__(self, parent, name, fl, task_node_name = 'Unamed task-node'):
-         QWidget.__init__(self, parent, Qt.WindowFlags(fl))
-         self.setObjectName(name)
-        
-         self._tree_brick = None
-         self._task_node_name = task_node_name
+        QWidget.__init__(self, parent, Qt.WindowFlags(fl))
+        self.setObjectName(name)
 
-         # Centred positons that currently are selected in the parent
-         # widget, position_history_brick.
-         self._selected_positions = []
+        self._tree_brick = None
+        self._task_node_name = task_node_name
+        self._acquisition_parameters = None
+        self._processing_parameters = None
 
-         # Abstract attributes
-         self._acq_widget = None
-         self._data_path_widget = None
-         self._current_selected_items = []
-         self._path_template = None
-         self._energy_scan_result = None
-         self._session_hwobj = None
-         self._beamline_setup_hwobj = None
-         self._graphics_manager_hwobj = None
-         self._in_plate_mode = None
+        # Centred positons that currently are selected in the parent
+        # widget, position_history_brick.
+        self._selected_positions = []
+
+        # Abstract attributes
+        self._acq_widget = None
+        self._data_path_widget = None
+        self._current_selected_items = []
+        self._path_template = None
+        self._energy_scan_result = None
+        # NB this should be clened out and api used everywhere
+        self._session_hwobj = api.session
+        self._beamline_setup_hwobj = api.beamline_setup
+        # self._session_hwobj = None
+        # self._beamline_setup_hwobj = None
+        self._graphics_manager_hwobj = None
+        self._in_plate_mode = None
         
     def set_expert_mode(self, state):
         if self._acq_widget:
@@ -106,23 +113,22 @@ class CreateTaskBase(QWidget):
     def init_data_path_model(self):
         bl_setup = self._beamline_setup_hwobj
 
-        if bl_setup is not None:
+        if bl_setup is not None and self._data_path_widget:
             # Initialize the path_template of the widget to default
             # values read from the beamline setup
-            if self._data_path_widget:
-                logging.getLogger('HWR').debug("*** CreateTaskBase.init_data_path_model: data path widget")
-                self._data_path_widget._base_image_dir = \
-                    self._session_hwobj.get_base_image_directory()
-                self._data_path_widget._base_process_dir = \
-                    self._session_hwobj.get_base_process_directory()
+            logging.getLogger('HWR').debug("*** CreateTaskBase.init_data_path_model: data path widget")
+            self._data_path_widget._base_image_dir = \
+                self._session_hwobj.get_base_image_directory()
+            self._data_path_widget._base_process_dir = \
+                self._session_hwobj.get_base_process_directory()
 
-                (data_directory, proc_directory) = self.get_default_directory()
-                self._path_template = bl_setup.get_default_path_template()
-                self._path_template.directory = data_directory
-                self._path_template.process_directory = proc_directory
-                self._path_template.base_prefix = self.get_default_prefix()
-                self._path_template.run_number = bl_setup.queue_model_hwobj.\
-                    get_next_run_number(self._path_template)
+            (data_directory, proc_directory) = self.get_default_directory()
+            self._path_template = bl_setup.get_default_path_template()
+            self._path_template.directory = data_directory
+            self._path_template.process_directory = proc_directory
+            self._path_template.base_prefix = self.get_default_prefix()
+            self._path_template.run_number = api.queue_model.\
+                get_next_run_number(self._path_template)
         else:
             logging.getLogger('HWR').debug("*** CreateTaskBase.init_data_path_model: data path template")
             self._path_template = queue_model_objects.PathTemplate()
@@ -134,7 +140,6 @@ class CreateTaskBase(QWidget):
             self.update_selection()
 
     def set_beamline_setup(self, bl_setup_hwobj):
-        print ('@~@~ set_beamline_setup')
         self._beamline_setup_hwobj = bl_setup_hwobj
         self._in_plate_mode = self._beamline_setup_hwobj.diffractometer_hwobj.in_plate_mode()
 
@@ -156,7 +161,6 @@ class CreateTaskBase(QWidget):
             bl_setup_hwobj.resolution_hwobj.update_values()
             bl_setup_hwobj.detector_hwobj.update_values()
         except AttributeError as ex:
-            print ('@~@~ set_beamline_setup in exception')
             msg = 'Could not connect to one or more hardware objects' + str(ex)
             logging.getLogger("HWR").warning(msg)
        
@@ -167,7 +171,6 @@ class CreateTaskBase(QWidget):
             self._graphics_manager_hwobj.connect('shapeDeleted', self.shape_deleted)
 
         self._session_hwobj = bl_setup_hwobj.session_hwobj
-        print ('@~@~ set_beamline_setup _session_hwobj is', self._session_hwobj)
         self.init_models()
 
     def set_osc_start(self, new_value):

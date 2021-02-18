@@ -69,7 +69,7 @@ class DataPathWidget(QWidget):
         _main_vlayout.setSpacing(0)
         _main_vlayout.setContentsMargins(0, 0, 0, 0)
 
-        # Qt signal/slot connections ------------------------------------------ 
+        # Qt signal/slot connections ------------------------------------------
         self.data_path_layout.prefix_ledit.textChanged.\
              connect(self._prefix_ledit_change)
         self.data_path_layout.run_number_ledit.textChanged.\
@@ -155,8 +155,8 @@ class DataPathWidget(QWidget):
         """
         Descript. :
         """
-        base_image_dir = self._base_image_dir
-        base_proc_dir = self._base_process_dir
+        base_image_dir = self._base_image_dir or ""
+        base_proc_dir = self._base_process_dir or ""
 
         cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
@@ -220,7 +220,7 @@ class DataPathWidget(QWidget):
         Descript. :
         """
 
-        base_image_dir = self._base_image_dir
+        base_image_dir = self._base_image_dir or ""
         dir_parts = directory.split(base_image_dir)
         logging.getLogger('GUI').debug('base image dir: %s' % base_image_dir)
         logging.getLogger('GUI').debug('directory: %s' % directory)

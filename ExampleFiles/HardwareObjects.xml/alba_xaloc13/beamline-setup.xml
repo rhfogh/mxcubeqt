@@ -8,6 +8,8 @@
   <object href="/mini-diff" role="diffractometer"/>
   <object href="/omega" role="omega_axis"/>
   <object href="/kappa" role="kappa_axis"/>
+  <!-- Detector distance needed here for now to be put int  api -->
+  <object href="/detector-distance" role="detector_distance"/>
 <!--  <object href="/kappaphi" role="kappa_phi_axis"/>-->
   <object href="/cats" role="sample_changer"/>    
   <!-- object href="/plate-manipulator" role="plate_manipulator"/ -->

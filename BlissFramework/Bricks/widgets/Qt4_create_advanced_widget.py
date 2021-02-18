@@ -46,7 +46,6 @@ class CreateAdvancedWidget(CreateTaskBase):
         # Hardware objects ----------------------------------------------------
  
         # Internal variables --------------------------------------------------
-        self.init_models()
         self._advanced_methods = None
         self._grid_map = {}
         self.spacing = [0, 0]
@@ -56,6 +55,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._advanced_methods_widget = loadUi(os.path.join(\
             os.path.dirname(__file__), "ui_files/Qt4_advanced_methods_layout.ui"))
 
+        self._init_models()
+
         self._acq_widget =  AcquisitionWidget(self, "acquisition_widget",
              layout='vertical', acq_params=self._acquisition_parameters,
              path_template=self._path_template)
@@ -63,6 +64,9 @@ class CreateAdvancedWidget(CreateTaskBase):
 
         self._data_path_widget = DataPathWidget(self, 'create_dc_path_widget', 
              data_model = self._path_template, layout = 'vertical')
+
+        # Must be exactly here to avoid errros
+        self.init_models()
 
         # Layout --------------------------------------------------------------
         _main_vlayout = QVBoxLayout(self) 
@@ -143,7 +147,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         Descript. :
         """
         CreateTaskBase.init_models(self)
-        self._init_models()
+        # self._init_models()
+        self.grid_treewidget_item_selection_changed()
 
     def _init_models(self):
         """
@@ -153,12 +158,12 @@ class CreateAdvancedWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_advanced_values")
+            has_shutter_less = self._beamline_setup_hwobj. \
+                detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
 
             if not self._advanced_methods:
                 self._advanced_methods = self._beamline_setup_hwobj.get_advanced_methods()            
@@ -168,7 +173,6 @@ class CreateAdvancedWidget(CreateTaskBase):
                 else:
                    self.setEnabled(False)    
 
-            self.grid_treewidget_item_selection_changed()
 
     def set_beamline_setup(self, bl_setup_hwobj):
         """

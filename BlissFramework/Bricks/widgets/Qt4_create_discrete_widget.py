@@ -18,6 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import logging
 
 from QtImport import *
 
@@ -109,12 +110,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
         if self._beamline_setup_hwobj is not None:
-            has_shutter_less = self._beamline_setup_hwobj.\
-                               detector_has_shutterless()
-            self._acquisition_parameters.shutterless = has_shutter_less
 
             self._acquisition_parameters = self._beamline_setup_hwobj.\
                 get_default_acquisition_parameters("default_acquisition_values")
+            has_shutter_less = self._beamline_setup_hwobj. \
+                detector_has_shutterless()
+            self._acquisition_parameters.shutterless = has_shutter_less
             self._acquisition_parameters.compression = True
             
     def set_tunable_energy(self, state):
