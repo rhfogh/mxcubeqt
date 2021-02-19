@@ -649,14 +649,20 @@ class TreeBrick(BaseWidget):
         sample_changer = None
 
         self.sample_changer_widget.sample_combo.clear()
-        for sample in self.lims_samples:
-            try:
-                if sample.containerSampleChangerLocation:
-                    self.filtered_lims_samples.append(sample)
-                    item_text = "%s-%s" % (sample.proteinAcronym, sample.sampleName)
+        for lims_sample in self.lims_samples:
+            if isinstance(lims_sample, dict):
+                if lims_sample.get("containerSampleChangerLocation"):
+                    self.filtered_lims_samples.append(lims_sample)
+                    item_text = "%s-%s" % (
+                        lims_sample.get("proteinAcronym"), lims_sample.get("sampleName")
+                    )
                     self.sample_changer_widget.sample_combo.addItem(item_text)
-            except BaseException:
-                pass
+            elif lims_sample.containerSampleChangerLocation:
+                self.filtered_lims_samples.append(lims_sample)
+                item_text = "%s-%s" % (
+                    lims_sample.proteinAcronym, lims_sample.sampleName
+                )
+                self.sample_changer_widget.sample_combo.addItem(item_text)
 
         self.sample_changer_widget.sample_label.setEnabled(True)
         self.sample_changer_widget.sample_combo.setEnabled(True)

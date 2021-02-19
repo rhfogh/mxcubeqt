@@ -158,8 +158,8 @@ class DataPathWidget(QtImport.QWidget):
             )
 
     def _folder_ledit_change(self, new_value):
-        base_image_dir = self._base_image_dir
-        base_proc_dir = self._base_process_dir
+        base_image_dir = self._base_image_dir or ""
+        base_proc_dir = self._base_process_dir or ""
 
         cursor_pos = self.data_path_layout.folder_ledit.cursorPosition()
         if len(new_value) > 0:
