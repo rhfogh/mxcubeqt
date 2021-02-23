@@ -61,6 +61,41 @@ class LineEdit(QtImport.QLineEdit):
     def get_value(self):
         return ConvertUtils.text_type(self.text())
 
+    def input_field_changed(self):
+        """UI update function triggered by field value changes"""
+        valid = self.is_valid()
+        if valid:
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
+            if self.update_function is not None:
+                self.update_function(self.parent())
+        else:
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+            )
+        #
+        self.parent().parametersValidSignal.emit(valid)
+
+
+    def is_valid(self):
+        if self.validator():
+            return (
+                self.validator().validate(self.text(), 0)[0]
+                == QtImport.QValidator.Acceptable
+            )
+        else:
+            return True
+
+        # if valid:
+        #     Colors.set_widget_color(
+        #         self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+        #     )
+        # else:
+        #     Colors.set_widget_color(
+        #         self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+        #     )
+
 
 class FloatString(LineEdit):
     """LineEdit widget with validators and formatting for floating point numbers"""
@@ -74,32 +109,17 @@ class FloatString(LineEdit):
         else:
             self.formatstr = "%%.%sf" % decimals
         LineEdit.__init__(self, parent, options)
-        self.validator = QtImport.QDoubleValidator(self)
+        self.setValidator(QtImport.QDoubleValidator(self))
         val = options.get("lowerBound")
         if val is not None:
-            self.validator.setBottom(val)
+            self.validator().setBottom(val)
         val = options.get("upperBound")
         if val is not None:
-            self.validator.setTop(val)
+            self.validator().setTop(val)
         self.update_function = options.get("update_function")
 
-        self.editingFinished.connect(self.input_field_changed)
-
-    def input_field_changed(self):
-        """UI update function triggered by field value changes"""
-        if (
-            self.validator.validate(self.text(), 0)[0]
-            == QtImport.QValidator.Acceptable
-        ):
-            if self.update_function is not None:
-                self.update_function(self.parent())
-            Colors.set_widget_color(
-                self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
-            )
-        else:
-            Colors.set_widget_color(
-                self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
-            )
+        # self.editingFinished.connect(self.input_field_changed)
+        self.textEdited.connect(self.input_field_changed)
 
     def set_value(self, value):
         self.setText(self.formatstr % value)
@@ -358,6 +378,7 @@ def make_widget(parent, options):
 
 class FieldsWidget(QtImport.QWidget):
     """Collection-of-widgets widget for parameter query"""
+    parametersValidSignal = QtImport.pyqtSignal(bool)
 
     def __init__(self, fields, parent=None):
         QtImport.QWidget.__init__(self, parent)
@@ -452,13 +473,11 @@ class FieldsWidget(QtImport.QWidget):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-    # def update(self):
-    #     """Call update functions
-    #
-    #     NB as update functions may interfere with each other,
-    #     this should NOT be called without careful consideration"""
-    #     for field in self.field_widgets:
-    #         if hasattr(field, 'update_function'):
-    #             update_function = field.update_function
-    #             if update_function:
-    #                 update_function(self)
+    def invalid_fields(self):
+        invalids = []
+
+        for widget in self.field_widgets:
+            if isinstance(widget, LineEdit):
+                if not widget.is_valid():
+                    invalids.append(widget.get_name())
+        return invalids
