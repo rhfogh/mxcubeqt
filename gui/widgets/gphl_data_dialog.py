@@ -167,7 +167,8 @@ class GphlDataDialog(QtImport.QDialog):
         self.continue_button.clicked.connect(self.continue_button_click)
         self.cancel_button.clicked.connect(self.cancel_button_click)
 
-        self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
+        # self.resize(QtImport.QSize(1018, 472).expandedTo(self.minimumSizeHint()))
+        self.resize(QtImport.QSize(1200, 578).expandedTo(self.minimumSizeHint()))
         # self.clearWState(QtImport.WState_Polished)
 
     def keyPressEvent(self, event):
@@ -253,15 +254,20 @@ class GphlDataDialog(QtImport.QDialog):
 
         # parameters widget
         if self.params_widget is not None:
+            self.params_widget.parametersValidSignal.disconnect(
+                self.continue_button.setEnabled
+            )
             self.params_widget.close()
             self.params_widget = None
         if parameters:
-            self.params_widget = FieldsWidget(
+            params_widget = self.params_widget = FieldsWidget(
                 fields=parameters, parent=self.parameter_gbox
             )
             if parameter_update_function:
-                parameter_update_function(self.params_widget)
+                parameter_update_function(params_widget)
             self.parameter_gbox.show()
+            params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
+            self.continue_button.setEnabled(not params_widget.invalid_fields())
         else:
             self.parameter_gbox.hide()
 
