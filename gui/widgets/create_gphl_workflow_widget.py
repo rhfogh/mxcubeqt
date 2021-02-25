@@ -94,7 +94,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
         data_path_layout.run_number_ledit.setEnabled(False)
-        data_path_layout.folder_ledit.setReadOnly(True)
+        # data_path_layout.folder_ledit.setReadOnly(True)
 
         # Layout --------------------------------------------------------------
         _workflow_type_vlayout = QtImport.QVBoxLayout(self._workflow_type_widget)
