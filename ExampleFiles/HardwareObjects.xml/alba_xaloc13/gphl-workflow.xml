@@ -136,9 +136,9 @@
         <!-- NB you must set EITHER wfprefix OR samplesubdir (or both)-->
         <!-- wfprefix is the enactment fixed file prefix  - if set to e.g. 'wfx_',
         data for workflow runs will be stored under 'wfx_001/, wfx_002,/ ... -->
-<!--        <wfprefix>gphl_wf_</wfprefix>-->
+        <wfprefix>Acq_</wfprefix>
         <!-- Include sample filename prefix as subdirector in enactment directory path -->
-        <samplesubdir/>
+<!--        <samplesubdir/>-->
 
         <!-- directory paths are:
          wfprefix:  .../RAW_DATA/<wfprefix>_001/...
