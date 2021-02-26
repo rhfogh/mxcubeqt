@@ -862,7 +862,23 @@ class DataCollectTree(QWidget):
 
                 if len(checked_items):
                     self.confirm_dialog.set_items(checked_items)
-                    self.confirm_dialog.show()
+                    # Replaced so that you skip confirmation dialog for specific cases
+                    # You do not want confirmation for GPhL workflow
+                    # even on beamlines where the [Collect Now] butotn is disabled
+                    # Code by Gleb Bourenkov
+                    # self.confirm_dialog.show()
+                    show = False
+                    for item in checked_items:
+                        if isinstance(item, queue_item.SampleQueueItem):
+                            if not item.mounted_style:
+                                show = True
+                        elif not isinstance(item, queue_item.GphlWorkflowQueueItem):
+                            if not isinstance(item, queue_item.DataCollectionGroupQueueItem):
+                                show = True
+                    if show:
+                       self.confirm_dialog.show()
+                    else:
+                       self.confirm_dialog.continue_button_click()
                 else:
                     message = "No data collections selected, please select one" + \
                               " or more data collections"
