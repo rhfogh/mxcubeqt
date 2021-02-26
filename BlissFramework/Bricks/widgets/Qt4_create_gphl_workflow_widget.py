@@ -220,14 +220,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         self.current_prefix = parameters.get("prefix")
 
-    def get_default_directory(self, tree_item=None, sub_dir=''):
-        # Add placeholder for enactment number
-        if sub_dir:
-            sub_dir += "_000"
-        #
-        return super(CreateGphlWorkflowWidget, self).get_default_directory(
-            tree_item=tree_item, sub_dir=sub_dir
-        )
+    # def get_default_directory(self, tree_item=None, sub_dir=''):
+    #     # Add placeholder for enactment number
+    #     if sub_dir:
+    #         sub_dir += "_000"
+    #     #
+    #     return super(CreateGphlWorkflowWidget, self).get_default_directory(
+    #         tree_item=tree_item, sub_dir=sub_dir
+    #     )
 
     def single_item_selection(self, tree_item):
         CreateTaskBase.single_item_selection(self, tree_item)
@@ -236,7 +236,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         if isinstance(tree_item, queue_item.DataCollectionQueueItem):
             self._path_template = tree_item.get_model().acquisitions[0].path_template
             self._data_path_widget.update_data_model(self._path_template)
-
 
         elif self._tree_brick.dc_tree_widget.collecting:
             # We do not want reset after collection has started
@@ -252,14 +251,15 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._path_template = model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
-        elif isinstance(tree_item, queue_item.BasketQueueItem):
-            self.setDisabled(False)
+        # elif isinstance(tree_item, queue_item.BasketQueueItem):
+        #     print ('@~@~ 4')
+        #     self.setDisabled(False)
 
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            # Reset directory to default (and folder edt field to empty)
-            (data_directory, proc_directory) = self.get_default_directory()
-            self._path_template.directory = data_directory
-            self._path_template.process_directory = proc_directory
+            # # Reset directory to default (and folder edt field to empty)
+            # (data_directory, proc_directory) = self.get_default_directory()
+            # self._path_template.directory = data_directory
+            # self._path_template.process_directory = proc_directory
 
             if not model.has_lims_data() and not api.session.get_group_name():
                 # When noprefix is set, verride prefix setting;
@@ -308,8 +308,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                         % observedResolution
                     )
 
-        elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-            self.setDisabled(True)
+        # elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
+        #     self.setDisabled(True)
 
 
 
