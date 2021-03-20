@@ -63,6 +63,7 @@ class LineEdit(QtImport.QLineEdit):
     def input_field_changed(self):
         """UI update function triggered by field value changes"""
         valid = self.is_valid()
+        print ('@~@~ input_field_changed', valid, self.update_function)
         if valid:
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
