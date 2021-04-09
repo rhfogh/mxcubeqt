@@ -117,8 +117,7 @@ class GphlDataDialog(QtImport.QDialog):
         self._async_result = None
 
         # Layout
-        QtImport.QVBoxLayout(self)
-        main_layout = self.layout()
+        main_layout = QtImport.QVBoxLayout(self)
         main_layout.setSpacing(10)
         main_layout.setMargin(6)
         self.setSizePolicy(
@@ -129,17 +128,19 @@ class GphlDataDialog(QtImport.QDialog):
 
         # Info box
         self.info_gbox = QtImport.QGroupBox("Info", self)
-        QtImport.QVBoxLayout(self.info_gbox)
-        main_layout.addWidget(self.info_gbox)
+        info_vbox = QtImport.QVBoxLayout()
+        self.info_gbox.setLayout(info_vbox)
+        main_layout.addWidget(self.info_gbox, stretch=8)
         self.info_text = QtImport.QTextEdit(self.info_gbox)
         self.info_text.setFont(QtImport.QFont("Courier"))
         self.info_text.setReadOnly(True)
-        self.info_gbox.layout().addWidget(self.info_text)
+        info_vbox.addWidget(self.info_text, stretch=8)
 
         # Special parameter box
         self.cplx_gbox = QtImport.QGroupBox("Indexing solution", self)
-        QtImport.QVBoxLayout(self.cplx_gbox)
-        main_layout.addWidget(self.cplx_gbox)
+        cplx_vbox = QtImport.QVBoxLayout()
+        self.cplx_gbox.setLayout(cplx_vbox)
+        main_layout.addWidget(self.cplx_gbox, stretch=8)
         self.cplx_gbox.setSizePolicy(
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
@@ -147,14 +148,18 @@ class GphlDataDialog(QtImport.QDialog):
 
         # Parameter box
         self.parameter_gbox = QtImport.QGroupBox("Parameters", self)
-        main_layout.addWidget(self.parameter_gbox)
+        parameter_vbox =  QtImport.QVBoxLayout()
+        self.parameter_gbox.setLayout(parameter_vbox)
+        main_layout.addWidget(self.parameter_gbox, stretch=1)
         self.parameter_gbox.setSizePolicy(
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
         self.params_widget = None
 
         # Button bar
+        self.button_widget = QtImport.QWidget(self)
         button_layout = QtImport.QHBoxLayout(None)
+        self.button_widget.setLayout(button_layout)
         hspacer = QtImport.QSpacerItem(
             1, 20, QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Minimum
         )
@@ -163,7 +168,7 @@ class GphlDataDialog(QtImport.QDialog):
         button_layout.addWidget(self.continue_button)
         self.cancel_button = QtImport.QPushButton("Abort", self)
         button_layout.addWidget(self.cancel_button)
-        main_layout.addLayout(button_layout)
+        main_layout.addWidget(self.button_widget)
 
         self.continue_button.clicked.connect(self.continue_button_click)
         self.cancel_button.clicked.connect(self.cancel_button_click)
@@ -239,7 +244,10 @@ class GphlDataDialog(QtImport.QDialog):
                 self.cplx_widget = SelectionTable(
                     self.cplx_gbox, "cplx_widget", cplx["header"]
                 )
-                self.cplx_gbox.layout().addWidget(self.cplx_widget)
+                self.cplx_widget.setSizePolicy(
+                    QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+                )
+                self.cplx_gbox.layout().addWidget(self.cplx_widget, stretch=8)
                 self.cplx_gbox.setTitle(cplx.get("uiLabel"))
                 for ii, values in enumerate(cplx["defaultValue"]):
                     self.cplx_widget.populateColumn(
@@ -261,9 +269,8 @@ class GphlDataDialog(QtImport.QDialog):
             self.params_widget.close()
             self.params_widget = None
         if parameters:
-            params_widget = self.params_widget = FieldsWidget(
-                fields=parameters, parent=self.parameter_gbox
-            )
+            params_widget = self.params_widget = FieldsWidget(fields=parameters)
+            self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
             if parameter_update_function:
                 parameter_update_function(params_widget)
             self.parameter_gbox.show()

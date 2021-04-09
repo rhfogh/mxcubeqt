@@ -427,14 +427,7 @@ class FieldsWidget(QtImport.QWidget):
                         QtImport.QSizePolicy.Fixed, QtImport.QSizePolicy.Fixed
                     )
                 self.field_widgets.append(widget)
-                if col_incr:
-                    # Add empty column, for separation purposes
-                    empty = QtImport.QLabel(pad1, self)
-                    self.layout().addWidget(
-                        empty, current_row, col_incr, QtImport.Qt.AlignLeft
-                    )
-
-                col = col_incr + 1 if col_incr else col_incr
+                col = col_incr
                 if field["type"] == "boolean":
                     self.layout().addWidget(
                         widget, current_row, col, 1, 2, QtImport.Qt.AlignLeft
@@ -453,15 +446,24 @@ class FieldsWidget(QtImport.QWidget):
                     self.layout().addWidget(
                         widget, current_row, 1 + col, QtImport.Qt.AlignLeft
                     )
+                    # Add empty column, for separation purposes
+
+                    hspacer = QtImport.QSpacerItem(
+                        10,
+                        20,
+                        QtImport.QSizePolicy.MinimumExpanding,
+                        QtImport.QSizePolicy.Minimum
+                    )
+                    # empty = QtImport.QLabel(pad1, self)
+                    self.layout().addItem(
+                        hspacer, current_row, col + 2, QtImport.Qt.AlignLeft
+                    )
 
             current_row += 1
             if field.pop("NEW_COLUMN", False):
                 current_row = 0
                 # Increment column
-                if col_incr:
-                    col_incr += 3
-                else:
-                    col_incr += 2
+                col_incr += 3
 
     def set_values(self, **values):
         """Set values for all fields from values dictionary"""
