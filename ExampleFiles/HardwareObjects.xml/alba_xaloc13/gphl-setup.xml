@@ -50,7 +50,7 @@
     <!--<java_binary>ssh -i /home/rhfogh/.ssh/wf_test_id -o StrictHostKeyChecking=no lonsdale java</java_binary>-->
 
         <!-- Location of GPhL release, containing program binaries (or their wrapper scripts) -->
-        <GPHL_INSTALLATION>{GPHL_RELEASE}/autoPROC/bin/linux64</GPHL_INSTALLATION>
+        <GPHL_INSTALLATION>{GPHL_RELEASE}/gphl_release/exe</GPHL_INSTALLATION>
 
         <!-- Location of CCP4 release binaries - if required to pass on to some wrapper scripts -->
         <!-- <GPHL_CCP4_PATH>/mnt/scratch/rhfogh/GPhL/ccp4-7.1/bin</GPHL_CCP4_PATH> -->
@@ -86,7 +86,7 @@
         <!-- They default to within GPHL_INSTALLATION -->
 
         <!-- Location of stratcal binary -->
-        <co.gphl.wf.stratcal.bin>{GPHL_SETUP}/scripts/stratcal_wrap.py</co.gphl.wf.stratcal.bin>
+        <co.gphl.wf.stratcal.bin>{GPHL_RELEASE}/gphl_release/exe/run_stratcal_wrap.py</co.gphl.wf.stratcal.bin>
         <!-- Location of stratcal-specific license directory - OPTIONAL ->
         <co.gphl.wf.stratcal.bdg_licence_dir>/public/xtal/Server-nightly-alpha-bdg-linux64</co.gphl.wf.stratcal.bdg_licence_dir>
         -->
