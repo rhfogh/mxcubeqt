@@ -489,7 +489,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
                 widget,
                 float,
                 validator,
-                api.gphl_workflow.getProperty("default_decay_limit", 0.25)  * 100.0
+                api.gphl_workflow.getProperty("default_decay_limit", 25)
             )
 
             #
