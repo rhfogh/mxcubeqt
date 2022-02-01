@@ -175,6 +175,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
     def gphl_done_acquisition(self, workflow_model):
         """Change tab back to acquisition display"""
         self.workflow_selected()
+        # Necessary to clean up folder settings
+        self.init_data_path_model()
 
     def workflow_selected(self):
         # necessary as this comes in as a QString object
@@ -187,7 +189,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         parameters = api.gphl_workflow.get_available_workflows()[name]
         strategy_type = parameters.get("strategy_type")
-        if strategy_type =="transcal":
+        if strategy_type == "transcal":
             # NB Once we do not have to set unique prefixes, this should be readOnly
             # self._data_path_widget.data_path_layout.prefix_ledit.setReadOnly(False)
             self._gphl_diffractcal_widget.hide()
@@ -246,18 +248,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 self._path_template = model.get_path_template()
             self._data_path_widget.update_data_model(self._path_template)
 
-        # elif isinstance(tree_item, queue_item.BasketQueueItem):
-        #     print ('@~@~ 4')
-        #     self.setDisabled(False)
-
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            # # Reset directory to default (and folder edt field to empty)
+            # # Reset directory to default (and folder edit field to empty)
             # (data_directory, proc_directory) = self.get_default_directory()
             # self._path_template.directory = data_directory
             # self._path_template.process_directory = proc_directory
 
             if not model.has_lims_data() and not api.session.get_group_name():
-                # When noprefix is set, verride prefix setting;
+                # When noprefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
                 self._path_template.base_prefix = (
                     model.get_name() or api.session.get_proposal()
@@ -342,6 +340,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
         wf_parameters = workflow_hwobj.get_available_workflows()[wf_type]
         strategy_type = wf_parameters.get("strategy_type")
+        variant = wf_parameters["variants"][0]
+        wf.set_variant(variant)
         wf.set_interleave_order(wf_parameters.get("interleaveOrder", ""))
         if strategy_type == "transcal":
             pass
@@ -368,19 +368,34 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             wf.set_space_group(
                 self._gphl_acq_param_widget.get_parameter_value("space_group")
             )
-            # If fixed to default
-            if  api.gphl_workflow.getProperty("advanced_mode", False):
-                # # If selected in UI
+            use_for_indexing = False
+            characterisation_strategy = (
+                api.gphl_workflow.get_property("characterisation_strategies").split()[0]
+            )
+            if  api.gphl_workflow.get_property("advanced_mode", False):
                 characterisation_strategy = (
                     self._gphl_acq_param_widget.get_parameter_value(
                         "characterisation_strategy"
                     )
                 )
-            else:
-                characterisation_strategy = (
-                    api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
+
+                crystalObj = sample.crystals[0]
+                cell_params = list(
+                    getattr(crystalObj, tag)
+                    for tag in (
+                        "cell_a", "cell_b", "cell_c",
+                        "cell_alpha", "cell_beta", "cell_gamma",
+                    )
                 )
+                if all(cell_params):
+                    use_for_indexing = (
+                        self._gphl_acq_param_widget.get_parameter_value(
+                            "use_for_indexing"
+                        )
+                    )
+
             wf.set_characterisation_strategy(characterisation_strategy)
+            wf.set_use_cell_for_processing(use_for_indexing)
             tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
             crystal_system, point_group = None, None
             if tag:

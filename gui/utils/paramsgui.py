@@ -76,24 +76,18 @@ class LineEdit(QtImport.QLineEdit):
         #
         self.parent().parametersValidSignal.emit(valid)
 
-
-    def is_valid(self):
-        if self.validator():
-            return (
-                self.validator().validate(self.text(), 0)[0]
-                == QtImport.QValidator.Acceptable
+    def color_warning(self, warning=True):
+        if warning:
+            Colors.set_widget_color(
+                self, Colors.LIGHT_ORANGE, QtImport.QPalette.Base
             )
         else:
-            return True
+            Colors.set_widget_color(
+                self, Colors.WHITE, QtImport.QPalette.Base
+            )
 
-        # if valid:
-        #     Colors.set_widget_color(
-        #         self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
-        #     )
-        # else:
-        #     Colors.set_widget_color(
-        #         self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
-        #     )
+    def is_valid(self):
+        return True
 
 
 class FloatString(LineEdit):
@@ -123,6 +117,14 @@ class FloatString(LineEdit):
     def set_value(self, value):
         self.setText(self.formatstr % value)
 
+    def is_valid(self):
+        if self.validator:
+            return (
+                self.validator.validate(self.text(), 0)[0]
+                == qt_import.QValidator.Acceptable
+            )
+        else:
+            return True
 
 class TextEdit(QtImport.QTextEdit):
     """Standard text edit widget (multiline text)"""
@@ -469,6 +471,14 @@ class FieldsWidget(QtImport.QWidget):
         for field in self.field_widgets:
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
+
+    def color_warning(self, field_name, warning=True):
+        for field in self.field_widgets:
+            if (
+                field.get_name() == field_name and hasattr(field, "color_warning")
+            ):
+                field.color_warning(warning=warning)
+                break
 
     def get_parameters_map(self):
         """Get paramer values dictionary for all fields"""
