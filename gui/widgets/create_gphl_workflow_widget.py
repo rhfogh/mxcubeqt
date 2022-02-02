@@ -370,9 +370,9 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
             use_for_indexing = False
             characterisation_strategy = (
-                api.gphl_workflow.get_property("characterisation_strategies").split()[0]
+                api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
             )
-            if  api.gphl_workflow.get_property("advanced_mode", False):
+            if  api.gphl_workflow.getProperty("advanced_mode", False):
                 characterisation_strategy = (
                     self._gphl_acq_param_widget.get_parameter_value(
                         "characterisation_strategy"

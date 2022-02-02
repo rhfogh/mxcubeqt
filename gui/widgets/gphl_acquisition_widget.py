@@ -497,10 +497,10 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             field_name = "use_for_indexing"
             label_name = self._get_label_name(field_name)
             label_str = "Use input cell for indexing?"
-            label = qt_import.QLabel(label_str, _parameters_widget)
+            label = QtImport.QLabel(label_str, _parameters_widget)
             _parameters_widget.layout().addWidget(label, row, 0)
             self._widget_data[label_name] = (label, str, None, label_str)
-            widget = qt_import.QCheckBox()
+            widget = QtImport.QCheckBox()
             _parameters_widget.layout().addWidget(widget, row, 1)
             self._widget_data[field_name] = (widget, bool, None, False)
 

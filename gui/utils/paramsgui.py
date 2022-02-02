@@ -120,8 +120,8 @@ class FloatString(LineEdit):
     def is_valid(self):
         if self.validator:
             return (
-                self.validator.validate(self.text(), 0)[0]
-                == qt_import.QValidator.Acceptable
+                self.validator().validate(self.text(), 0)[0]
+                == QtImport.QValidator.Acceptable
             )
         else:
             return True
