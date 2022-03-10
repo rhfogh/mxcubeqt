@@ -85,7 +85,7 @@ class SelectionTable(QtImport.QTableWidget):
                         wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
             self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and colour or no_colours:
+            if "*" in text and (colour or no_colours):
                 selectRow = rowNum
         if selectRow is not None:
             self.setCurrentCell(selectRow, 0)
