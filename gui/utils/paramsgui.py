@@ -62,28 +62,30 @@ class LineEdit(QtImport.QLineEdit):
 
     def input_field_changed(self):
         """UI update function triggered by field value changes"""
+        self.parent().validate_fields()
         valid = self.is_valid()
         if valid:
+            if self.update_function is not None:
+                self.update_function(self.parent())
+
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
             )
-            if self.update_function is not None:
-                self.update_function(self.parent())
+        self.parent().input_field_changed()
+
+    def color_by_error(self, warning=False):
+        if self.is_valid():
+            if warning:
+                Colors.set_widget_color(
+                    self, Colors.LIGHT_YELLOW, QtImport.QPalette.Base
+                )
+            else:
+                Colors.set_widget_color(
+                    self, Colors.WHITE, QtImport.QPalette.Base
+                )
         else:
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
-            )
-        #
-        self.parent().parametersValidSignal.emit(valid)
-
-    def color_warning(self, warning=True):
-        if warning:
-            Colors.set_widget_color(
-                self, Colors.LIGHT_ORANGE, QtImport.QPalette.Base
-            )
-        else:
-            Colors.set_widget_color(
-                self, Colors.WHITE, QtImport.QPalette.Base
             )
 
     def is_valid(self):
@@ -172,6 +174,7 @@ class Combo(QtImport.QComboBox):
         """UI update function triggered by field value changes"""
         if self.update_function is not None:
             self.update_function(self.parent())
+        self.parent().input_field_changed()
 
     def set_value(self, value):
         self.setCurrentIndex(self.findText(value))
@@ -472,23 +475,27 @@ class FieldsWidget(QtImport.QWidget):
             if field.get_name() in values:
                 field.set_value(values[field.get_name()])
 
-    def color_warning(self, field_name, warning=True):
-        for field in self.field_widgets:
-            if (
-                field.get_name() == field_name and hasattr(field, "color_warning")
-            ):
-                field.color_warning(warning=warning)
-                break
+    def input_field_changed(self):
+        """Placeholder function, can be overridden inj individual instances
+
+        Executed at the end of all input_field_changed functions """
+        pass
 
     def get_parameters_map(self):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
 
-    def invalid_fields(self):
-        invalids = []
-
+    def validate_fields(self):
+        all_valid = True
         for widget in self.field_widgets:
-            if isinstance(widget, LineEdit):
+            # The two fuinctions should go in parallel, but for precision, ...
+            if hasattr(widget, "color_by_error"):
+                widget.color_by_error()
+            if hasattr(widget, "is_valid"):
                 if not widget.is_valid():
-                    invalids.append(widget.get_name())
-        return invalids
+                    all_valid = False
+                    print (
+                        "WARNING, invalid value %s for %s"
+                        % (widget.get_value(), widget.get_name())
+                    )
+        self.parametersValidSignal.emit(all_valid)

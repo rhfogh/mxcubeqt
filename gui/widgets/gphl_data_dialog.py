@@ -177,14 +177,14 @@ class GphlDataDialog(QtImport.QDialog):
         # self.clearWState(QtImport.WState_Polished)
 
     def keyPressEvent(self, event):
-        """This should disable having Qt interpret {Rerutn> as [Continue] """
+        """This should disable having Qt interpret {Return> as [Continue] """
         if ((not event.modifiers() and
              event.key() == QtImport.Qt.Key_Return) or
             (event.modifiers() == QtImport.Qt.KeypadModifier and
              event.key() == QtImport.Qt.Key_Enter)):
             event.accept()
         else:
-            super(QtImport.Dialog, self).keyPressEvent(event)
+            super(QtImport.QDialog, self).keyPressEvent(event)
 
     def continue_button_click(self):
         result = {}
@@ -268,16 +268,34 @@ class GphlDataDialog(QtImport.QDialog):
             self.params_widget.close()
             self.params_widget = None
         if parameters:
-            params_widget = self.params_widget = FieldsWidget(fields=parameters)
+            params_widget = self.params_widget = LocalFieldsWidget(fields=parameters)
             self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
             if parameter_update_function:
                 parameter_update_function(params_widget)
             self.parameter_gbox.show()
             params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
-            self.continue_button.setEnabled(not params_widget.invalid_fields())
+            params_widget.validate_fields()
         else:
             self.parameter_gbox.hide()
+            self.continue_button.setEnabled(True)
 
         self.show()
         self.setEnabled(True)
         self.update()
+
+class LocalFieldsWidget(FieldsWidget):
+    """Local version, adding custom input_field_changed function"""
+
+    def input_field_changed(self):
+        """Color use_dose field for warning if > dose_budget"""
+
+        parameters = self.get_parameters_map()
+        use_dose = parameters.get("use_dose")
+        dose_budget = parameters.get("dose_budget")
+        if use_dose and dose_budget:
+            use_dose = float(use_dose)
+            dose_budget = float(dose_budget)
+            if use_dose > dose_budget:
+                for field in self.field_widgets:
+                    if field.get_name() in ("use_dose", "dose_budget"):
+                        field.color_by_error(warning=True)

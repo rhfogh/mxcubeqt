@@ -473,6 +473,18 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             )
             self._pulldowns[field_name] = strategy_names
 
+            #
+            row += 1
+            field_name = "use_for_indexing"
+            label_name = self._get_label_name(field_name)
+            label_str = "Use input cell for indexing?"
+            label = QtImport.QLabel(label_str, _parameters_widget)
+            _parameters_widget.layout().addWidget(label, row, 0)
+            self._widget_data[label_name] = (label, str, None, label_str)
+            widget = QtImport.QCheckBox()
+            _parameters_widget.layout().addWidget(widget, row, 1)
+            self._widget_data[field_name] = (widget, bool, None, False)
+
             row += 1
             field_name = "decay_limit"
             label_name = self._get_label_name(field_name)
@@ -491,18 +503,6 @@ class GphlAcquisitionWidget(GphlSetupWidget):
                 validator,
                 api.gphl_workflow.getProperty("default_decay_limit", 25)
             )
-
-            #
-            row += 1
-            field_name = "use_for_indexing"
-            label_name = self._get_label_name(field_name)
-            label_str = "Use input cell for indexing?"
-            label = QtImport.QLabel(label_str, _parameters_widget)
-            _parameters_widget.layout().addWidget(label, row, 0)
-            self._widget_data[label_name] = (label, str, None, label_str)
-            widget = QtImport.QCheckBox()
-            _parameters_widget.layout().addWidget(widget, row, 1)
-            self._widget_data[field_name] = (widget, bool, None, False)
 
     def populate_widget(self, **kwargs):
         GphlSetupWidget.populate_widget(self, **kwargs)
