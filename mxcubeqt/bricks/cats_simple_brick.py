@@ -101,7 +101,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         self._pathRunning = None
         self._poweredOn = None
 
-        self.addProperty("use_basket_HT", "boolean", False)
+        self.add_property("use_basket_HT", "boolean", False)
 
         # display operations widget
         self.operations_widget.show()
@@ -250,7 +250,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         elif ready:
             logging.getLogger().info("CatsSimpleBrick update buttons (ready)")
             self.load_button.setEnabled(True)
-            if HWR.beamline.sample_changer.hasLoadedSample():
+            if HWR.beamline.sample_changer.has_loaded_sample():
                 self.unload_button.setEnabled(True)
             else:
                 self.unload_button.setEnabled(False)
