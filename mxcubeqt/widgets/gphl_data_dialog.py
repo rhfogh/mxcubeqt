@@ -23,7 +23,7 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
-from mxcubecore import ConvertUtils
+from mxcubecore.utils import conversion
 
 from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.paramsgui import FieldsWidget
