@@ -349,7 +349,7 @@ class AcquisitionWidget(qt_import.QWidget):
             self.emit_acq_parameters_changed()
 
     def update_kappa_phi(self, new_value):
-        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and new_value:
+        if not self.acq_widget_layout.kappa_phi_ledit.hasFocus() and new_value is not None:
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
             self.emit_acq_parameters_changed()
 
