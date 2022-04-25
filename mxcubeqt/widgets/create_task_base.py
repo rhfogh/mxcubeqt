@@ -189,7 +189,7 @@ class CreateTaskBase(qt_import.QWidget):
     def set_osc_start(self, new_value):
         acq_widget = self.get_acquisition_widget()
 
-        if self._item_is_group_or_sample() and acq_widget:
+        if acq_widget:
             acq_widget.update_osc_start(new_value)
 
     def _run_processing_toggled(self, run_processing_after, run_online_processing):
