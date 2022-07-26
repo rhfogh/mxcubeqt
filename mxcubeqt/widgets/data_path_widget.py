@@ -25,6 +25,7 @@ from mxcubeqt.utils import colors, qt_import
 from mxcubeqt.utils.widget_utils import DataModelInputBinder
 
 from mxcubecore.HardwareObjects import queue_model_objects
+from mxcubecore import HardwareRepository as HWR
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -147,6 +148,12 @@ class DataPathWidget(qt_import.QWidget):
 
         self.data_path_layout.prefix_ledit.setText(new_value)
         self.data_path_layout.prefix_ledit.setCursorPosition(cursor_pos)
+        
+        # XALOC specific: Change subfolder When prefix is manually edited
+        # and preserve group (if any).
+        if HWR.beamline.session.synchrotron_name == "ALBA":
+            _group, _ = os.path.split(str(self.data_path_layout.folder_ledit.text()))
+            self.data_path_layout.folder_ledit.setText(os.path.join(_group, str(new_value)))
 
         self._data_model.base_prefix = str(new_value)
         self.update_file_name()

@@ -361,6 +361,7 @@ class CreateTaskBase(qt_import.QWidget):
             item = self.get_sample_item(tree_item)
             if isinstance(tree_item, queue_item.BasketQueueItem):
                 sub_dir += str(tree_item.get_model().get_location())
+            # Code below was marked as no-op in the previous ALBA version of mxcube. It doesnt do anything in fact
             else:
                 if isinstance(tree_item, queue_item.SampleQueueItem):
                     if item.get_model().lims_id == -1:
@@ -417,17 +418,39 @@ class CreateTaskBase(qt_import.QWidget):
                 HWR.beamline.sample_view.get_snapshot()
             )
 
+            # XALOC specific: always add the prefix to the image path
+
+            if HWR.beamline.session.synchrotron_name == "ALBA" or sample_data_model.lims_id == -1: 
+                prefix = self.get_default_prefix(sample_data_model)
+                (data_directory, proc_directory) = self.get_default_directory( \
+                    tree_item, sub_dir=prefix)
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
+                self._path_template.base_prefix = prefix
             # Sample with lims information, use values from lims
             # to set the data path. Or has a specific user group set.
             if sample_data_model.lims_id != -1:
                 prefix = self.get_default_prefix(sample_data_model)
-                (data_directory, proc_directory) = self.get_default_directory(
-                    tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
-                )
-
                 # TODO create templates to customize this
-                # self._path_template.directory = data_directory
-                # self._path_template.process_directory = proc_directory
+                if HWR.beamline.session.synchrotron_name == "ALBA":
+                    #TODO, tree_item should BasketQueueItem for the get_location() method
+                    #  The data and process directory should be as follows, 
+                    #  where get_location should return BnXm 
+                    #sample_sub_dir = "%s-%s%s" % (
+                        #prefix.split("-")[0], 
+                        #str( tree_item.get_model().get_location() ), 
+                        #os.path.sep
+                    #)
+                    (data_directory, proc_directory) = self.get_default_directory(
+                        tree_item, sub_dir="%s%s" % (prefix.split("-")[0], os.path.sep)
+                    )
+                else:
+                    (data_directory, proc_directory) = self.get_default_directory(
+                        tree_item, sub_dir="%s%s" % (prefix, os.path.sep)
+                    )
+
+                self._path_template.directory = data_directory
+                self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
             elif HWR.beamline.session.get_group_name() != "":
                 base_dir = HWR.beamline.session.get_base_image_directory()
