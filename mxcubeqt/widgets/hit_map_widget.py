@@ -75,8 +75,7 @@ class HitMapWidget(qt_import.QWidget):
         score_type_label = qt_import.QLabel("Result: ", hit_map_info_widget)
         self._score_type_cbox = qt_import.QComboBox(hit_map_info_widget)
         self._autoscale_button = qt_import.QPushButton("Auto scale", hit_map_info_widget)
-        # RB: why leave the self out for the image_display_cbox object?????
-        self.image_display_cbox = qt_import.QCheckBox("Display image in ADxV", hit_map_info_widget)
+        image_display_cbox = qt_import.QCheckBox("Display image in ADxV", hit_map_info_widget)
         self._image_info_label = qt_import.QLabel(
             "Image: #, value #", hit_map_info_widget
         )
@@ -108,7 +107,7 @@ class HitMapWidget(qt_import.QWidget):
         _hit_map_info_hlayout.addWidget(score_type_label)
         _hit_map_info_hlayout.addWidget(self._score_type_cbox)
         _hit_map_info_hlayout.addWidget(self._autoscale_button)
-        _hit_map_info_hlayout.addWidget(self.image_display_cbox)
+        _hit_map_info_hlayout.addWidget(image_display_cbox)
         _hit_map_info_hlayout.addStretch(0)
         _hit_map_info_hlayout.addWidget(self._image_info_label)
         _hit_map_info_hlayout.setSpacing(2)
@@ -156,7 +155,7 @@ class HitMapWidget(qt_import.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signals and slots ------------------------------------------------
-        self.image_display_cbox.stateChanged.connect(self.enable_image_display_state_changed)
+        image_display_cbox.stateChanged.connect(self.enable_image_display_state_changed)
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.connect(self.filter_min_slider_changed)
         self._relaunch_processing_button.clicked.connect(
@@ -332,19 +331,20 @@ class HitMapWidget(qt_import.QWidget):
         self._grid_hit_map_plot.plot_result(result)
 
     def mouse_moved(self, pos_x, pos_y):
+        do_update = False
         if self.__results_raw:
-            do_update = False
-
             if self.__grid: 
-                (num_col, num_row) = self.__grid.get_col_row_num()
-                pos_y = num_row - pos_y
+                (num_col, num_row) = self.__grid.get_col_row_num() # mesh data collection values
+                if pos_x > 0 and pos_x < num_col and \
+                    pos_y > 0 and pos_y < num_row:
+                    pos_y = num_row - pos_y
 
-                if abs(int(pos_x) - int(self.__selected_col)):
                     self.__selected_col = pos_x
-                    do_update = True
-                if abs(int(pos_y) - int(self.__selected_row)):
                     self.__selected_row = pos_y
                     do_update = True
+                else: 
+                    self.__selected_col = None
+                    self.__selected_row = None
             else:
                 if pos_x < 0:
                     pos_x = 0
@@ -354,6 +354,7 @@ class HitMapWidget(qt_import.QWidget):
                     self.__selected_col = pos_x
                     do_update = True
 
+        if do_update and self.__hitmap_clicked:
             if do_update:
                 self.update_image_info()
                 if self.__enable_continues_image_display: 
@@ -361,6 +362,9 @@ class HitMapWidget(qt_import.QWidget):
 
     def mouse_clicked(self, pos_x, pos_y):
         self.__hitmap_clicked = True
+
+    def mouse_left_plot(self):
+        self.__hitmap_clicked = False
 
     def update_image_info(self):
         if self.__data_collection:
@@ -498,7 +502,7 @@ class HitMapWidget(qt_import.QWidget):
         """
         returns image parameters for selected hit map frame
         """
-        if self.__grid:
+        if self.__grid and None not in [ self.__selected_col, self.__selected_row ]:
             image, line, image_num = self.__grid.get_image_from_col_row(
                 self.__selected_col, self.__selected_row
             ) 
