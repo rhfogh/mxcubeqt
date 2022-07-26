@@ -1,13 +1,13 @@
 #pylint: skip-file
 
 from mxcubeqt.utils import qt_import
-from mxcubeqt.utils.QLedfrom import qled_resources
+from mxcubeqt.utils.qled.qled_resources import *
 
 
-class QLed(QWidget):
+class QLed(qt_import.QWidget):
     def __init__(self, *args):
 
-        QWidget.__init__(self, *args)
+        qt_import.QWidget.__init__(self, *args)
         self.value = False
 
         self.username = None
@@ -20,7 +20,7 @@ class QLed(QWidget):
 
         self.shapes = ["circle", "square", "triang", "round"]
         self.colors = ["red", "green", "yellow", "grey", "orange", "purple", "blue"]
-        self.renderer = QSvgRenderer()
+        self.renderer = qt_import.QSvgRenderer()
         self.setOff()
 
     def setUserName(self, name):
@@ -36,8 +36,8 @@ class QLed(QWidget):
         self._update()
 
     def paintEvent(self, ev):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing, True)
+        painter = qt_import.QPainter(self)
+        painter.setRenderHint(qt_import.QPainter.Antialiasing, True)
 
         self.filename = ":/resources/%s_%s.svg" % (self.shape, self.color)
 
@@ -100,8 +100,8 @@ class QLed(QWidget):
 
 
 if __name__ == "__main__":
-    app = QApplication([])
-    win = QMainWindow()
+    app = qt_import.QApplication([])
+    win = qt_import.QMainWindow()
     wid = QLed()
     wid.setOn()
     win.setCentralWidget(wid)

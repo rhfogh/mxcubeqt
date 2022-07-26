@@ -230,6 +230,8 @@ if (qt_variant == "PyQt5") or (qt_variant is None and not qt_imported):
             QValidator
         )
         from PyQt5.uic import loadUi
+        from PyQt5.QtSvg import QSvgRenderer
+
 
         QStringList = list
         getQApp = QCoreApplication.instance
@@ -378,6 +380,7 @@ if (qt_variant == "PyQt4") or (qt_variant is None and not qt_imported):
             QWhatsThis,
         )
         from PyQt4.uic import loadUi
+        from PyQt4.QtSvg import QSvgRenderer
 
         def getQApp():
             return qApp
