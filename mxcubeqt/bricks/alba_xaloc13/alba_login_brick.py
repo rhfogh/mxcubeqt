@@ -110,6 +110,9 @@ class AlbaLoginBrick(ProposalBrick):
         self.user_group_save_button.setFixedHeight(27)
         self.saved_group = True
 
+        # small molecule proposals
+        self.is_small_molecule_cbox = qt_import.QCheckBox("Process as small molecule")
+        
         # Layout --------------------------------------------------------------
         _user_group_widget_hlayout = qt_import.QHBoxLayout(self.user_group_widget)
         _user_group_widget_hlayout.setSpacing(2)
@@ -162,7 +165,7 @@ class AlbaLoginBrick(ProposalBrick):
 
         _main_gboxlayout.addLayout(_main_gboxlayout1)
         _main_gboxlayout.addLayout(_main_gboxlayout2)
-
+        #_main_gboxlayout.addWidget(self.is_small_molecule_cbox)
 
         _main_vlayout = qt_import.QVBoxLayout(self)
         _main_vlayout.addWidget(self.main_gbox)
@@ -180,6 +183,7 @@ class AlbaLoginBrick(ProposalBrick):
         self.user_group_save_button.clicked.connect(self.save_group)
         self.user_group_ledit.returnPressed.connect(self.save_group)
         self.user_group_ledit.textChanged.connect(self.user_group_changed)
+        self.is_small_molecule_cbox.stateChanged.connect(self.molecule_type_toggled)
 
         # Other ---------------------------------------------------------------
         colors.set_widget_color(
@@ -366,3 +370,5 @@ class AlbaLoginBrick(ProposalBrick):
         self.setEnabled(True)
         self.user_group_widget.show()
 
+    def molecule_type_toggled(self, state):
+        HWR.beamline.offline_processing.set_sample_type( state )
