@@ -1210,6 +1210,782 @@
                     value: default
                   type: hbox
                 - children:
+                  - children: []
+                    connections: []
+                    name: hspacer6
+                    properties:
+                    - choices:
+                      - none
+                      - top center
+                      - top left
+                      - top right
+                      - bottom center
+                      - bottom left
+                      - bottom right
+                      - center
+                      - hcenter
+                      - vcenter
+                      - left
+                      - right
+                      comment: ''
+                      default_value: none
+                      hidden: false
+                      name: alignment
+                      old_value: null
+                      type: combo
+                      value: none
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: fixed_size
+                      old_value: null
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 100
+                      hidden: false
+                      name: size
+                      old_value: null
+                      type: integer
+                      value: 100
+                    type: hspacer
+                  - brick:
+                      class: alba_motor_spinbox_brick
+                      name: cstagex
+                    children: []
+                    connections: []
+                    name: cstagex
+                    properties:
+                    - comment: ''
+                      default_value: 2
+                      hidden: false
+                      name: decimals
+                      old_value: 2
+                      type: integer
+                      value: 3
+                    - comment: ''
+                      default_value: 180 90 45 30 10
+                      hidden: false
+                      name: defaultSteps
+                      old_value: 180 90 45 30 10
+                      type: string
+                      value: 0.01 0.02
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: delta
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: enableSliderTracking
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Set fixed height in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedHeight
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: Set fixed width in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedWidth
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: ''
+                      default_value: '9'
+                      hidden: false
+                      name: fontSize
+                      old_value: '9'
+                      type: string
+                      value: '9'
+                    - comment: ''
+                      default_value: +##.##
+                      formatString: '%+2.2f'
+                      formatStringLength: 5
+                      hidden: false
+                      name: formatString
+                      old_value: +##.##
+                      type: formatString
+                      value: +##.##
+                    - comment: Draw a frame around the widget
+                      default_value: 0
+                      hidden: false
+                      name: frame
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpDecrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpIncrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Hide widget
+                      default_value: 0
+                      hidden: false
+                      name: hide
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: hideInUser
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: icons
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Allow to control brick in all modes
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowAlways
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Allow to control brick in slave mode
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowConnected
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: invertButtons
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: label
+                      old_value: ''
+                      type: string
+                      value: Stage X
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: mnemonic
+                      old_value: ''
+                      type: string
+                      value: /cstagex
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showLabel
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showMoveButtons
+                      old_value: 1
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showPosition
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showSlider
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStep
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showStepList
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStop
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    type: alba_motor_spinbox_brick
+                  - brick:
+                      class: alba_motor_spinbox_brick
+                      name: cstagey
+                    children: []
+                    connections: []
+                    name: cstagey
+                    properties:
+                    - comment: ''
+                      default_value: 2
+                      hidden: false
+                      name: decimals
+                      old_value: 2
+                      type: integer
+                      value: 3
+                    - comment: ''
+                      default_value: 180 90 45 30 10
+                      hidden: false
+                      name: defaultSteps
+                      old_value: 180 90 45 30 10
+                      type: string
+                      value: 0.01 0.02
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: delta
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: enableSliderTracking
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Set fixed height in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedHeight
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: Set fixed width in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedWidth
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: ''
+                      default_value: '9'
+                      hidden: false
+                      name: fontSize
+                      old_value: '9'
+                      type: string
+                      value: '9'
+                    - comment: ''
+                      default_value: +##.##
+                      formatString: '%+2.2f'
+                      formatStringLength: 5
+                      hidden: false
+                      name: formatString
+                      old_value: +##.##
+                      type: formatString
+                      value: +##.##
+                    - comment: Draw a frame around the widget
+                      default_value: 0
+                      hidden: false
+                      name: frame
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpDecrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpIncrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Hide widget
+                      default_value: 0
+                      hidden: false
+                      name: hide
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: hideInUser
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: icons
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Allow to control brick in all modes
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowAlways
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Allow to control brick in slave mode
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowConnected
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: invertButtons
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: label
+                      old_value: ''
+                      type: string
+                      value: Stage Y
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: mnemonic
+                      old_value: ''
+                      type: string
+                      value: /cstagey
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showLabel
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showMoveButtons
+                      old_value: 1
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showPosition
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showSlider
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStep
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showStepList
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStop
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    type: alba_motor_spinbox_brick
+                  - brick:
+                      class: alba_motor_spinbox_brick
+                      name: cstagez
+                    children: []
+                    connections: []
+                    name: cstagez
+                    properties:
+                    - comment: ''
+                      default_value: 2
+                      hidden: false
+                      name: decimals
+                      old_value: 2
+                      type: integer
+                      value: 3
+                    - comment: ''
+                      default_value: 180 90 45 30 10
+                      hidden: false
+                      name: defaultSteps
+                      old_value: 180 90 45 30 10
+                      type: string
+                      value: 0.01 0.02
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: delta
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: enableSliderTracking
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Set fixed height in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedHeight
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: Set fixed width in pixels
+                      default_value: -1
+                      hidden: false
+                      name: fixedWidth
+                      old_value: -1
+                      type: integer
+                      value: -1
+                    - comment: ''
+                      default_value: '9'
+                      hidden: false
+                      name: fontSize
+                      old_value: '9'
+                      type: string
+                      value: '9'
+                    - comment: ''
+                      default_value: +##.##
+                      formatString: '%+2.2f'
+                      formatStringLength: 5
+                      hidden: false
+                      name: formatString
+                      old_value: +##.##
+                      type: formatString
+                      value: +##.##
+                    - comment: Draw a frame around the widget
+                      default_value: 0
+                      hidden: false
+                      name: frame
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpDecrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: helpIncrease
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Hide widget
+                      default_value: 0
+                      hidden: false
+                      name: hide
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: hideInUser
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: icons
+                      old_value: ''
+                      type: string
+                      value: ''
+                    - comment: Allow to control brick in all modes
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowAlways
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: Allow to control brick in slave mode
+                      default_value: 0
+                      hidden: false
+                      name: instanceAllowConnected
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: invertButtons
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: label
+                      old_value: ''
+                      type: string
+                      value: Stage Z
+                    - comment: ''
+                      default_value: ''
+                      hidden: false
+                      name: mnemonic
+                      old_value: ''
+                      type: string
+                      value: /cstagez
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showLabel
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showMoveButtons
+                      old_value: 1
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showPosition
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showSlider
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStep
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: showStepList
+                      old_value: 0
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 1
+                      hidden: false
+                      name: showStop
+                      old_value: 1
+                      type: boolean
+                      value: 1
+                    type: alba_motor_spinbox_brick
+                  - children: []
+                    connections: []
+                    name: hspacer5
+                    properties:
+                    - choices:
+                      - none
+                      - top center
+                      - top left
+                      - top right
+                      - bottom center
+                      - bottom left
+                      - bottom right
+                      - center
+                      - hcenter
+                      - vcenter
+                      - left
+                      - right
+                      comment: ''
+                      default_value: none
+                      hidden: false
+                      name: alignment
+                      old_value: null
+                      type: combo
+                      value: none
+                    - comment: ''
+                      default_value: 0
+                      hidden: false
+                      name: fixed_size
+                      old_value: null
+                      type: boolean
+                      value: 0
+                    - comment: ''
+                      default_value: 100
+                      hidden: false
+                      name: size
+                      old_value: null
+                      type: integer
+                      value: 100
+                    type: hspacer
+                  connections: []
+                  name: hbox7
+                  properties:
+                  - choices:
+                    - none
+                    - top center
+                    - top left
+                    - top right
+                    - bottom center
+                    - bottom left
+                    - bottom right
+                    - center
+                    - hcenter
+                    - vcenter
+                    - left
+                    - right
+                    comment: ''
+                    default_value: none
+                    hidden: false
+                    name: alignment
+                    old_value: null
+                    type: combo
+                    value: none
+                  - comment: ''
+                    default_value: null
+                    hidden: false
+                    name: color
+                    old_value: null
+                    type: color
+                    value: null
+                  - comment: ''
+                    default_value: -1
+                    hidden: false
+                    name: fixedheight
+                    old_value: null
+                    type: integer
+                    value: -1
+                  - comment: ''
+                    default_value: -1
+                    hidden: false
+                    name: fixedwidth
+                    old_value: null
+                    type: integer
+                    value: -1
+                  - choices:
+                    - Box
+                    - Panel
+                    - StyledPanel
+                    - HLine
+                    - VLine
+                    - default
+                    comment: ''
+                    default_value: default
+                    hidden: false
+                    name: frameshape
+                    old_value: null
+                    type: combo
+                    value: default
+                  - choices:
+                    - fixed
+                    - expanding
+                    - default
+                    comment: ''
+                    default_value: default
+                    hidden: false
+                    name: hsizepolicy
+                    old_value: null
+                    type: combo
+                    value: default
+                  - comment: ''
+                    default_value: ''
+                    hidden: false
+                    name: icon
+                    old_value: null
+                    type: string
+                    value: ''
+                  - comment: ''
+                    default_value: ''
+                    hidden: false
+                    name: label
+                    old_value: null
+                    type: string
+                    value: ''
+                  - comment: ''
+                    default_value: 2
+                    hidden: false
+                    name: margin
+                    old_value: null
+                    type: integer
+                    value: 2
+                  - choices:
+                    - plain
+                    - raised
+                    - sunken
+                    - default
+                    comment: ''
+                    default_value: default
+                    hidden: false
+                    name: shadowstyle
+                    old_value: null
+                    type: combo
+                    value: default
+                  - comment: ''
+                    default_value: 2
+                    hidden: false
+                    name: spacing
+                    old_value: null
+                    type: integer
+                    value: 2
+                  - choices:
+                    - fixed
+                    - expanding
+                    - default
+                    comment: ''
+                    default_value: default
+                    hidden: false
+                    name: vsizepolicy
+                    old_value: null
+                    type: combo
+                    value: default
+                  type: hbox
+                - children:
                   - brick:
                       class: AlbaLightControlBrick
                       name: backlight_brick
@@ -1793,10 +2569,10 @@
                   - children:
                     - brick:
                         class: SampleViewBrick
-                        name: camera_brick
+                        name: sample_view_brick
                       children: []
                       connections: []
-                      name: camera_brick
+                      name: sample_view_brick
                       properties:
                       - comment: ''
                         default_value: 0
@@ -1839,7 +2615,7 @@
                         name: fixedHeight
                         old_value: -1
                         type: integer
-                        value: 670
+                        value: 700
                       - comment: ''
                         default_value: ''
                         hidden: false
@@ -1853,7 +2629,7 @@
                         name: fixedWidth
                         old_value: -1
                         type: integer
-                        value: 900
+                        value: 905
                       - comment: ''
                         default_value: '9'
                         hidden: false
@@ -2122,11 +2898,11 @@
                       value: default
                     type: vbox
                   - brick:
-                      class: SampleControlBrick
-                      name: hutchmenu_brick
+                      class: AlbaSampleControlBrick
+                      name: sample_control_brick
                     children: []
                     connections: []
-                    name: hutchmenu_brick
+                    name: sample_control_brick
                     properties:
                     - comment: ''
                       default_value: 1
@@ -2226,7 +3002,7 @@
                       old_value: 0
                       type: boolean
                       value: 0
-                    type: sample_control_brick
+                    type: alba_sample_control_brick
                   connections: []
                   name: sample_video_groupbox
                   properties:
@@ -2510,7 +3286,7 @@
                 type: vbox
               - children:
                 - brick:
-                    class: TreeBrick
+                    class: AlbaTreeBrick
                     name: tree_brick
                   children: []
                   connections:
@@ -2798,9 +3574,9 @@
                     old_value: /xml_rpc_server
                     type: string
                     value: /xml-rpc-server
-                  type: tree_brick
+                  type: alba_tree_brick
                 - brick:
-                    class: OnlineProcessingBrick
+                    class: AlbaOnlineProcessingBrick
                     name: online_processing_brick
                   children: []
                   connections: []
@@ -2862,7 +3638,7 @@
                     old_value: 0
                     type: boolean
                     value: 0
-                  type: online_processing_brick
+                  type: alba_online_processing_brick
                 connections: []
                 name: vbox3
                 properties:
@@ -3012,7 +3788,7 @@
                   name: fixedWidth
                   old_value: -1
                   type: integer
-                  value: -1
+                  value: 450
                 - comment: ''
                   default_value: '9'
                   hidden: false
@@ -6427,7 +7203,7 @@
                 value: /beam
               type: beam_size_brick
             - brick:
-                class: PhaseBrick
+                class: AlbaPhaseBrick
                 name: phase_brick
               children: []
               connections: []
@@ -6489,7 +7265,7 @@
                 old_value: ''
                 type: string
                 value: /mini-diff
-              type: phase_brick
+              type: alba_phase_brick
             - children: []
               connections: []
               name: hspacer1
@@ -6650,198 +7426,6 @@
               type: combo
               value: default
             type: hbox
-          - brick:
-              class: AlbaMotorSpinboxBrick
-              name: bstopz_brick
-            children: []
-            connections: []
-            name: bstopz_brick
-            properties:
-            - comment: ''
-              default_value: 2
-              hidden: false
-              name: decimals
-              old_value: 2
-              type: integer
-              value: 2
-            - comment: ''
-              default_value: 180 90 45 30 10
-              hidden: false
-              name: defaultSteps
-              old_value: 180 90 45 30 10
-              type: string
-              value: 180 90 45 30 10
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: delta
-              old_value: ''
-              type: string
-              value: ''
-            - comment: ''
-              default_value: 0
-              hidden: false
-              name: enableSliderTracking
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: Set fixed height in pixels
-              default_value: -1
-              hidden: false
-              name: fixedHeight
-              old_value: -1
-              type: integer
-              value: -1
-            - comment: Set fixed width in pixels
-              default_value: -1
-              hidden: false
-              name: fixedWidth
-              old_value: -1
-              type: integer
-              value: -1
-            - comment: ''
-              default_value: '9'
-              hidden: false
-              name: fontSize
-              old_value: '9'
-              type: string
-              value: '9'
-            - comment: ''
-              default_value: +##.##
-              formatString: '%+2.2f'
-              formatStringLength: 5
-              hidden: false
-              name: formatString
-              old_value: +##.##
-              type: formatString
-              value: +##.##
-            - comment: Draw a frame around the widget
-              default_value: 0
-              hidden: false
-              name: frame
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: helpDecrease
-              old_value: ''
-              type: string
-              value: ''
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: helpIncrease
-              old_value: ''
-              type: string
-              value: ''
-            - comment: Hide widget
-              default_value: 0
-              hidden: false
-              name: hide
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 0
-              hidden: false
-              name: hideInUser
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: icons
-              old_value: ''
-              type: string
-              value: ''
-            - comment: Allow to control brick in all modes
-              default_value: 0
-              hidden: false
-              name: instanceAllowAlways
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: Allow to control brick in slave mode
-              default_value: 0
-              hidden: false
-              name: instanceAllowConnected
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 0
-              hidden: false
-              name: invertButtons
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: label
-              old_value: ''
-              type: string
-              value: Fixed Beamstop pos
-            - comment: ''
-              default_value: ''
-              hidden: false
-              name: mnemonic
-              old_value: ''
-              type: string
-              value: /bstopz
-            - comment: ''
-              default_value: 1
-              hidden: false
-              name: showLabel
-              old_value: 1
-              type: boolean
-              value: 1
-            - comment: ''
-              default_value: 1
-              hidden: false
-              name: showMoveButtons
-              old_value: 1
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 1
-              hidden: false
-              name: showPosition
-              old_value: 1
-              type: boolean
-              value: 1
-            - comment: ''
-              default_value: 0
-              hidden: false
-              name: showSlider
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 1
-              hidden: false
-              name: showStep
-              old_value: 1
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 0
-              hidden: false
-              name: showStepList
-              old_value: 0
-              type: boolean
-              value: 0
-            - comment: ''
-              default_value: 1
-              hidden: false
-              name: showStop
-              old_value: 1
-              type: boolean
-              value: 1
-            type: alba_motor_spinbox_brick
           - children: []
             connections: []
             name: vspacer1
