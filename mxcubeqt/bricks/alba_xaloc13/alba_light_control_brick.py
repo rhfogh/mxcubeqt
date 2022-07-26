@@ -21,7 +21,7 @@ import logging
 
 from mxcubeqt.utils import colors, icons, qt_import
 from mxcubeqt.base_components import BaseWidget
-
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -54,7 +54,7 @@ class AlbaLightControlBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
-        self.logger = logging.getLogger("GUI Alba Light Control")
+        self.logger = logging.getLogger("HWR")
         #self.logger.info("__init__()")
 
         self.on_color = colors.color_to_hexa(colors.LIGHT_GREEN)
@@ -92,6 +92,24 @@ class AlbaLightControlBrick(BaseWidget):
         self.setSizePolicy(
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.MinimumExpanding
         )
+
+        # Slots --------------------------------------------------------
+
+        # Qt signal/slot connections ------------------------------------------
+        if HWR.beamline.machine_info is not None:
+            self.connect(
+                HWR.beamline.sample_changer, "path_safeChanged", self.enable_backlight_widget_toggle
+            )
+        if HWR.beamline.collect is not None:
+            self.connect(
+                HWR.beamline.collect, "collectStarted", self.collect_started
+            )
+            self.connect(
+                HWR.beamline.collect, "collectOscillationFinished", self.collect_finished
+            )
+            self.connect(
+                HWR.beamline.collect, "collectOscillationFailed", self.collect_failed
+            )
 
         # Defaults
         self.set_icons("BulbCheck,BulbDelete")
@@ -139,16 +157,16 @@ class AlbaLightControlBrick(BaseWidget):
         if self.light_ho is not None:
             self.setEnabled(True)
             if self.state:
-                color = self.on_color
-                self.widget.slider.setEnabled(True)
-                if self.icon_list:
-                    self.widget.button.setIcon(self.icon_list["on"])
-                    self.widget.button.setToolTip("Set light Off")
-            else:
                 color = self.off_color
                 self.widget.slider.setEnabled(True)
                 if self.icon_list:
                     self.widget.button.setIcon(self.icon_list["off"])
+                    self.widget.button.setToolTip("Set light Off")
+            else:
+                color = self.on_color
+                self.widget.slider.setEnabled(True)
+                if self.icon_list:
+                    self.widget.button.setIcon(self.icon_list["on"])
                     self.widget.button.setToolTip("Set light On")
             #else:
                 #color = self.fault_color
@@ -164,6 +182,19 @@ class AlbaLightControlBrick(BaseWidget):
             color = self.unknown_color
 
         self.widget.button.setStyleSheet("background-color: %s;" % color)
+
+    def enable_backlight_widget_toggle(self, value):
+        if self.light_ho.name() == 'backlight': 
+            if value: self.setEnabled(True)
+            else: self.setEnabled(False)
+
+    def enable_backlight_widget(self):
+        if self.light_ho.name() == 'backlight': 
+            self.setEnabled(True)
+
+    def disable_backlight_widget(self):
+        if self.light_ho.name() == 'backlight': 
+            self.setEnabled(False)
 
     def set_icons(self, icon_string):
         icon_list = icon_string.split(",")
@@ -196,9 +227,19 @@ class AlbaLightControlBrick(BaseWidget):
         self.light_ho.set_level(newvalue)
 
     def do_switch(self):
-        self.logger.info("self.state = %s" % self.state )
+        #self.logger.info("self.state = %s" % self.state )
         if self.state:
             self.light_ho.set_off()
         else:
             self.logger.info("Setting light on" )
             self.light_ho.set_on()
+
+    def collect_started(self, owner, num_oscillations):
+        self.disable_backlight_widget()
+
+    def collect_finished(self, owner, state, message, *args):
+        self.enable_backlight_widget()
+        
+    def collect_failed(self, owner, state, message, *args):
+        self.enable_backlight_widget()
+ 
