@@ -18,7 +18,7 @@
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
 from mxcubeqt.bricks.cats_maint_brick import CatsMaintBrick
-from mxcubeqt.utils import sample_changer_helper
+from mxcubeqt.utils import sample_changer_helper, qt_import
 
 import logging
 
@@ -145,7 +145,7 @@ class AlbaCatsMaintBrick(CatsMaintBrick):
     def lid3_open(self):
         try:
             if self.device is not None:
-                self.device._doL_lid3_state(True)
+                self.device._do_lid3_state(True)
         except BaseException:
             qt_import.QMessageBox.warning(self, "Error", str(sys.exc_info()[1]))
 
