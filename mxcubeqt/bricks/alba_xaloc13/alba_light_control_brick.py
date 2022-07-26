@@ -17,9 +17,11 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
 from mxcubeqt.utils import colors, icons, qt_import
 from mxcubeqt.base_components import BaseWidget
-
+from mxcubecore import HardwareRepository as HWR
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
@@ -52,8 +54,8 @@ class AlbaLightControlBrick(BaseWidget):
     def __init__(self, *args):
 
         BaseWidget.__init__(self, *args)
-        self.logger = logging.getLogger("GUI Alba Actuator")
-        self.logger.info("__init__()")
+        self.logger = logging.getLogger("HWR")
+        #self.logger.info("__init__()")
 
         self.on_color = colors.color_to_hexa(colors.LIGHT_GREEN)
         self.off_color = colors.color_to_hexa(colors.LIGHT_GRAY)
@@ -63,17 +65,18 @@ class AlbaLightControlBrick(BaseWidget):
         # Hardware objects ----------------------------------------------------
         self.light_ho = None
 
-        self.state = None
+        self.state = None # True = "on", False = "off"
         self.level = None
-        self.icons = None
+        self.icon_list = None
         self.level_limits = [None, None]
 
         # Properties ----------------------------------------------------------
         self.add_property("mnemonic", "string", "")
-        self.add_property("icons", "string", "")
+        self.add_property("icon_list", "string", "")
 
         # Graphic elements ----------------------------------------------------
         self.widget = qt_import.load_ui_file("alba_lightcontrol.ui")
+        self.widget.slider.setSingleStep(5)
 
         qt_import.QHBoxLayout(self)
 
@@ -90,15 +93,32 @@ class AlbaLightControlBrick(BaseWidget):
             qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.MinimumExpanding
         )
 
+        # Slots --------------------------------------------------------
+
+        # Qt signal/slot connections ------------------------------------------
+        if HWR.beamline.machine_info is not None:
+            self.connect(
+                HWR.beamline.sample_changer, "path_safeChanged", self.enable_backlight_widget_toggle
+            )
+        if HWR.beamline.collect is not None:
+            self.connect(
+                HWR.beamline.collect, "collectStarted", self.collect_started
+            )
+            self.connect(
+                HWR.beamline.collect, "collectOscillationFinished", self.collect_finished
+            )
+            self.connect(
+                HWR.beamline.collect, "collectOscillationFailed", self.collect_failed
+            )
+
         # Defaults
         self.set_icons("BulbCheck,BulbDelete")
 
         # Other ---------------------------------------------------------------
         self.setToolTip("Control of light (set level and on/off switch.")
 
-        self.update()
-
     def property_changed(self, property_name, old_value, new_value):
+        #self.logger.info("New property %s, new_value: %s" % (property_name, str(new_value) ) )
         if property_name == "mnemonic":
             if self.light_ho is not None:
                 self.disconnect(
@@ -121,13 +141,14 @@ class AlbaLightControlBrick(BaseWidget):
                 self.light_ho.re_emit_values()
                 self.setToolTip(
                     "Control of %s (light level and on/off switch."
-                    % self.light_ho.getUserName()
+                    % self.light_ho.get_user_name()
                 )
-                self.set_level_limits(self.light_ho.get_limits())
-                self.set_label(self.light_ho.getUserName())
+                self.set_level_limits( self.light_ho.get_limits() )
+                self.set_label( self.light_ho.get_user_name() )
             else:
+                logging.getLogger.debug("Can't load alba light control widget")
                 self.setEnabled(False)
-        elif property_name == "icons":
+        elif property_name == "icon_list":
             self.set_icons(new_value)
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
@@ -135,22 +156,21 @@ class AlbaLightControlBrick(BaseWidget):
     def update(self, state=None):
         if self.light_ho is not None:
             self.setEnabled(True)
-            if self.state is "on":
+            if self.state:
+                color = self.off_color
+                self.widget.slider.setEnabled(True)
+                if self.icon_list:
+                    self.widget.button.setIcon(self.icon_list["off"])
+                    self.widget.button.setToolTip("Set light Off")
+            else:
                 color = self.on_color
                 self.widget.slider.setEnabled(True)
-                if self.icons:
-                    self.widget.button.setIcon(self.icons["on"])
-                    self.widget.button.setToolTip("Set light Off")
-            elif self.state is "off":
-                color = self.off_color
-                # self.widget.slider.setEnabled(False)
-                self.widget.slider.setEnabled(True)
-                if self.icons:
-                    self.widget.button.setIcon(self.icons["off"])
+                if self.icon_list:
+                    self.widget.button.setIcon(self.icon_list["on"])
                     self.widget.button.setToolTip("Set light On")
-            else:
-                color = self.fault_color
-                self.setEnabled(False)
+            #else:
+                #color = self.fault_color
+                #self.setEnabled(False)
 
             if self.level is not None and None not in self.level_limits:
                 self.widget.slider.blockSignals(True)
@@ -163,14 +183,27 @@ class AlbaLightControlBrick(BaseWidget):
 
         self.widget.button.setStyleSheet("background-color: %s;" % color)
 
-    def set_icons(self, icons):
-        icons = icons.split(",")
-        if len(icons) == 2:
-            self.icons = {
-                "on": icons.load_icon(icons[0]),
-                "off": icons.load_icon(icons[1]),
+    def enable_backlight_widget_toggle(self, value):
+        if self.light_ho.name() == 'backlight': 
+            if value: self.setEnabled(True)
+            else: self.setEnabled(False)
+
+    def enable_backlight_widget(self):
+        if self.light_ho.name() == 'backlight': 
+            self.setEnabled(True)
+
+    def disable_backlight_widget(self):
+        if self.light_ho.name() == 'backlight': 
+            self.setEnabled(False)
+
+    def set_icons(self, icon_string):
+        icon_list = icon_string.split(",")
+        if len(icon_list) == 2:
+            self.icon_list = {
+                "on": icons.load_icon(icon_list[0]),
+                "off": icons.load_icon(icon_list[1]),
             }
-            self.widget.button.setIcon(self.icons["on"])
+            self.widget.button.setIcon(self.icon_list["on"])
 
     def level_changed(self, level):
         self.level = level
@@ -191,12 +224,22 @@ class AlbaLightControlBrick(BaseWidget):
 
     def do_set_level(self):  # when slider is moved
         newvalue = self.widget.slider.value()
-        self.light_ho.setLevel(newvalue)
+        self.light_ho.set_level(newvalue)
 
     def do_switch(self):
-        if self.state == "on":
-            self.light_ho.setOff()
-        elif self.state == "off":
-            self.light_ho.setOn()
+        #self.logger.info("self.state = %s" % self.state )
+        if self.state:
+            self.light_ho.set_off()
         else:
-            pass
+            self.logger.info("Setting light on" )
+            self.light_ho.set_on()
+
+    def collect_started(self, owner, num_oscillations):
+        self.disable_backlight_widget()
+
+    def collect_finished(self, owner, state, message, *args):
+        self.enable_backlight_widget()
+        
+    def collect_failed(self, owner, state, message, *args):
+        self.enable_backlight_widget()
+ 

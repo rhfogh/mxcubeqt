@@ -25,6 +25,7 @@ from mxcubeqt.base_components import BaseWidget
 
 __credits__ = ["MXCuBE collaboration"]
 __license__ = "LGPLv3+"
+__version__ = "3"
 __category__ = "ALBA"
 
 
@@ -110,9 +111,9 @@ class AlbaActuatorBrick(BaseWidget):
                 )
                 self.actuator_hwo.force_emit_signals()
                 logging.getLogger("HWR").info(
-                    "User Name is: %s" % self.actuator_hwo.getUserName()
+                    "User Name is: %s" % self.actuator_hwo.get_user_name()
                 )
-                self.widget.actuatorBox.setTitle(self.actuator_hwo.getUserName())
+                self.widget.actuatorBox.setTitle(self.actuator_hwo.get_user_name())
             else:
                 self.setEnabled(False)
         elif property_name == "in_cmd_name":
@@ -126,7 +127,9 @@ class AlbaActuatorBrick(BaseWidget):
         if self.actuator_hwo is not None:
             if state is None:
                 state = self.actuator_hwo.get_state()
-                status = self.actuator_hwo.getStatus()
+                self.logger.info("State = %s" % state )
+                status = self.actuator_hwo.get_status()
+                self.logger.info("Status = %s" % status )
                 self.widget.stateLabel.setText(status)
                 colors.set_widget_color(self.widget.stateLabel, STATES[state])
 
@@ -150,8 +153,8 @@ class AlbaActuatorBrick(BaseWidget):
 
     def do_cmd_in(self):
         if self.actuator_hwo is not None:
-            self.actuator_hwo.cmdIn()
+            self.actuator_hwo.cmd_in()
 
     def do_cmd_out(self):
         if self.actuator_hwo is not None:
-            self.actuator_hwo.cmdOut()
+            self.actuator_hwo.cmd_out()

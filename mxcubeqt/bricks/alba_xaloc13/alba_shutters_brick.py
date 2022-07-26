@@ -20,7 +20,7 @@
 import logging
 
 from mxcubeqt.utils import colors, qt_import
-from mxcubeqt.utils.QLed import QLed
+from mxcubeqt.utils.qled.q_led import QLed
 from mxcubeqt.base_components import BaseWidget
 
 
@@ -77,16 +77,16 @@ class AlbaShuttersBrick(BaseWidget):
         self.shutter_box.setTitle("Beam on Sample")
         self.leds_layout = qt_import.QHBoxLayout(self.shutter_box)
 
-        self.fast_led = QLed.QLed()
+        self.fast_led = QLed()
         self.fast_led.setUserName("Fast Shutter")
 
-        self.slow_led = QLed.QLed()
+        self.slow_led = QLed()
         self.slow_led.setUserName("Slow Shutter")
 
-        self.photon_led = QLed.QLed()
+        self.photon_led = QLed()
         self.photon_led.setUserName("Photon Shutter")
 
-        self.fe_led = QLed.QLed()
+        self.fe_led = QLed()
         self.fe_led.setUserName("Front End")
 
         self.leds_layout.addWidget(self.fast_led)
