@@ -116,7 +116,25 @@ class ProcessingWidget(qt_import.QWidget):
         self.processing_widget.pdb_file_label.setHidden(True)
         self.processing_widget.pdb_file_ledit.setHidden(True)
         self.processing_widget.pdb_file_browse_button.setHidden(True)
-
+        # ALBA specific
+        self.processing_widget.unit_cell_heading.setHidden(True)
+        self.processing_widget.a_ledit.setHidden(True)
+        self.processing_widget.b_ledit.setHidden(True)
+        self.processing_widget.c_ledit.setHidden(True)
+        self.processing_widget.alpha_ledit.setHidden(True)
+        self.processing_widget.beta_ledit.setHidden(True)
+        self.processing_widget.gamma_ledit.setHidden(True)
+        self.processing_widget.a_label.setHidden(True)
+        self.processing_widget.b_label.setHidden(True)
+        self.processing_widget.c_label.setHidden(True)
+        self.processing_widget.alpha_label.setHidden(True)
+        self.processing_widget.beta_label.setHidden(True)
+        self.processing_widget.gamma_label.setHidden(True)
+        self.processing_widget.num_residues_label.setHidden(True)
+        self.processing_widget.num_residues_ledit.setHidden(True)
+        self.processing_widget.run_offline_processing_cbox.setHidden(True)
+        self.processing_widget.run_online_processing_cbox.setHidden(True)
+        
         if HWR.beamline.offline_processing_methods:
             cbox_text = "Run offline processing ("
             for method in HWR.beamline.offline_processing_methods:
