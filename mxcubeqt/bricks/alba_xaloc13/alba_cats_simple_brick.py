@@ -104,6 +104,22 @@ class AlbaCatsSimpleBrick(CatsSimpleBrick):
     def _reportTaskFailed(self, msg):
         qt_import.QMessageBox.warning( self, "Error", msg )
 
+    def infoChanged(self):
+
+        CatsSimpleBrick.infoChanged(self)
+
+        baskets_at_sc = HWR.beamline.sample_changer.get_components()
+
+        basketno = 0
+        for basket in baskets_at_sc:
+            no_samples = basket.get_number_of_samples() 
+            for samp_box in self.baskets[basketno].samples_view.sample_boxes[no_samples:]:
+                samp_box.hide()
+            for samp_box in self.baskets[basketno].samples_view.sample_boxes[:no_samples]:
+                samp_box.show()
+            basketno += 1
+            
+
     #def load_selected_sample(self):
 
         #basket, vial = self.user_selected_sample
