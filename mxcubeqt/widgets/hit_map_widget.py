@@ -75,7 +75,8 @@ class HitMapWidget(qt_import.QWidget):
         score_type_label = qt_import.QLabel("Result: ", hit_map_info_widget)
         self._score_type_cbox = qt_import.QComboBox(hit_map_info_widget)
         self._autoscale_button = qt_import.QPushButton("Auto scale", hit_map_info_widget)
-        image_display_cbox = qt_import.QCheckBox("Display image in ADxV", hit_map_info_widget)
+        # RB: why leave the self out for the image_display_cbox object?????
+        self.image_display_cbox = qt_import.QCheckBox("Display image in ADxV", hit_map_info_widget)
         self._image_info_label = qt_import.QLabel(
             "Image: #, value #", hit_map_info_widget
         )
@@ -107,7 +108,7 @@ class HitMapWidget(qt_import.QWidget):
         _hit_map_info_hlayout.addWidget(score_type_label)
         _hit_map_info_hlayout.addWidget(self._score_type_cbox)
         _hit_map_info_hlayout.addWidget(self._autoscale_button)
-        _hit_map_info_hlayout.addWidget(image_display_cbox)
+        _hit_map_info_hlayout.addWidget(self.image_display_cbox)
         _hit_map_info_hlayout.addStretch(0)
         _hit_map_info_hlayout.addWidget(self._image_info_label)
         _hit_map_info_hlayout.setSpacing(2)
@@ -155,7 +156,7 @@ class HitMapWidget(qt_import.QWidget):
         # SizePolicies --------------------------------------------------------
 
         # Qt signals and slots ------------------------------------------------
-        image_display_cbox.stateChanged.connect(self.enable_image_display_state_changed)
+        self.image_display_cbox.stateChanged.connect(self.enable_image_display_state_changed)
         self._score_type_cbox.activated.connect(self.score_type_changed)
         self._threshold_slider.valueChanged.connect(self.filter_min_slider_changed)
         self._relaunch_processing_button.clicked.connect(
@@ -192,6 +193,7 @@ class HitMapWidget(qt_import.QWidget):
         )
 
         self._hit_map_popup_menu.addSeparator()
+        #TODO remove for XALOC the ADXV option
         self._hit_map_popup_menu.addAction(
             "Open image in ADXV", self.display_image_clicked
         )
@@ -339,9 +341,11 @@ class HitMapWidget(qt_import.QWidget):
                     pos_y > 0 and pos_y < num_row:
                     pos_y = num_row - pos_y
 
-                    self.__selected_col = pos_x
-                    self.__selected_row = pos_y
-                    do_update = True
+                    if self.__selected_col != pos_x and \
+                        self.__selected_row != pos_y:
+                        self.__selected_col = pos_x
+                        self.__selected_row = pos_y
+                        do_update = True
                 else: 
                     self.__selected_col = None
                     self.__selected_row = None

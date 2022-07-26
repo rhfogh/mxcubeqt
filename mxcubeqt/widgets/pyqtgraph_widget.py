@@ -62,6 +62,34 @@ class PlotWidget(qt_import.QWidget):
 
         self.one_dim_plot.scene().sigMouseMoved.connect(self.one_dim_plot_mouse_moved)
         self.two_dim_plot.scene.sigMouseMoved.connect(self.two_dim_plot_mouse_moved)
+        self.one_dim_plot.scene().sigMouseClicked.connect(self.one_dim_button_pressed)
+        self.two_dim_plot.scene.sigMouseClicked.connect(self.two_dim_button_pressed)
+        # Check if sigMouseLeft is the right signal
+        #self.two_dim_plot.scene.mouseLeaveEvent.connect(self.mouse_left_two_dim)
+
+    def leaveEvent(self, ev):
+        self.mouseLeftSignal.emit()
+        
+    def one_dim_button_pressed(self, mouse_event):
+        #TODO: check if this is the right position, there are several possibilities, 
+        #    see https://pyqtgraph.readthedocs.io/en/latest/graphicsscene/mouseclickevent.html
+        mouse_point_x, mouse_point_y = mouse_event.pos()
+        if mouse_point_x and mouse_point_y :
+            if mouse_event.double():
+                self.mouseDoubleClickedSignal.emit( mouse_point_x, mouse_point_y )
+            else:
+                self.mouseClickedSignal.emit( mouse_point_x, mouse_point_y )
+
+    def two_dim_button_pressed(self, mouse_event):
+        #TODO: check if this is the right position, there are several possibilities, 
+        #    see https://pyqtgraph.readthedocs.io/en/latest/graphicsscene/mouseclickevent.html
+        mouse_point_x, mouse_point_y = mouse_event.pos()
+        #mouse_point = self.two_dim_plot.imageItem.getViewBox().mapSceneToView(mouse_event)
+        if mouse_point_x and mouse_point_y:
+            if mouse_event.double():
+                self.mouseDoubleClickedSignal.emit(mouse_point_x, mouse_point_y )
+            else:
+                self.mouseClickedSignal.emit(mouse_point_x, mouse_point_y )
 
     def set_plot_type(self, plot_type):
         self.one_dim_plot.setVisible(plot_type == "1D")
@@ -130,7 +158,7 @@ class PlotWidget(qt_import.QWidget):
     def autoscale_axes(self):
         #self.one_dim_plot.enableAutoRange(self.view_box.XYAxes, True)
         self.view_box.autoRange(padding=0.02)
-        
+        self.view_box.setXRange(min=0, max=max(self.curves_dict[self.visible_curve].xData))
         self.view_box.setYRange(min=0, max=max(self.curves_dict[self.visible_curve].yData))
 
     def clear(self):
@@ -150,8 +178,8 @@ class PlotWidget(qt_import.QWidget):
                 self.visible_curve = key
                 return
 
-    def one_dim_plot_mouse_moved(self, mouse_event):
-        mouse_point = self.one_dim_plot.plotItem.vb.mapSceneToView(mouse_event)
+    def one_dim_plot_mouse_moved(self, event_pos):
+        mouse_point = self.one_dim_plot.plotItem.vb.mapSceneToView(event_pos)
         self.mouseMovedSignal.emit(mouse_point.x(), mouse_point.y())
 
     def two_dim_plot_mouse_moved(self, mouse_event):
@@ -160,7 +188,7 @@ class PlotWidget(qt_import.QWidget):
 
     def mouse_double_clicked(self, press_event, double):
         pass
-
+    
     def set_yticks(self, ticks):
         y_axis = self.one_dim_plot.getAxis("left")
         y_axis.setTicks([ticks])
