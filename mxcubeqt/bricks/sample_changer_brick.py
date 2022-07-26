@@ -1113,7 +1113,7 @@ class SampleChangerBrick(BaseWidget):
         for basket_index in range(self.basket_count):
             temp_basket = BasketView(
                 self.sc_contents_gbox,
-                basket_index + 1,
+                basket_index,
                 self.vials_per_basket,
                 self.vials_per_row,
                 self.basket_label,
@@ -1283,7 +1283,7 @@ class SampleChangerBrick(BaseWidget):
     def load_this_sample(self, basket_index, vial_index):
         if self.double_click_loads_cbox.isChecked():
             # holder_len = self.current_sample_view.getHolderLength()
-            HWR.beamline.sample_changer.load((basket_index, vial_index), wait=False)
+            HWR.beamline.sample_changer.load((basket_index + 1, vial_index), wait=False)
 
     def loadSample(self, holder_len):
         HWR.beamline.sample_changer.load(
