@@ -17,6 +17,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with MXCuBE.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+
+#from mxcubeqt.utils import colors
 from mxcubeqt.bricks.transmission_brick import TransmissionBrick
 
 from mxcubecore import HardwareRepository as HWR
@@ -32,3 +35,17 @@ class AlbaTransmissionBrick(TransmissionBrick):
         if HWR.beamline.transmission is not None:
             HWR.beamline.transmission.update_values()
     
+    # If the transmission has a problem during a change due to falied insertion of foils,
+    #    the widget stays frozen. This may be related to some FAULT state, 
+    #    leaving the transmission HO in not ready state, which calls disconnected method, 
+    #    which disables the widget...
+    #    To diagnose the problem, I added some prints
+    #def _state_changed(self, state):
+        #"""Updates new value QLineEdit based on the state"""
+        #logging.getLogger("HWR").debug("Transmission state_changed, state is %s" % state)
+        #if HWR.beamline.transmission.is_ready():
+            #self.connected()
+        #else:
+            #self.disconnected()
+        #self._update_ledit_color(colors.COLOR_STATES[state])
+
