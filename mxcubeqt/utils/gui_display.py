@@ -68,6 +68,7 @@ class CustomMenuBar(qt_import.QMenuBar):
         self.execution_mode = None
         self.menu_items = []
         self.original_style = None
+        self.original_widget_color = None
         self.preview_windows = {}
 
         # Graphic elements ----------------------------------------------------
@@ -139,6 +140,9 @@ class CustomMenuBar(qt_import.QMenuBar):
         self.bricks_properties_editor.bricks_listwidget.sortItems(
             qt_import.Qt.AscendingOrder
         )
+        self.original_widget_color = self.palette().color(qt_import.QPalette.Background)
+        logging.getLogger().debug("original_widget_color %s" % self.original_widget_color)
+
 
     def insert_menu(self, new_menu_item, position):
         """Inserts item in menu"""
@@ -173,6 +177,7 @@ class CustomMenuBar(qt_import.QMenuBar):
             # This should be based on instance connection
             # restore colour if master/client/etc
             self.original_style = self.styleSheet()
+
         if self.expert_mode_action.isChecked():
             res = qt_import.QInputDialog.getText(
                 self,
@@ -244,6 +249,8 @@ class CustomMenuBar(qt_import.QMenuBar):
                     pass
                     #logging.getLogger().warning("Widget {} has no attribute {}"
                     #                            .format(widget, "set_expert_mode"))
+            # The color of the menu bar is not reverted using the original_style
+            self.set_color(self.original_widget_color)
             if self.original_style:
                 self.setStyleSheet(self.original_style)
 
