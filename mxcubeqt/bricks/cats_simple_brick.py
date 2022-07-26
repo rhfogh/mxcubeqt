@@ -287,7 +287,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         HWR.beamline.sample_changer.unload()
 
     def abort_mounting(self):
-        HWR.beamline.sample_changer._doAbort()
+        HWR.beamline.sample_changer._do_abort()
 
 
 def test_brick(brick):

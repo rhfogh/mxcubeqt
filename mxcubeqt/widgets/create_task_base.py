@@ -582,7 +582,7 @@ class CreateTaskBase(qt_import.QWidget):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
                         snapshot = HWR.beamline.sample_view.get_snapshot(
-                            shape=position
+                            #shape=position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos

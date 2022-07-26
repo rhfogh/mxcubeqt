@@ -274,7 +274,10 @@ class CreateHelicalWidget(CreateTaskBase):
         data_collections = []
 
         for shape in self.get_selected_shapes():
-            snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
+            # RB: sample_view.get_snapshot does not have an argument shape!
+            #  What was intended? Perhaps a snapshot at each point??
+            #snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot()
 
             # Acquisition for start position
             start_acq = self._create_acq(sample)
@@ -308,7 +311,7 @@ class CreateHelicalWidget(CreateTaskBase):
             dc.set_experiment_type(EXPERIMENT_TYPE.HELICAL)
             dc.set_requires_centring(False)
             dc.run_processing_after = (
-                self._processing_widget.processing_widget.run_processing_after_cbox.isChecked()
+                self._processing_widget.processing_widget.run_offline_processing_cbox.isChecked()
             )
             if (
                 self._processing_widget.processing_widget.run_online_processing_cbox.isChecked()

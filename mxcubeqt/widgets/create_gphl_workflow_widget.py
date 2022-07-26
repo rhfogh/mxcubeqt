@@ -198,7 +198,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     # Called by the owning widget (task_toolbox_widget) to create
     # a collection. When a data collection group is selected.
-    def _create_task(self, sample, shape):
+    def _create_task(self, sample, shape, comments):
         tasks = []
 
         path_template = self._create_path_template(sample, self._path_template)
