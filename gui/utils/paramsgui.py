@@ -249,6 +249,11 @@ class IntSpinBox(QtImport.QSpinBox):
             self.setMinimum(int(options["lowerBound"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
+        if "stepsize" in options:
+            self.setSingleStep(options["stepsize"])
+
+        self.update_function = options.get("update_function")
+        self.valueChanged.connect(self.input_field_changed)
 
     def set_value(self, value):
         self.setValue(int(value))
@@ -259,6 +264,13 @@ class IntSpinBox(QtImport.QSpinBox):
 
     def get_name(self):
         return self.__name
+
+    def input_field_changed(self, input_field_text):
+        """UI update function triggered by field value changes"""
+        self.parent().validate_fields()
+        if self.update_function is not None:
+            self.update_function(self.parent())
+        self.parent().input_field_changed()
 
 
 class DoubleSpinBox(QtImport.QDoubleSpinBox):
@@ -283,16 +295,28 @@ class DoubleSpinBox(QtImport.QDoubleSpinBox):
             self.setMinimum(float(options["lowerBound"]))
         if "tooltip" in options:
             self.setToolTip(options["tooltip"])
+        if "stepsize" in options:
+            self.setSingleStep(options["stepsize"])
+
+        self.update_function = options.get("update_function")
+        self.valueChanged.connect(self.input_field_changed)
 
     def set_value(self, value):
         self.setValue(int(value))
 
     def get_value(self):
-        val = int(self.value())
+        val = float(self.value())
         return ConvertUtils.text_type(val)
 
     def get_name(self):
         return self.__name
+
+    def input_field_changed(self, input_field_text):
+        """UI update function triggered by field value changes"""
+        self.parent().validate_fields()
+        if self.update_function is not None:
+            self.update_function(self.parent())
+        self.parent().input_field_changed()
 
 
 class Message(QtImport.QWidget):
@@ -488,7 +512,7 @@ class FieldsWidget(QtImport.QWidget):
     def validate_fields(self):
         all_valid = True
         for widget in self.field_widgets:
-            # The two fuinctions should go in parallel, but for precision, ...
+            # The two functions should go in parallel, but for precision, ...
             if hasattr(widget, "color_by_error"):
                 widget.color_by_error()
             if hasattr(widget, "is_valid"):
