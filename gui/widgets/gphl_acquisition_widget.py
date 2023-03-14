@@ -310,35 +310,33 @@ class GphlRuntimeWidget(QtImport.QWidget):
         self._fields = OrderedDict(
             (
                 (
-                    "dose_budget",
+                    "wf_type",
                      {
-                        "label": "Total dose budget (MGy)",
-                        "getter": "get_dose_budget",
+                        "label": "Workflow type",
+                        "getter": "get_type",
                          "options":{
-                            "variableName":"dose_consumed",
-                             "decimals":2,
-                             "type":"floatstring",
+                            "variableName":"wf_type",
+                             "type":"text",
                              "readOnly":True,
                          }
                      }
                 ),
                 (
-                    "dose_consumed",
-                    {
-                        "label": "Acq. dose budget (MGy)",
-                        "getter": "get_dose_consumed",
-                        "options":{
-                            "variableName":"dose_consumed",
-                            "decimals":2,
-                            "type":"floatstring",
-                            "readOnly":True,
-                        }
-                    }
+                    "wf_variant",
+                     {
+                        "label": "Workflow variant",
+                        "getter": "get_variant",
+                         "options":{
+                            "variableName":"wf_variant",
+                             "type":"text",
+                             "readOnly":True,
+                         }
+                     }
                 ),
                 (
                     "exposure_time",
                     {
-                        "label": "Exposure tiume (s)",
+                        "label": "Exposure time (s)",
                         "getter": "get_exposure_time",
                         "options":{
                             "variableName":"exposure_time",

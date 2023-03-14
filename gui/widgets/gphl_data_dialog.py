@@ -295,7 +295,8 @@ class LocalFieldsWidget(FieldsWidget):
         if use_dose and dose_budget:
             use_dose = float(use_dose)
             dose_budget = float(dose_budget)
-            if use_dose > dose_budget:
+            repetition_count = int(parameters.get("repetition_count", 1))
+            if use_dose * repetition_count > dose_budget:
                 for field in self.field_widgets:
                     if field.get_name() in ("use_dose", "dose_budget"):
                         field.color_by_error(warning=True)
