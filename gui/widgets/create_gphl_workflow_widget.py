@@ -268,10 +268,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
                     space_group = spg
             self._gphl_acq_param_widget.set_parameter_value(
-                "crystal_system", ""
+                "crystal_family", ""
             )
             self._gphl_acq_param_widget._refresh_interface(
-                "crystal_system", None
+                "crystal_family", None
             )
             self._gphl_acq_param_widget.set_parameter_value(
                 "space_group", space_group
@@ -396,17 +396,17 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
             wf.set_characterisation_strategy(characterisation_strategy)
             wf.set_use_cell_for_processing(use_for_indexing)
-            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
-            crystal_system, point_group = None, None
+            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_family")
+            crystal_family, point_group = None, None
             if tag:
-                data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
-                crystal_system = data.crystal_system
+                data = self._gphl_acq_param_widget._CRYSTAL_FAMILY_DATA[tag]
+                crystal_family = data.crystal_family
                 point_groups = data.point_groups
                 if len(point_groups) == 1 or point_groups[0] == "32":
                     # '32' is a special case; '312' and '321' are also returned as '32'
                     point_group = point_groups[0]
             wf.set_point_group(point_group)
-            wf.set_crystal_system(crystal_system)
+            wf.set_crystal_family(crystal_family)
             val = self._gphl_acq_param_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )

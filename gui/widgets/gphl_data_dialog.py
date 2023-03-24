@@ -85,10 +85,6 @@ class SelectionTable(QtImport.QTableWidget):
                         wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
             self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and (colour or no_colours):
-                selectRow = rowNum
-        if selectRow is not None:
-            self.setCurrentCell(selectRow, 0)
 
 
     def get_value(self):
@@ -252,6 +248,8 @@ class GphlDataDialog(QtImport.QDialog):
                     self.cplx_widget.populateColumn(
                         ii, values, colours=cplx.get("colours")
                     )
+                select_row = cplx.get("select_row", 0)
+                self.cplx_widget.setCurrentCell(select_row, 0)
                 self.cplx_gbox.show()
 
             else:

@@ -42,7 +42,7 @@ __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
 
-CrystalSystemData = namedtuple("CrystalSystemData", ("crystal_system", "point_groups"))
+CrystalFamilyData = namedtuple("CrystalFamilyData", ("crystal_family", "point_groups"))
 CrystalData = namedtuple(
     "CrystalData", ("name", "space_group", "a", "b", "c", "alpha", "beta", "gamma")
 )
@@ -389,27 +389,31 @@ class GphlAcquisitionWidget(GphlSetupWidget):
     """Input widget for GPhL data collection setup"""
 
     # Popup label to point groups dict
-    _CRYSTAL_SYSTEM_DATA = OrderedDict(
+    _CRYSTAL_FAMILY_DATA = OrderedDict(
         (
-            ("", CrystalSystemData("", (None,))),
-            ("Triclinic    |   1", CrystalSystemData("Triclinic", ("1",))),
-            ("Monoclinic   |   2", CrystalSystemData("Monoclinic", ("2",))),
-            ("Orthorhombic | 222", CrystalSystemData("Orthorhombic", ("222",))),
-            ("Tetragonal   | Any", CrystalSystemData("Tetragonal", ("4", "422"))),
-            ("Tetragonal   |   4", CrystalSystemData("Tetragonal", ("4",))),
-            ("Tetragonal   | 422", CrystalSystemData("Tetragonal", ("422",))),
+            ("", CrystalFamilyData("", (None,))),
+            ("Triclinic    |   1", CrystalFamilyData("Triclinic", ("1",))),
+            ("Monoclinic   |   2", CrystalFamilyData("Monoclinic", ("2",))),
+            ("Orthorhombic | 222", CrystalFamilyData("Orthorhombic", ("222",))),
+            ("Tetragonal   | Any", CrystalFamilyData("Tetragonal", ("4", "422"))),
+            ("Tetragonal   |   4", CrystalFamilyData("Tetragonal", ("4",))),
+            ("Tetragonal   | 422", CrystalFamilyData("Tetragonal", ("422",))),
             (
-                "Trigonal     | Any",
-                CrystalSystemData("Trigonal", ("3", "32", "321", "312")),
+                "Hexagonal     | Any",
+                CrystalFamilyData("Hexagonal", ("3", "32", "321", "312", "6", "622")),
             ),
-            ("Trigonal     |   3", CrystalSystemData("Trigonal", ("3",))),
-            ("Trigonal     |  32", CrystalSystemData("Trigonal", ("32", "321", "312"))),
-            ("Hexagonal    | Any", CrystalSystemData("Hexagonal", ("6", "622"))),
-            ("Hexagonal    |   6", CrystalSystemData("Hexagonal", ("6",))),
-            ("Hexagonal    | 622", CrystalSystemData("Hexagonal", ("622",))),
-            ("Cubic        | Any", CrystalSystemData("Cubic", ("23", "432"))),
-            ("Cubic        |  23", CrystalSystemData("Cubic", ("23",))),
-            ("Cubic        | 432", CrystalSystemData("Cubic", ("432",))),
+            (
+                "Hexagonal     | 3/32",
+                CrystalFamilyData("Hexagonal", ("3", "32", "321", "312")),
+            ),
+            ("Hexagonal     |   3", CrystalFamilyData("Hexagonal", ("3",))),
+            ("Hexagonal     |  32", CrystalFamilyData("Hexagonal", ("32", "321", "312"))),
+            ("Hexagonal    | 6/622", CrystalFamilyData("Hexagonal", ("6", "622"))),
+            ("Hexagonal    |   6", CrystalFamilyData("Hexagonal", ("6",))),
+            ("Hexagonal    | 622", CrystalFamilyData("Hexagonal", ("622",))),
+            ("Cubic        | Any", CrystalFamilyData("Cubic", ("23", "432"))),
+            ("Cubic        |  23", CrystalFamilyData("Cubic", ("23",))),
+            ("Cubic        | 432", CrystalFamilyData("Cubic", ("432",))),
         )
     )
 
@@ -421,16 +425,16 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget = self._parameters_widget
 
         row = 0
-        field_name = "crystal_system"
+        field_name = "crystal_family"
         label_name = self._get_label_name(field_name)
-        label_str = "Crystal system :"
+        label_str = "Crystal family :"
         label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
-        self._pulldowns[field_name] = list(self._CRYSTAL_SYSTEM_DATA)
+        self._pulldowns[field_name] = list(self._CRYSTAL_FAMILY_DATA)
 
         row += 1
         field_name = "space_group"
@@ -509,7 +513,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
         # Special case, reset space_group pulldown
         # which changes with crystal_system
-        self._refresh_interface("crystal_system", None)
+        self._refresh_interface("crystal_family", None)
 
         skip_fields = []
 
@@ -530,12 +534,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
-        if field_name == "crystal_system":
+        if field_name == "crystal_family":
             # Refresh space_group pulldown to reflect crystal_system pulldown
-            crystal_system = self.get_parameter_value("crystal_system") or ""
-            data = self._CRYSTAL_SYSTEM_DATA[crystal_system]
+            crystal_family = self.get_parameter_value("crystal_family") or ""
+            data = self._CRYSTAL_FAMILY_DATA[crystal_family]
             ll0 = self._pulldowns["space_group"] = []
-            if data.crystal_system:
+            if data.crystal_family:
                 ll0.append("")
                 ll0.extend(
                     [
