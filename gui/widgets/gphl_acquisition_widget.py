@@ -481,7 +481,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             self._widget_data[label_name] = (label, str, None, label_str)
             widget = QtImport.QCheckBox()
             _parameters_widget.layout().addWidget(widget, row, 1)
-            self._widget_data[field_name] = (widget, bool, None, False)
+            self._widget_data[field_name] = (
+                widget,
+                bool,
+                None,
+                api.gphl_workflow.getProperty("use_cell_for_processing", False)
+            )
 
             row += 1
             field_name = "decay_limit"
