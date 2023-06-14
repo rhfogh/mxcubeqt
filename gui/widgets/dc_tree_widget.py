@@ -263,8 +263,9 @@ class DataCollectTree(QtImport.QWidget):
                                          self.add_star_treewidget_item)
 
             if isinstance(item, queue_item.TaskQueueItem):
-                if not isinstance(item.get_model(),
-                                  queue_model_objects.SampleCentring):
+                if not isinstance(
+                    item.get_model(), queue_model_objects.SampleCentring
+                ):
                     self.item_menu.addSeparator()
                     self.item_menu.addAction("Cut", self.cut_item)
                     self.item_menu.addAction("Copy", self.copy_item)
