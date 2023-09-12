@@ -65,11 +65,10 @@ class SelectionTable(QtImport.QTableWidget):
         """Dummy method, recommended by docs when not using std cell widgets"""
         pass
 
-    def populateColumn(self, colNum, values, colours=None):
+    def populateColumn(self, colNum, values, colours=None, selectRow=None):
         """Fill values into column, extending if necessary"""
         if len(values) > self.rowCount():
             self.setRowCount(len(values))
-        selectRow = None
         no_colours = not colours or not any(colours)
         colour = None
         for rowNum, text in enumerate(values):
@@ -85,7 +84,7 @@ class SelectionTable(QtImport.QTableWidget):
                         wdg, getattr(Colors, colour), QtImport.QPalette.Base
                     )
             self.setCellWidget(rowNum, colNum, wdg)
-            if "*" in text and (colour or no_colours):
+            if selectRow is None and "*" in text and (colour or no_colours):
                 selectRow = rowNum
         if selectRow is not None:
             self.setCurrentCell(selectRow, 0)
@@ -250,7 +249,10 @@ class GphlDataDialog(QtImport.QDialog):
                 self.cplx_gbox.setTitle(cplx.get("uiLabel"))
                 for ii, values in enumerate(cplx["defaultValue"]):
                     self.cplx_widget.populateColumn(
-                        ii, values, colours=cplx.get("colours")
+                        ii,
+                        values,
+                        colours=cplx.get("colours"),
+                        selectRow = cplx.get("selectRow")
                     )
                 self.cplx_gbox.show()
 

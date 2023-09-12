@@ -33,7 +33,8 @@ from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 from gui.utils.paramsgui import make_widget
 
-from HardwareRepository.HardwareObjects import queue_model_enumerables
+from HardwareRepository.HardwareObjects import GphlWorkflow
+from HardwareRepository.HardwareObjects.Gphl import crystal_symmetry
 from HardwareRepository.dispatcher import dispatcher
 
 __category__ = "TaskToolbox_Tabs"
@@ -42,7 +43,6 @@ __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
 __author__ = "Rasmus H Fogh"
 
-CrystalSystemData = namedtuple("CrystalSystemData", ("crystal_system", "point_groups"))
 CrystalData = namedtuple(
     "CrystalData", ("name", "space_group", "a", "b", "c", "alpha", "beta", "gamma")
 )
@@ -388,31 +388,6 @@ class GphlRuntimeWidget(QtImport.QWidget):
 class GphlAcquisitionWidget(GphlSetupWidget):
     """Input widget for GPhL data collection setup"""
 
-    # Popup label to point groups dict
-    _CRYSTAL_SYSTEM_DATA = OrderedDict(
-        (
-            ("", CrystalSystemData("", (None,))),
-            ("Triclinic    |   1", CrystalSystemData("Triclinic", ("1",))),
-            ("Monoclinic   |   2", CrystalSystemData("Monoclinic", ("2",))),
-            ("Orthorhombic | 222", CrystalSystemData("Orthorhombic", ("222",))),
-            ("Tetragonal   | Any", CrystalSystemData("Tetragonal", ("4", "422"))),
-            ("Tetragonal   |   4", CrystalSystemData("Tetragonal", ("4",))),
-            ("Tetragonal   | 422", CrystalSystemData("Tetragonal", ("422",))),
-            (
-                "Trigonal     | Any",
-                CrystalSystemData("Trigonal", ("3", "32", "321", "312")),
-            ),
-            ("Trigonal     |   3", CrystalSystemData("Trigonal", ("3",))),
-            ("Trigonal     |  32", CrystalSystemData("Trigonal", ("32", "321", "312"))),
-            ("Hexagonal    | Any", CrystalSystemData("Hexagonal", ("6", "622"))),
-            ("Hexagonal    |   6", CrystalSystemData("Hexagonal", ("6",))),
-            ("Hexagonal    | 622", CrystalSystemData("Hexagonal", ("622",))),
-            ("Cubic        | Any", CrystalSystemData("Cubic", ("23", "432"))),
-            ("Cubic        |  23", CrystalSystemData("Cubic", ("23",))),
-            ("Cubic        | 432", CrystalSystemData("Cubic", ("432",))),
-        )
-    )
-
     def __init__(self, parent=None, name="gphl_acquisition_widget"):
         GphlSetupWidget.__init__(self, parent=parent, name=name)
 
@@ -421,16 +396,16 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         _parameters_widget = self._parameters_widget
 
         row = 0
-        field_name = "crystal_system"
+        field_name = "crystal_lattice"
         label_name = self._get_label_name(field_name)
-        label_str = "Crystal system :"
+        label_str = "Crystal lattice :"
         label = QtImport.QLabel(label_str, _parameters_widget)
         _parameters_widget.layout().addWidget(label, row, 0)
         self._widget_data[label_name] = (label, str, None, label_str)
         widget = QtImport.QComboBox()
         _parameters_widget.layout().addWidget(widget, row, 1)
         self._widget_data[field_name] = (widget, str, None, 0)
-        self._pulldowns[field_name] = list(self._CRYSTAL_SYSTEM_DATA)
+        self._pulldowns[field_name] = [""] + list(GphlWorkflow.lattice2point_group_tags)
 
         row += 1
         field_name = "space_group"
@@ -513,8 +488,8 @@ class GphlAcquisitionWidget(GphlSetupWidget):
         data_object = self._data_object
 
         # Special case, reset space_group pulldown
-        # which changes with crystal_system
-        self._refresh_interface("crystal_system", None)
+        # which changes with crystal_lattice
+        self._refresh_interface("crystal_lattice", None)
 
         skip_fields = []
 
@@ -535,26 +510,15 @@ class GphlAcquisitionWidget(GphlSetupWidget):
 
     def _refresh_interface(self, field_name, data_binder):
         """Refresh interface when values change"""
-        if field_name == "crystal_system":
+        if field_name == "crystal_lattice":
             # Refresh space_group pulldown to reflect crystal_system pulldown
-            crystal_system = self.get_parameter_value("crystal_system") or ""
-            data = self._CRYSTAL_SYSTEM_DATA[crystal_system]
-            ll0 = self._pulldowns["space_group"] = []
-            if data.crystal_system:
-                ll0.append("")
-                ll0.extend(
-                    [
-                        x.name
-                        for x in queue_model_enumerables.SPACEGROUP_DATA
-                        if x.point_group in data.point_groups
-                    ]
-                )
-            else:
-                ll0.extend(queue_model_enumerables.XTAL_SPACEGROUPS)
+            crystal_lattice = self.get_parameter_value("crystal_lattice") or ""
+            space_groups = crystal_symmetry.space_groups_from_params(
+                lattices=((crystal_lattice,) if crystal_lattice else ())
+            )
+            ll0 = self._pulldowns["space_group"] = [""] + space_groups
 
             widget = self._widget_data["space_group"][0]
             widget.clear()
             widget.addItems(list(QtImport.QString(tag) for tag in ll0))
             self._data_object.space_group = 0
-            # widget.setCurrentIndex(0)
-            # self._parameter_mib._update_widget('space_group', None)

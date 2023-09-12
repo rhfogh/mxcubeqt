@@ -35,6 +35,7 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 from HardwareRepository import ConvertUtils
 from HardwareRepository.HardwareObjects import queue_model_objects
 from HardwareRepository.HardwareObjects import queue_model_enumerables
+from HardwareRepository.HardwareObjects.Gphl import crystal_symmetry
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -268,10 +269,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                 if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
                     space_group = spg
             self._gphl_acq_param_widget.set_parameter_value(
-                "crystal_system", ""
+                "crystal_lattice", ""
             )
             self._gphl_acq_param_widget._refresh_interface(
-                "crystal_system", None
+                "crystal_lattice", None
             )
             self._gphl_acq_param_widget.set_parameter_value(
                 "space_group", space_group
@@ -393,20 +394,17 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                             "use_for_indexing"
                         )
                     )
-
             wf.set_characterisation_strategy(characterisation_strategy)
             wf.set_use_cell_for_processing(use_for_indexing)
-            tag = self._gphl_acq_param_widget.get_parameter_value("crystal_system")
-            crystal_system, point_group = None, None
-            if tag:
-                data = self._gphl_acq_param_widget._CRYSTAL_SYSTEM_DATA[tag]
-                crystal_system = data.crystal_system
-                point_groups = data.point_groups
-                if len(point_groups) == 1 or point_groups[0] == "32":
-                    # '32' is a special case; '312' and '321' are also returned as '32'
-                    point_group = point_groups[0]
-            wf.set_point_group(point_group)
-            wf.set_crystal_system(crystal_system)
+            lattice = self._gphl_acq_param_widget.get_parameter_value("crystal_lattice")
+            lattices = (lattice,) if lattice else ()
+            space_group = self._gphl_acq_param_widget.get_parameter_value("space_group")
+            # NB this gives priority to lattice over space_group, but anyway
+            # either one or the other should be unset.
+            crystal_classes = crystal_symmetry.crystal_classes_from_params(
+                lattices=lattices, space_group=space_group or None
+            )
+            wf.set_crystal_classes(crystal_classes)
             val = self._gphl_acq_param_widget.get_parameter_value(
                 "relative_rad_sensitivity"
             )
