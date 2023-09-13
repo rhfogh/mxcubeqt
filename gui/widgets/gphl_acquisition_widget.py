@@ -517,8 +517,12 @@ class GphlAcquisitionWidget(GphlSetupWidget):
                 lattices=((crystal_lattice,) if crystal_lattice else ())
             )
             ll0 = self._pulldowns["space_group"] = [""] + space_groups
-
             widget = self._widget_data["space_group"][0]
             widget.clear()
             widget.addItems(list(QtImport.QString(tag) for tag in ll0))
             self._data_object.space_group = 0
+        elif field_name == "space_group":
+            # Clear Crystal lattice pulldown when space group is set
+            space_group = self.get_parameter_value("space_group") or ""
+            self.set_parameter_value("crystal_lattice", "")
+            self._data_object.space_group = space_group
