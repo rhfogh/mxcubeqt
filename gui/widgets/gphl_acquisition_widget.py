@@ -53,6 +53,9 @@ class GphlAcquisitionData(object):
 
     Attributes are set in the GphlAcquisitionWidget"""
 
+    # HACK
+    input_space_group = None
+
     pass
 
 
@@ -450,7 +453,7 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             row += 1
             field_name = "use_for_indexing"
             label_name = self._get_label_name(field_name)
-            label_str = "Use input cell for indexing?"
+            label_str = "Use input SG for indexing?"
             label = QtImport.QLabel(label_str, _parameters_widget)
             _parameters_widget.layout().addWidget(label, row, 0)
             self._widget_data[label_name] = (label, str, None, label_str)
@@ -525,4 +528,4 @@ class GphlAcquisitionWidget(GphlSetupWidget):
             # Clear Crystal lattice pulldown when space group is set
             space_group = self.get_parameter_value("space_group") or ""
             self.set_parameter_value("crystal_lattice", "")
-            self._data_object.space_group = space_group
+            self.set_parameter_value("space_group", space_group)

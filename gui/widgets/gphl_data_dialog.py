@@ -61,6 +61,10 @@ class SelectionTable(QtImport.QTableWidget):
         for ii in range(1, len(header)):
             hdr.setResizeMode(ii, QtImport.QHeaderView.ResizeToContents)
 
+        self.parameters_widget = None
+        self.update_function = None
+        self.itemSelectionChanged.connect(self.input_field_changed)
+
     def resizeData(self, ii):
         """Dummy method, recommended by docs when not using std cell widgets"""
         pass
@@ -97,7 +101,15 @@ class SelectionTable(QtImport.QTableWidget):
             logging.getLogger("user_log").warning(
                 "Select a row of the table, and then press [Continue]"
             )
-        return [self.cellWidget(row_id, ii).text() for ii in range(self.columnCount())]
+        return [
+            ConvertUtils.text_type(self.cellWidget(row_id, ii).text())
+            for ii in range(self.columnCount())
+        ]
+
+    def input_field_changed(self):
+        """UI update function triggered by field value changes"""
+        if self.update_function is not None:
+            self.update_function(self)
 
 
 class GphlDataDialog(QtImport.QDialog):
@@ -222,6 +234,27 @@ class GphlDataDialog(QtImport.QDialog):
             else:
                 parameters.append(dd0)
 
+        # parameters widget
+        if self.params_widget is not None:
+            self.params_widget.parametersValidSignal.disconnect(
+                self.continue_button.setEnabled
+            )
+            self.params_widget.close()
+            self.params_widget = None
+        if parameters:
+            params_widget = self.params_widget = LocalFieldsWidget(
+                fields=parameters)
+            self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
+            if parameter_update_function:
+                parameter_update_function(params_widget)
+            self.parameter_gbox.show()
+            params_widget.parametersValidSignal.connect(
+                self.continue_button.setEnabled)
+            params_widget.validate_fields()
+        else:
+            self.parameter_gbox.hide()
+            self.continue_button.setEnabled(True)
+
         # Info box
         if info is None:
             self.info_text.setText("")
@@ -234,6 +267,8 @@ class GphlDataDialog(QtImport.QDialog):
 
         # Complex box
         if self.cplx_widget:
+            if isinstance(self.cplx_widget, SelectionTable):
+                self.itemSelectionChanged.disconnect(self.input_field_changed)
             self.cplx_widget.close()
         if cplx is None:
             self.cplx_gbox.hide()
@@ -255,31 +290,16 @@ class GphlDataDialog(QtImport.QDialog):
                         selectRow = cplx.get("selectRow")
                     )
                 self.cplx_gbox.show()
+                update_function = cplx.get("update_function")
+                if update_function:
+                    self.cplx_widget.update_function = update_function
+                    self.cplx_widget.parameters_widget = params_widget
 
             else:
                 raise NotImplementedError(
                     "GPhL complex widget type %s not recognised for parameter _cplx"
                     % repr(cplx.get("type"))
                 )
-
-        # parameters widget
-        if self.params_widget is not None:
-            self.params_widget.parametersValidSignal.disconnect(
-                self.continue_button.setEnabled
-            )
-            self.params_widget.close()
-            self.params_widget = None
-        if parameters:
-            params_widget = self.params_widget = LocalFieldsWidget(fields=parameters)
-            self.parameter_gbox.layout().addWidget(params_widget, stretch=1)
-            if parameter_update_function:
-                parameter_update_function(params_widget)
-            self.parameter_gbox.show()
-            params_widget.parametersValidSignal.connect(self.continue_button.setEnabled)
-            params_widget.validate_fields()
-        else:
-            self.parameter_gbox.hide()
-            self.continue_button.setEnabled(True)
 
         self.show()
         self.setEnabled(True)

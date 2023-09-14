@@ -65,8 +65,13 @@ class LineEdit(QtImport.QLineEdit):
         self.parent().validate_fields()
         valid = self.is_valid()
         if valid:
-            if self.update_function is not None:
-                self.update_function(self.parent())
+            if self.update_function is not None and not self.parent().block_updates:
+                try:
+                    self.parent().block_updates = True
+                    self.update_function(self.parent())
+                finally:
+                    self.parent().block_updates = False
+
 
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
@@ -161,6 +166,7 @@ class Combo(QtImport.QComboBox):
     def __init__(self, parent, options):
         QtImport.QComboBox.__init__(self, parent)
         self.__name = options["variableName"]
+        self.setSizeAdjustPolicy(QtImport.QComboBox.AdjustToContents)
         if "textChoices" in options:
             for val in options["textChoices"]:
                 self.addItem(val)
@@ -172,8 +178,13 @@ class Combo(QtImport.QComboBox):
 
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
-        if self.update_function is not None:
-            self.update_function(self.parent())
+        if self.update_function is not None and not self.parent().block_updates:
+            try:
+                self.parent().block_updates = True
+                self.update_function(self.parent())
+            finally:
+                self.parent().block_updates = False
+
         self.parent().input_field_changed()
 
     def set_value(self, value):
@@ -268,8 +279,12 @@ class IntSpinBox(QtImport.QSpinBox):
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
         self.parent().validate_fields()
-        if self.update_function is not None:
-            self.update_function(self.parent())
+        if self.update_function is not None and not self.parent().block_updates:
+            try:
+                self.parent().block_updates = True
+                self.update_function(self.parent())
+            finally:
+                self.parent().block_updates = False
         self.parent().input_field_changed()
 
 
@@ -314,8 +329,12 @@ class DoubleSpinBox(QtImport.QDoubleSpinBox):
     def input_field_changed(self, input_field_text):
         """UI update function triggered by field value changes"""
         self.parent().validate_fields()
-        if self.update_function is not None:
-            self.update_function(self.parent())
+        if self.update_function is not None and not self.parent().block_updates:
+            try:
+                self.parent().block_updates = True
+                self.update_function(self.parent())
+            finally:
+                self.parent().block_updates = False
         self.parent().input_field_changed()
 
 
@@ -416,6 +435,7 @@ class FieldsWidget(QtImport.QWidget):
         self.setSizePolicy(
             QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
         )
+        self.block_updates = False
 
         current_row = 0
         col_incr = 0
@@ -500,7 +520,7 @@ class FieldsWidget(QtImport.QWidget):
                 field.set_value(values[field.get_name()])
 
     def input_field_changed(self):
-        """Placeholder function, can be overridden inj individual instances
+        """Placeholder function, can be overridden in individual instances
 
         Executed at the end of all input_field_changed functions """
         pass
@@ -508,6 +528,15 @@ class FieldsWidget(QtImport.QWidget):
     def get_parameters_map(self):
         """Get paramer values dictionary for all fields"""
         return dict((w.get_name(), w.get_value()) for w in self.field_widgets)
+
+    def reset_pulldown(self, fieldName, textChoices, defaultValue=None):
+        for field in self.field_widgets:
+            if field.get_name() == fieldName:
+                field.clear()
+                field.addItems(textChoices)
+                if defaultValue is not None:
+                    field.set_value(defaultValue)
+                break
 
     def validate_fields(self):
         all_valid = True

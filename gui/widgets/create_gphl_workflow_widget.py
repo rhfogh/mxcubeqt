@@ -266,16 +266,14 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             space_group = ""
             if crystals:
                 spg = crystals[0].space_group
-                if spg in  queue_model_enumerables.XTAL_SPACEGROUPS:
+                if spg in queue_model_enumerables.XTAL_SPACEGROUPS:
                     space_group = spg
-            self._gphl_acq_param_widget.set_parameter_value(
-                "crystal_lattice", ""
-            )
-            self._gphl_acq_param_widget._refresh_interface(
-                "crystal_lattice", None
-            )
-            self._gphl_acq_param_widget.set_parameter_value(
-                "space_group", space_group
+            self._gphl_acq_param_widget.set_parameter_value("crystal_lattice", "")
+            self._gphl_acq_param_widget._refresh_interface("crystal_lattice", None)
+            self._gphl_acq_param_widget.set_parameter_value("space_group", space_group)
+            # NBNB HORRIBLE hack. But no quick and clean way to pass input_space_group
+            self._gphl_acq_param_widget._data_object.input_space_group = (
+                space_group or None
             )
             diffraction_plan = model.diffraction_plan
             if diffraction_plan:
@@ -301,11 +299,6 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                         "Diffraction plan observed resolution is %.3f A, "
                         % observedResolution
                     )
-
-        # elif not isinstance(tree_item, queue_item.DataCollectionGroupQueueItem):
-        #     self.setDisabled(True)
-
-
 
     def init_models(self):
         CreateTaskBase.init_models(self)
@@ -366,9 +359,12 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         else:
             # Coulds be native_... phasing_... etc.
 
-            wf.set_space_group(
-                self._gphl_acq_param_widget.get_parameter_value("space_group")
+            space_group = self._gphl_acq_param_widget.get_parameter_value("space_group")
+            wf.set_space_group(space_group)
+            input_space_group = self._gphl_acq_param_widget.get_parameter_value(
+                "input_space_group"
             )
+            wf.set_input_space_group(input_space_group)
             use_for_indexing = False
             characterisation_strategy = (
                 api.gphl_workflow.getProperty("characterisation_strategies").split()[0]
@@ -388,7 +384,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                         "cell_alpha", "cell_beta", "cell_gamma",
                     )
                 )
-                if all(cell_params):
+                if space_group and all(cell_params):
                     use_for_indexing = (
                         self._gphl_acq_param_widget.get_parameter_value(
                             "use_for_indexing"
