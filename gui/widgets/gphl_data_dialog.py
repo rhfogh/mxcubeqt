@@ -268,7 +268,9 @@ class GphlDataDialog(QtImport.QDialog):
         # Complex box
         if self.cplx_widget:
             if isinstance(self.cplx_widget, SelectionTable):
-                self.itemSelectionChanged.disconnect(self.input_field_changed)
+                self.cplx_widget.itemSelectionChanged.disconnect(
+                    self.cplx_widget.input_field_changed
+                )
             self.cplx_widget.close()
         if cplx is None:
             self.cplx_gbox.hide()
