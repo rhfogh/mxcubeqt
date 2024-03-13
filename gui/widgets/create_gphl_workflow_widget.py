@@ -21,6 +21,8 @@
 from __future__ import division, absolute_import
 from __future__ import print_function, unicode_literals
 
+import os.path
+
 import api
 import logging
 
@@ -414,6 +416,25 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     "decay_limit"
                 )
                 wf.set_decay_limit(val)
+                val = self._gphl_acq_param_widget.get_parameter_value(
+                    "reference_reflection_file"
+                ) or None
+                if val:
+                    if not ":" in val:
+                        val = "file:" + val
+                    if val.startswith("file:"):
+                        fpath = val[5:]
+                        if not os.path.isabs(fpath):
+                            logging.getLogger("user_level_log").warning(
+                                "Reference file path is not absolute: %s "
+                                % fpath
+                            )
+                        elif not os.path.isfile(fpath):
+                            logging.getLogger("user_level_log").warning(
+                                "Reference file path not found on this computer: %s "
+                                % fpath
+                            )
+                wf.set_reference_reflection_file(val)
         beam_energy_tags = wf_parameters.get("beam_energy_tags")
         if beam_energy_tags:
             wf.set_beam_energy_tags(beam_energy_tags)

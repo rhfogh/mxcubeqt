@@ -220,6 +220,12 @@ class DataModelInputBinder(object):
                     validator.bottom(),
                     validator.top(),
                 )
+            elif isinstance(validator, QtImport.QRegExpValidator):
+                tooltip = "%s regular Expression: %s" % (
+                    field_name.replace("_", " ").capitalize(),
+                    str(validator.regExp().pattern()),
+                )
+
             else:
                 tooltip = "%s limits %d : %d" % (
                     field_name.replace("_", " ").capitalize(),
