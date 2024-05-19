@@ -183,12 +183,12 @@ class EsrfCameraCalibrationBrick(BaseWidget):
 
         if property_name == "vertical motor":
             self.v_motor_hwobj = self.get_hardware_object(new_value)
-            name = self.v_motor_hwobj.name()
+            name = self.v_motor_hwobj.name
             self.ui_widgets_manager.delta_z_label.setText(f"Delta on {name}:")
             
         if property_name == "horizontal motor":
             self.h_motor_hwobj = self.get_hardware_object(new_value)
-            name = self.h_motor_hwobj.name()
+            name = self.h_motor_hwobj.name
             self.ui_widgets_manager.delta_y_label.setText(f"Delta on {name}:")
             
         else:

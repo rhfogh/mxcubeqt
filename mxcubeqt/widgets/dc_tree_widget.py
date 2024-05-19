@@ -1704,8 +1704,9 @@ class DataCollectTree(qt_import.QWidget):
         pass
 
     def save_history_in_file(self):
-        filename = os.path.join(self.tree_brick.user_file_directory,
-                                "queue_history.dat")
+        # filename = os.path.join(self.tree_brick.user_file_directory,
+        #                         "queue_history.dat")
+        filename = "queue_history.dat"
         save_file = None
         try:
             save_file = open(filename, 'w')
@@ -1720,8 +1721,9 @@ class DataCollectTree(qt_import.QWidget):
                 save_file.close()
 
     def load_history_queue_from_file(self):
-        filename = os.path.join(self.tree_brick.user_file_directory,
-                                "queue_history.dat")
+        # filename = os.path.join(self.tree_brick.user_file_directory,
+        #                         "queue_history.dat")
+        filename = "queue_history.dat"
 
         load_file = None
         try:
