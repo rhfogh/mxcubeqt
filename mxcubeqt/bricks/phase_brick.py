@@ -74,27 +74,27 @@ class PhaseBrick(BaseWidget):
         self.init_phase_list()
 
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.config.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseStateChanged", self.phase_state_changed
+            HWR.beamline.config.diffractometer, "minidiffPhaseStateChanged", self.phase_state_changed
         )
         self.phase_changed()
 
 
     def init_phase_list(self):
         self.phase_combobox.clear()
-        phase_list = HWR.beamline.diffractometer.get_phase_list()
+        phase_list = HWR.beamline.config.diffractometer.get_phase_list()
         if len(phase_list) > 0:
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
             self.setEnabled(True)
-            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(HWR.beamline.diffractometer.current_phase))
+            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(HWR.beamline.config.diffractometer.current_phase))
         else:
             self.setEnabled(False)
 
     def change_phase(self):
-        if HWR.beamline.diffractometer is not None:
+        if HWR.beamline.config.diffractometer is not None:
             requested_phase = self.phase_combobox.currentText()
             if self["confirmPhaseChange"] and requested_phase == "BeamLocation":
                 conf_msg = "Please remove any objects that might cause collision!\n" + \
@@ -109,16 +109,16 @@ class PhaseBrick(BaseWidget):
                    )
                    == qt_import.QMessageBox.Ok
                 ):
-                   HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
+                   HWR.beamline.config.diffractometer.set_phase(requested_phase, timeout=None)
             else:
-                HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
+                HWR.beamline.config.diffractometer.set_phase(requested_phase, timeout=None)
 
     def phase_changed(self, phase=None):
         if phase is None:
             try:
                 # NB get_phase is only defined in P11-specific code, so this is no good.
                 # What should be here??
-                phase = HWR.beamline.diffractometer.get_phase()
+                phase = HWR.beamline.config.diffractometer.get_phase()
             except AttributeError:
                 return
 

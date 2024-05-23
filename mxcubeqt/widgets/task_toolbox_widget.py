@@ -71,7 +71,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         self.helical_page = CreateHelicalWidget(self.tool_box, "helical_page")
         self.energy_scan_page = CreateEnergyScanWidget(self.tool_box, "energy_scan")
         self.xrf_spectrum_page = CreateXRFSpectrumWidget(self.tool_box, "xrf_spectrum")
-        if HWR.beamline.gphl_workflow is not None:
+        if HWR.beamline.config.gphl_workflow is not None:
             self.gphl_workflow_page = CreateGphlWorkflowWidget(
                 self.tool_box, "gphl_workflow"
             )
@@ -143,25 +143,25 @@ class TaskToolBoxWidget(qt_import.QWidget):
             )
 
         # Other ---------------------------------------------------------------
-        in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
+        in_plate_mode = HWR.beamline.config.diffractometer.in_plate_mode()
 
         if (
-            HWR.beamline.energy_scan is None
+            HWR.beamline.config.energy_scan is None
             or in_plate_mode
-            or not HWR.beamline.tunable_wavelength
+            or not HWR.beamline.config.tunable_wavelength
         ):
             self.hide_task(self.energy_scan_page)
             logging.getLogger("HWR").info("Energy scan task not available")
 
-        if HWR.beamline.xrf_spectrum is None or in_plate_mode:
+        if HWR.beamline.config.xrf_spectrum is None or in_plate_mode:
             self.hide_task(self.xrf_spectrum_page)
             logging.getLogger("HWR").info("XRF spectrum task not available")
 
-        if not HWR.beamline.imaging or in_plate_mode:
+        if not HWR.beamline.config.imaging or in_plate_mode:
             self.hide_task(self.xray_imaging_page)
             logging.getLogger("HWR").info("Xray Imaging task not available")
 
-        if HWR.beamline.gphl_connection and HWR.beamline.gphl_workflow:
+        if HWR.beamline.config.gphl_connection and HWR.beamline.config.gphl_workflow:
             self.gphl_workflow_page.initialise_workflows()
         else:
             logging.getLogger("HWR").info("GΦL workflow task not available")
@@ -253,7 +253,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
 
                 new_pt.directory = previous_pt.directory
                 new_pt.base_prefix = previous_pt.base_prefix
-                new_pt.run_number = HWR.beamline.queue_model.get_next_run_number(
+                new_pt.run_number = HWR.beamline.config.queue_model.get_next_run_number(
                     new_pt
                 )
                 self.create_task_button.setEnabled(True)
@@ -364,7 +364,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
                 )
             else:
                 for item in items:
-                    shapes = HWR.beamline.sample_view.get_selected_points()
+                    shapes = HWR.beamline.config.sample_view.get_selected_points()
                     task_model = item.get_model()
                     # TODO Consider if GPhL workflow needs task-per-shape
                     # like xrf does
@@ -423,7 +423,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
         num = task_model.get_next_number_for_name(group_name)
         group_task_node.set_number(num)
 
-        HWR.beamline.queue_model.add_child(task_model, group_task_node)
+        HWR.beamline.config.queue_model.add_child(task_model, group_task_node)
 
         return group_task_node
 
@@ -435,12 +435,12 @@ class TaskToolBoxWidget(qt_import.QWidget):
             task_list = self.tool_box.currentWidget().create_task(sample, shape, comment)
 
             for child_task_node in task_list:
-                HWR.beamline.queue_model.add_child(task_node, child_task_node)
+                HWR.beamline.config.queue_model.add_child(task_node, child_task_node)
         # The selected item is a task, make a copy.
         else:
-            new_node = HWR.beamline.queue_model.copy_node(task_node)
+            new_node = HWR.beamline.config.queue_model.copy_node(task_node)
             new_snapshot = (
-                HWR.beamline.sample_view.get_snapshot()
+                HWR.beamline.config.sample_view.get_snapshot()
             )
 
             if isinstance(task_node, queue_model_objects.Characterisation):
@@ -457,7 +457,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             ):
                 new_node.centred_position.snapshot_image = new_snapshot
 
-            HWR.beamline.queue_model.add_child(
+            HWR.beamline.config.queue_model.add_child(
                 task_node.get_parent(), new_node
             )
 

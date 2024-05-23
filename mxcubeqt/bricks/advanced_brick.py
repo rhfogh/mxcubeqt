@@ -66,24 +66,24 @@ class AdvancedBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
 
         # Other ---------------------------------------------------------------
-        self.connect(HWR.beamline.sample_view,
+        self.connect(HWR.beamline.config.sample_view,
                      "gridClicked",
                      self.grid_clicked
         )
 
     def populate_advanced_widget(self, item):
         self.mesh_parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+            HWR.beamline.config.session.get_base_image_directory()
         )
         self.mesh_parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+            HWR.beamline.config.session.get_base_process_directory()
         )
 
         self.line_parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+            HWR.beamline.config.session.get_base_image_directory()
         )
         self.line_parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+            HWR.beamline.config.session.get_base_process_directory()
         )
 
         if isinstance(item, queue_item.XrayCenteringQueueItem):
@@ -110,8 +110,8 @@ class AdvancedBrick(BaseWidget):
         if self._data_collection is not None:
             image_path = self._data_collection.acquisitions[0].path_template.get_image_path() % image_num
             # try:
-            #     HWR.beamline.image_tracking.load_image(image_path)
+            #     HWR.beamline.config.image_tracking.load_image(image_path)
             # except AttributeError:
             #     pass
             if hasattr(HWR.beamline, "image_tracking"):
-                HWR.beamline.image_tracking.load_image(image_path)
+                HWR.beamline.config.image_tracking.load_image(image_path)

@@ -132,22 +132,22 @@ class EsrfCameraBeamBrick(BaseWidget):
 
         # Other hardware object connections --------------------------
 
-        # Wanted to connect directly HWR.beamline.sample_view signal to
+        # Wanted to connect directly HWR.beamline.config.sample_view signal to
         # self.multipos_hwobj but sample_view is not created by the time
         # self.multipos_hwobj.init() is executed : create a pass by way
         # not very elegant...
 
-        # if HWR.beamline.sample_view is not None:
-        #     self.connect(HWR.beamline.sample_view,
+        # if HWR.beamline.config.sample_view is not None:
+        #     self.connect(HWR.beamline.config.sample_view,
         #                 "beam_position_data_changed",
         #                 self.beam_position_data_changed
         #     )
         # else:
-        #     logging.getLogger("HWR").warning("CameraBeamBrick : HWR.beamline.sample_view NONE")
+        #     logging.getLogger("HWR").warning("CameraBeamBrick : HWR.beamline.config.sample_view NONE")
 
     # def beam_position_data_changed(self, new_beam_data):
     #     """
-    #     auxiliar function to link HWR.beamline.sample_view to multipos_hwobj
+    #     auxiliar function to link HWR.beamline.config.sample_view to multipos_hwobj
     #     """        
     #     self.multipos_hwobj.beam_position_data_changed(new_beam_data)
 

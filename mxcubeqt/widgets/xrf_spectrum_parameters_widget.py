@@ -113,8 +113,8 @@ class XRFSpectrumParametersWidget(qt_import.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if HWR.beamline.xrf_spectrum is not None:
-            HWR.beamline.xrf_spectrum.connect(
+        if HWR.beamline.config.xrf_spectrum is not None:
+            HWR.beamline.config.xrf_spectrum.connect(
                 "xrfSpectrumFinished", self.spectrum_finished
             )
 

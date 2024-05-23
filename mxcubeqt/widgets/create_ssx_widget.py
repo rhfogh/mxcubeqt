@@ -106,7 +106,7 @@ class CreateSsxWidget(CreateTaskBase):
 
         # Other ---------------------------------------------------------------
         self._processing_widget.processing_widget.run_online_processing_cbox.setChecked(
-            HWR.beamline.run_online_processing
+            HWR.beamline.config.run_online_processing
         )
 
         #Rename to self._processing_widget.layout
@@ -139,7 +139,7 @@ class CreateSsxWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = HWR.beamline.detector.has_shutterless()
+        has_shutter_less = HWR.beamline.config.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
         self._acquisition_parameters = (
@@ -196,7 +196,7 @@ class CreateSsxWidget(CreateTaskBase):
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
                 if len(dc_model.acquisitions) == 1:
-                    HWR.beamline.sample_view.select_shape_with_cpos(
+                    HWR.beamline.config.sample_view.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
@@ -217,7 +217,7 @@ class CreateSsxWidget(CreateTaskBase):
         tasks = []
 
         cpos = queue_model_objects.CentredPosition()
-        cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
+        cpos.snapshot_image = HWR.beamline.config.sample_view.get_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos, comments=comments))
         self._path_template.run_number += 1

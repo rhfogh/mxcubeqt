@@ -75,7 +75,7 @@ class ImageTrackingWidget(qt_import.QWidget):
         self.setEnabled(False)
 
         # NB will be None if not configured
-        self.image_tracking_hwobj = HWR.beamline.image_tracking
+        self.image_tracking_hwobj = HWR.beamline.config.image_tracking
 
     def previous_button_clicked(self):
         value = self.image_tracking_widget_layout.image_num_spinbox.value() - 1

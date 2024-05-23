@@ -91,12 +91,12 @@ class EnergyScanParametersWidget(qt_import.QWidget):
         # Other ---------------------------------------------------------------
         self.data_path_widget.data_path_layout.compression_cbox.setVisible(False)
 
-        if HWR.beamline.energy_scan is not None:
-            HWR.beamline.energy_scan.connect(
+        if HWR.beamline.config.energy_scan is not None:
+            HWR.beamline.config.energy_scan.connect(
                 "energyScanStarted", self.energy_scan_started
             )
-            HWR.beamline.energy_scan.connect("scanNewPoint", self.energy_scan_new_point)
-            HWR.beamline.energy_scan.connect("choochFinished", self.chooch_finished)
+            HWR.beamline.config.energy_scan.connect("scanNewPoint", self.energy_scan_new_point)
+            HWR.beamline.config.energy_scan.connect("choochFinished", self.chooch_finished)
 
         self.scan_online_plot_widget.one_dim_plot.setLabel('left', "Counts")
         self.scan_online_plot_widget.one_dim_plot.setLabel('bottom', "Energy", "keV")

@@ -116,9 +116,9 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
         self.acq_widget_layout.detector_roi_mode_label.setEnabled(False)
         self.acq_widget_layout.detector_roi_mode_combo.setEnabled(False)
 
-        self.set_tunable_energy(HWR.beamline.tunable_wavelength)
+        self.set_tunable_energy(HWR.beamline.config.tunable_wavelength)
 
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.config.diffractometer.in_plate_mode():
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
@@ -146,7 +146,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.acq_widget_layout.kappa_phi_ledit.setText(str(new_value))
 
     def use_kappa(self, state):
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.config.diffractometer.in_plate_mode():
             state = False
         self.acq_widget_layout.kappa_label.setEnabled(state)
         self.acq_widget_layout.kappa_ledit.setEnabled(state)
@@ -197,7 +197,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
         pass
 
     def init_limits(self):
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = HWR.beamline.config.acquisition_limit_values
 
         tpl = limits_dict.get("osc_range")
         if tpl:
@@ -267,7 +267,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.resolution_validator,
         )
 
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.config.diffractometer.in_plate_mode():
             self.acq_widget_layout.num_images_cbox.clear()
             self.acq_widget_layout.num_images_cbox.addItem("1")
             self.acq_widget_layout.num_images_cbox.setCurrentIndex(0)
@@ -328,7 +328,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
             self.acq_widget_layout.energy_ledit.setText("%.4f" % float(energy))
 
     def init_detector_roi_modes(self):
-        roi_modes = HWR.beamline.detector.get_roi_modes()
+        roi_modes = HWR.beamline.config.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -341,9 +341,9 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
     def update_exp_time_limits(self):
         try:
             exp_time_limits = (
-                HWR.beamline.detector.get_exposure_time_limits()
+                HWR.beamline.config.detector.get_exposure_time_limits()
             )
-            max_osc_speed = HWR.beamline.diffractometer.get_osc_max_speed()
+            max_osc_speed = HWR.beamline.config.diffractometer.get_osc_max_speed()
             top_limit = (
                 float(self.acq_widget_layout.osc_range_ledit.text()) / max_osc_speed
             )
@@ -365,7 +365,7 @@ class AcquisitionWidgetSimple(qt_import.QWidget):
         pass
 
     def detector_roi_mode_changed(self, roi_mode_index):
-        HWR.beamline.detector.set_roi_mode(roi_mode_index)
+        HWR.beamline.config.detector.set_roi_mode(roi_mode_index)
 
     def update_data_model(self, acquisition_parameters, path_template):
         self._acquisition_parameters = acquisition_parameters

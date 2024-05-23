@@ -182,11 +182,11 @@ class SsxControlBrick(BaseWidget):
 
     def update_chip_config(self):
         self.current_chip_config = (
-            HWR.beamline.online_processing.ssx_setup.get_current_chip_config()
+            HWR.beamline.config.online_processing.ssx_setup.get_current_chip_config()
         )
         self.ssx_widget_layout.chip_template_list.blockSignals(True)
-        self.ssx_widget_layout.chip_template_list.addItems(HWR.beamline.online_processing.ssx_setup.get_chip_config_str_list())
-        self.ssx_widget_layout.chip_template_list.setCurrentRow(HWR.beamline.online_processing.ssx_setup.get_current_chip_index())
+        self.ssx_widget_layout.chip_template_list.addItems(HWR.beamline.config.online_processing.ssx_setup.get_chip_config_str_list())
+        self.ssx_widget_layout.chip_template_list.setCurrentRow(HWR.beamline.config.online_processing.ssx_setup.get_current_chip_index())
         self.ssx_widget_layout.chip_template_list.blockSignals(False)
 
         self.ssx_widget_layout.crystal_h_pitch_spinbox.blockSignals(True)

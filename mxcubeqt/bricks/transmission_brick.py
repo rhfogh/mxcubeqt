@@ -75,12 +75,12 @@ class TransmissionBrick(BaseWidget):
         self.new_value_ledit.setToolTip("Transmission limits 0 : 100 %")
         self.instance_synchronize("transmission_ledit", "new_value_ledit")
 
-        if HWR.beamline.transmission is not None:
+        if HWR.beamline.config.transmission is not None:
             # Qt signal/slot connections ------------------------------------------
             self.new_value_ledit.returnPressed.connect(self.current_value_changed)
             self.new_value_ledit.textChanged.connect(self.input_field_changed)
-            self.connect(HWR.beamline.transmission, "stateChanged", self._state_changed)
-            self.connect(HWR.beamline.transmission, "valueChanged", self._value_changed)
+            self.connect(HWR.beamline.config.transmission, "stateChanged", self._state_changed)
+            self.connect(HWR.beamline.config.transmission, "valueChanged", self._value_changed)
             self.connected()
         else:
             self.disconnected()
@@ -102,13 +102,13 @@ class TransmissionBrick(BaseWidget):
         """Sets new transmission value"""
         text = self.new_value_ledit.text()
         if self.validator.validate(text, 0)[0] == qt_import.QValidator.Acceptable:
-            HWR.beamline.transmission.set_value(float(text))
+            HWR.beamline.config.transmission.set_value(float(text))
             self.new_value_ledit.setText("")
             self._update_ledit_color(colors.LINE_EDIT_ACTIVE)
 
     def _state_changed(self, state):
         """Updates new value QLineEdit based on the state"""
-        if HWR.beamline.transmission.is_ready():
+        if HWR.beamline.config.transmission.is_ready():
             self.connected()
         else:
             self.disconnected()

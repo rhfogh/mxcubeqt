@@ -116,27 +116,27 @@ class ApertureBrick(BaseWidget):
 
         self.init_aperture()
         self.connect(
-                HWR.beamline.beam.aperture, "diameterIndexChanged", self.diameter_changed
+                HWR.beamline.config.beam.aperture, "diameterIndexChanged", self.diameter_changed
         )
         self.connect(
-                HWR.beamline.beam.aperture, "valueChanged", self.position_changed
+                HWR.beamline.config.beam.aperture, "valueChanged", self.position_changed
         )
 
     def change_diameter(self):
-        HWR.beamline.beam.aperture.set_diameter_index(
+        HWR.beamline.config.beam.aperture.set_diameter_index(
             self.aperture_diameter_combo.currentIndex()
         )
 
     def change_position(self):
-        HWR.beamline.beam.aperture.set_position(self.aperture_position_combo.currentIndex())
+        HWR.beamline.config.beam.aperture.set_position(self.aperture_position_combo.currentIndex())
 
     def init_aperture(self):
-        aperture_size_list = HWR.beamline.beam.aperture.get_diameter_size_list()
+        aperture_size_list = HWR.beamline.config.beam.aperture.get_diameter_size_list()
         self.aperture_diameter_combo.clear()
         for aperture_size in aperture_size_list:
             self.aperture_diameter_combo.addItem("%d%s" % (aperture_size, unichr(956)))
 
-        aperture_position_list = HWR.beamline.beam.aperture.get_position_list()
+        aperture_position_list = HWR.beamline.config.beam.aperture.get_position_list()
         self.aperture_position_combo.clear()
         for aperture_position in aperture_position_list:
             self.aperture_position_combo.addItem(aperture_position)

@@ -65,10 +65,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             layout="vertical",
         )
         self._data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+            HWR.beamline.config.session.get_base_image_directory()
         )
         self._data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+            HWR.beamline.config.session.get_base_process_directory()
         )
         data_path_layout = self._data_path_widget.data_path_layout
         data_path_layout.run_number_ledit.setReadOnly(True)
@@ -98,7 +98,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
 
     def initialise_workflows(self):
 
-        workflow_hwobj = HWR.beamline.gphl_workflow
+        workflow_hwobj = HWR.beamline.config.gphl_workflow
         if workflow_hwobj is not None:
             workflow_names = list(workflow_hwobj.workflow_strategies)
             self._initialize_graphics()
@@ -117,10 +117,10 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         # values read from the beamline setup
         if self._data_path_widget:
             self._data_path_widget.set_base_image_directory(
-                HWR.beamline.session.get_base_image_directory()
+                HWR.beamline.config.session.get_base_image_directory()
             )
             self._data_path_widget.set_base_process_directory(
-                HWR.beamline.session.get_base_process_directory()
+                HWR.beamline.config.session.get_base_process_directory()
             )
 
         (data_directory, proc_directory) = self.get_default_directory()
@@ -128,7 +128,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self._path_template.directory = data_directory
         self._path_template.process_directory = proc_directory
         self._path_template.base_prefix = self.get_default_prefix()
-        self._path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
+        self._path_template.run_number = HWR.beamline.config.queue_model.get_next_run_number(
             self._path_template
         )
 
@@ -172,11 +172,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             self._data_path_widget.update_data_model(self._path_template)
 
         elif isinstance(tree_item, queue_item.SampleQueueItem):
-            if not model.has_lims_data() and not HWR.beamline.session.get_group_name():
+            if not model.has_lims_data() and not HWR.beamline.config.session.get_group_name():
                 # When no prefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
                 self._path_template.base_prefix = (
-                    model.get_name() or HWR.beamline.session.get_proposal()
+                    model.get_name() or HWR.beamline.config.session.get_proposal()
                 )
                 self._data_path_widget.update_data_model(self._path_template)
 
@@ -207,7 +207,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         path_template = self._create_path_template(sample, self._path_template)
         path_template.num_files = 0
 
-        workflow_hwobj = HWR.beamline.gphl_workflow
+        workflow_hwobj = HWR.beamline.config.gphl_workflow
         if workflow_hwobj.get_state() == workflow_hwobj.STATES.OFF:
             # We will be setting up the connection now - time to connect to quit
             qt_import.QApplication.instance().aboutToQuit.connect(

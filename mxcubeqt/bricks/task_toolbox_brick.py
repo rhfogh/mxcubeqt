@@ -78,13 +78,13 @@ class TaskToolboxBrick(BaseWidget):
         #                   qt_import.QSizePolicy.MinimumExpanding)
 
         # Other ---------------------------------------------------------------
-        HWR.beamline.sample_view.connect("pointSelected", self.point_selected)
+        HWR.beamline.config.sample_view.connect("pointSelected", self.point_selected)
 
     def set_expert_mode(self, expert):
         self.task_tool_box_widget.set_expert_mode(expert)
 
     def run(self):
-        if HWR.beamline.session.session_id:
+        if HWR.beamline.config.session.session_id:
             self.setEnabled(True)
 
         #self.task_tool_box_widget.set_available_tasks(self["availableTasks"])
@@ -92,10 +92,10 @@ class TaskToolboxBrick(BaseWidget):
         self.task_tool_box_widget.adjust_width(self.width())
         
     def user_group_saved(self, new_user_group):
-        HWR.beamline.session.set_user_group(str(new_user_group))
+        HWR.beamline.config.session.set_user_group(str(new_user_group))
         self.task_tool_box_widget.update_data_path_model()
         path = (
-            HWR.beamline.session.get_base_image_directory()
+            HWR.beamline.config.session.get_base_image_directory()
             + "/"
             + str(new_user_group)
         )
@@ -140,8 +140,8 @@ class TaskToolboxBrick(BaseWidget):
 
         self.ispyb_logged_in = logged_in
 
-        if HWR.beamline.session is not None:
-            HWR.beamline.session.set_user_group("")
+        if HWR.beamline.config.session is not None:
+            HWR.beamline.config.session.set_user_group("")
 
         self.setEnabled(logged_in)
         self.task_tool_box_widget.ispyb_logged_in(logged_in)

@@ -44,9 +44,9 @@ class EnergyScanParametersBrick(BaseWidget):
 
     def populate_parameter_widget(self, item):
         self.energy_scan_widget.data_path_widget.set_base_image_directory(
-            HWR.beamline.session.get_base_image_directory()
+            HWR.beamline.config.session.get_base_image_directory()
         )
         self.energy_scan_widget.data_path_widget.set_base_process_directory(
-            HWR.beamline.session.get_base_process_directory()
+            HWR.beamline.config.session.get_base_process_directory()
         )
         self.energy_scan_widget.populate_widget(item)

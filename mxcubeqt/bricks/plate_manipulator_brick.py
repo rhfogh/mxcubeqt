@@ -80,17 +80,17 @@ class PlateManipulatorBrick(BaseWidget):
         self.xtal_image_graphics_pixmap = qt_import.QGraphicsPixmapItem()
         self.xtal_image_graphicsscene.addItem(self.xtal_image_graphics_pixmap)
 
-        if HWR.beamline.plate_manipulator is not None:
-            self.connect(HWR.beamline.plate_manipulator,
+        if HWR.beamline.config.plate_manipulator is not None:
+            self.connect(HWR.beamline.config.plate_manipulator,
                          SampleChanger.INFO_CHANGED_EVENT,
                          self.plate_navigator_widget.refresh_plate_location,
             )
 
 
     def search_button_clicked(self):
-        if HWR.beamline.plate_manipulator is not None:
-            # processing_plan = HWR.beamline.plate_manipulator.
-            self.plate_content = HWR.beamline.plate_manipulator.sync_with_crims(
+        if HWR.beamline.config.plate_manipulator is not None:
+            # processing_plan = HWR.beamline.config.plate_manipulator.
+            self.plate_content = HWR.beamline.config.plate_manipulator.sync_with_crims(
                 self.plate_widget.barcode_ledit.text()
             )
             if self.plate_content:
@@ -107,12 +107,12 @@ class PlateManipulatorBrick(BaseWidget):
     def move_to_xtal_clicked(self):
         xtal_item = self.xtal_map.get(self.plate_widget.xtal_treewidget.currentItem())
         if xtal_item:
-            HWR.beamline.plate_manipulator.load(xtal_item),
+            HWR.beamline.config.plate_manipulator.load(xtal_item),
             #     self.plate_widget.child('reposition_cbox').isChecked())
 
     def abort_clicked(self):
-        if HWR.beamline.plate_manipulator:
-            HWR.beamline.plate_manipulator.abort()
+        if HWR.beamline.config.plate_manipulator:
+            HWR.beamline.config.plate_manipulator.abort()
 
     def xtal_treewidget_current_item_changed(self, current_item):
         xtal_item = self.xtal_map.get(current_item)

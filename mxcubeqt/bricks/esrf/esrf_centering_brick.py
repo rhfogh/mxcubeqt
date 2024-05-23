@@ -178,13 +178,13 @@ class EsrfCenteringBrick(BaseWidget):
 
         self.plot_data_X = []
         self.plot_data_Y = []
-        self.connect(HWR.beamline.sample_view, "centringStarted", self.centring_started)
-        self.connect(HWR.beamline.sample_view, "centringFailed", self.centring_failed)
+        self.connect(HWR.beamline.config.sample_view, "centringStarted", self.centring_started)
+        self.connect(HWR.beamline.config.sample_view, "centringFailed", self.centring_failed)
         self.connect(
-            HWR.beamline.sample_view, "centringSuccessful", self.centring_successful
+            HWR.beamline.config.sample_view, "centringSuccessful", self.centring_successful
         )
-        self.connect(HWR.beamline.diffractometer, "centring_image_clicked", self.image_clicked)
-        self.connect(HWR.beamline.diffractometer, "centring_calculation_ended", self.show_centring_paremeters)
+        self.connect(HWR.beamline.config.diffractometer, "centring_image_clicked", self.image_clicked)
+        self.connect(HWR.beamline.config.diffractometer, "centring_calculation_ended", self.show_centring_paremeters)
 
         self.change_point_number(self.points_for_aligment)
 
@@ -259,8 +259,8 @@ class EsrfCenteringBrick(BaseWidget):
         offset = parameter_dict['offset']
         d_horizontal = parameter_dict['d_horizontal']
         phi_positions = parameter_dict['phi_positions']
-        image_width_pix = HWR.beamline.sample_view.get_image_size()[0]
-        beam_position_x = HWR.beamline.beam.get_beam_position_on_screen()[0]
+        image_width_pix = HWR.beamline.config.sample_view.get_image_size()[0]
+        beam_position_x = HWR.beamline.config.beam.get_beam_position_on_screen()[0]
         pixels_per_mm_hor = parameter_dict['pixelsPerMm_Hor']
         
         
@@ -314,7 +314,7 @@ class EsrfCenteringBrick(BaseWidget):
         """
         Launch aligment process
         """
-        HWR.beamline.sample_view.start_centring(tree_click=True)
+        HWR.beamline.config.sample_view.start_centring(tree_click=True)
     def cancel_centring(self):
         """
         Cancel aligment process
@@ -322,7 +322,7 @@ class EsrfCenteringBrick(BaseWidget):
         self.plot_data_X.clear()
         self.plot_data_Y.clear()
         self.figure.clear()
-        HWR.beamline.sample_view.reject_centring()
+        HWR.beamline.config.sample_view.reject_centring()
 
     def change_point_number(self, new_int_value):
         """
@@ -340,8 +340,8 @@ class EsrfCenteringBrick(BaseWidget):
             table.setItem(row, 1, qt_import.QTableWidgetItem(""))
             table.setItem(row, 2, qt_import.QTableWidgetItem(""))
         
-        if HWR.beamline.diffractometer is not None:
-            HWR.beamline.diffractometer.set_centring_parameters(
+        if HWR.beamline.config.diffractometer is not None:
+            HWR.beamline.config.diffractometer.set_centring_parameters(
                 self.points_for_aligment,
                 self.delta_phi
             )
@@ -359,8 +359,8 @@ class EsrfCenteringBrick(BaseWidget):
             )
         
         self.points_for_aligment = self.ui_widgets_manager.number_points_spinbox.value()
-        if HWR.beamline.diffractometer is not None:
-            HWR.beamline.diffractometer.set_centring_parameters(
+        if HWR.beamline.config.diffractometer is not None:
+            HWR.beamline.config.diffractometer.set_centring_parameters(
                 self.points_for_aligment,
                 self.delta_phi
             )

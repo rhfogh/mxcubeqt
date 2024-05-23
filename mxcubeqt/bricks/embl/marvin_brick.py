@@ -162,22 +162,22 @@ class MarvinBrick(BaseWidget):
         )
         self.init_tables()
         self.connect(
-            HWR.beamline.sample_changer,
+            HWR.beamline.config.sample_changer,
             "statusListChanged",
             self.status_list_changed
         )
         self.connect(
-            HWR.beamline.sample_changer, "infoDictChanged", self.info_dict_changed
+            HWR.beamline.config.sample_changer, "infoDictChanged", self.info_dict_changed
         )
 
-        HWR.beamline.sample_changer.re_emit_values()
+        HWR.beamline.config.sample_changer.re_emit_values()
 
     def init_tables(self):
         """
         Inits table with status info
         :return:
         """
-        self.status_str_desc = HWR.beamline.sample_changer.get_status_str_desc()
+        self.status_str_desc = HWR.beamline.config.sample_changer.get_status_str_desc()
         self.index_dict = {}
         self.status_table.setRowCount(len(self.status_str_desc))
         for row, key in enumerate(self.status_str_desc.keys()):
@@ -273,32 +273,32 @@ def open_lid_clicked():
     Opens SC lid
     :return:
     """
-    HWR.beamline.sample_changer.open_lid()
+    HWR.beamline.config.sample_changer.open_lid()
 
 def close_lid_clicked():
     """
     Closes SC lid
     :return:
     """
-    HWR.beamline.sample_changer.close_lid()
+    HWR.beamline.config.sample_changer.close_lid()
 
 def base_to_center_clicked():
     """
     Calls base-to-center function
     :return:
     """
-    HWR.beamline.sample_changer.base_to_center()
+    HWR.beamline.config.sample_changer.base_to_center()
 
 def center_to_base_clicked():
     """
     Calls center-to-base function
     :return:
     """
-    HWR.beamline.sample_changer.center_to_base()
+    HWR.beamline.config.sample_changer.center_to_base()
 
 def dry_gripper_clicked():
     """
     Calls dry-gripper function
     :return:
     """
-    HWR.beamline.sample_changer.dry_gripper()
+    HWR.beamline.config.sample_changer.dry_gripper()

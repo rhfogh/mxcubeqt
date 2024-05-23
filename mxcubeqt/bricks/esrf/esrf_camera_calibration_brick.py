@@ -144,7 +144,7 @@ class EsrfCameraCalibrationBrick(BaseWidget):
 
         # Other hardware object connections --------------------------
         self.connect(
-            HWR.beamline.diffractometer,
+            HWR.beamline.config.diffractometer,
             "new_calibration_done",
             self.diffractometer_manual_calibration_done,
         )
@@ -299,7 +299,7 @@ class EsrfCameraCalibrationBrick(BaseWidget):
         """
         Cancel current calibration
         """
-        HWR.beamline.diffractometer.cancel_manual_calibration()
+        HWR.beamline.config.diffractometer.cancel_manual_calibration()
 
     def start_new_calibration(self):
         """
@@ -309,15 +309,15 @@ class EsrfCameraCalibrationBrick(BaseWidget):
         hor_motor_delta = float(self.ui_widgets_manager.delta_y_textbox.text())
         ver_motor_delta = float(self.ui_widgets_manager.delta_z_textbox.text())
         
-        if HWR.beamline.sample_view is not None:
-            HWR.beamline.sample_view.start_calibration()
-            if HWR.beamline.diffractometer is not None:
-                HWR.beamline.diffractometer.set_calibration_parameters(
+        if HWR.beamline.config.sample_view is not None:
+            HWR.beamline.config.sample_view.start_calibration()
+            if HWR.beamline.config.diffractometer is not None:
+                HWR.beamline.config.diffractometer.set_calibration_parameters(
                     hor_motor_delta,
                     ver_motor_delta
                 )
         
-                HWR.beamline.diffractometer.start_manual_calibration()
+                HWR.beamline.config.diffractometer.start_manual_calibration()
 
     def diffractometer_manual_calibration_done(self, two_calibration_points):
         """
@@ -325,7 +325,7 @@ class EsrfCameraCalibrationBrick(BaseWidget):
         Update table, hightlight changes
         """
         
-        HWR.beamline.sample_view.stop_calibration()
+        HWR.beamline.config.sample_view.stop_calibration()
         
         delta_x_pixels = abs(two_calibration_points[0][0] - two_calibration_points[1][0])
         delta_y_pixels = abs(two_calibration_points[0][1] - two_calibration_points[1][1])

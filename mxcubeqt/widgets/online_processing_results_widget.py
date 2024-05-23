@@ -53,11 +53,11 @@ class OnlineProcessingResultsWidget(qt_import.QWidget):
 
         # Other ---------------------------------------------------------------
 
-        if HWR.beamline.online_processing is not None:
-            HWR.beamline.online_processing.connect(
+        if HWR.beamline.config.online_processing is not None:
+            HWR.beamline.config.online_processing.connect(
                "processingStarted", self.processing_started
             )
-            HWR.beamline.online_processing.connect(
+            HWR.beamline.config.online_processing.connect(
                "processingResultsUpdate", self.update_processing_results
             )
         else:

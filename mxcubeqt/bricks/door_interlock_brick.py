@@ -85,14 +85,14 @@ class DoorInterlockBrick(BaseWidget):
         self.unlock_door_button.setToolTip("Unlocks the doors")
 
         self.connect(
-            HWR.beamline.hutch_interlock,
+            HWR.beamline.config.hutch_interlock,
             "valueChanged",
             self.value_changed
         )
         
     def unlock_doors(self):
         self.unlock_door_button.setEnabled(False)
-        HWR.beamline.hutch_interlock.unlock()
+        HWR.beamline.config.hutch_interlock.unlock()
 
     def updateLabel(self, label):
         self.main_groupbox.setTitle(label)

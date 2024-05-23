@@ -140,7 +140,7 @@ class SoleilSampleControlBrick(SampleControlBrick):
         self.excenter_button.setEnabled(status)
         
     def realign_beam_clicked(self):
-        HWR.beamline.sample_view.realign_beam()
+        HWR.beamline.config.sample_view.realign_beam()
 
     def anneal_clicked(self):
         anneal_dialog = AnnealDialog(self, name='Anneal')
@@ -156,7 +156,7 @@ class SoleilSampleControlBrick(SampleControlBrick):
 
     def execute_anneal(self):
         logging.getLogger().info('execute_anneal time %s' % self.anneal_time)
-        HWR.beamline.sample_view.anneal(time=self.anneal_time)
+        HWR.beamline.config.sample_view.anneal(time=self.anneal_time)
         #os.system('anneal.py -t %f' % self.anneal_time)
 
     def excenter_clicked(self):
@@ -168,34 +168,34 @@ class SoleilSampleControlBrick(SampleControlBrick):
 
     def execute_excenter(self, scan_length, step):
         logging.getLogger().info('execute_excenter scan_length %.2f, step %.2f' % (scan_length, step))
-        HWR.beamline.sample_view.excenter(scan_length=scan_length, step=step)
+        HWR.beamline.config.sample_view.excenter(scan_length=scan_length, step=step)
         
     def refresh_camera_clicked():
-        HWR.beamline.sample_view.refresh_camera()
+        HWR.beamline.config.sample_view.refresh_camera()
 
     def visual_align_clicked(self):
-        HWR.beamline.sample_view.start_visual_align()
+        HWR.beamline.config.sample_view.start_visual_align()
 
     def select_all_clicked(self):
-        HWR.beamline.sample_view.select_all_points()
+        HWR.beamline.config.sample_view.select_all_points()
 
     def clear_all_clicked(self):
         """
         Clears all shapes (points, lines and meshes)
         """
-        HWR.beamline.sample_view.clear_all_shapes()
+        HWR.beamline.config.sample_view.clear_all_shapes()
 
     def auto_focus_clicked(self):
-        HWR.beamline.sample_view.auto_focus()
+        HWR.beamline.config.sample_view.auto_focus()
 
     def auto_center_clicked(self):
-        HWR.beamline.sample_view.start_auto_centring()
+        HWR.beamline.config.sample_view.start_auto_centring()
 
     def create_line_clicked(self):
-        HWR.beamline.sample_view.create_line()
+        HWR.beamline.config.sample_view.create_line()
 
     def draw_grid_clicked(self):
-        HWR.beamline.sample_view.create_grid()
+        HWR.beamline.config.sample_view.create_grid()
 
         
 class ExcenterDialog(qt_import.QDialog):

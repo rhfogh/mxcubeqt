@@ -133,15 +133,15 @@ class BeamPositionBrick(BaseWidget):
         self.measure_flux_button.setIcon(icons.load_icon("Sun"))
 
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.config.diffractometer, "minidiffPhaseChanged", self.phase_changed
         )
-        if HWR.beamline.beam.definer is not None:
+        if HWR.beamline.config.beam.definer is not None:
             self.connect(
-                    HWR.beamline.beam.definer,
+                    HWR.beamline.config.beam.definer,
                     "focusingModeChanged",
                     self.focus_mode_changed,
                     )
-            mode, beam_size = HWR.beamline.beam.definer.get_active_focus_mode()
+            mode, beam_size = HWR.beamline.config.beam.definer.get_active_focus_mode()
             self.focus_mode_changed(mode, beam_size)
 
         self.update_gui()
@@ -308,7 +308,7 @@ class BeamPositionBrick(BaseWidget):
         :param phase:
         :return:
         """
-        self.is_beam_location_phase = phase == HWR.beamline.diffractometer.PHASE_BEAM
+        self.is_beam_location_phase = phase == HWR.beamline.config.diffractometer.PHASE_BEAM
         self.update_gui()
 
     def measure_flux_clicked(self):
@@ -330,4 +330,4 @@ class BeamPositionBrick(BaseWidget):
             )
             == qt_import.QMessageBox.Ok
         ):
-            HWR.beamline.flux.measure_flux()
+            HWR.beamline.config.flux.measure_flux()

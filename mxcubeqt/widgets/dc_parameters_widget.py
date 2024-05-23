@@ -103,7 +103,7 @@ class DCParametersWidget(qt_import.QWidget):
         dc_tree_widget = self._tree_view_item.listView().parent().parent()
         dc_tree_widget.check_for_path_collisions()
         path_template = self._data_collection.acquisitions[0].path_template
-        HWR.beamline.queue_model.check_for_path_collisions(path_template)
+        HWR.beamline.config.queue_model.check_for_path_collisions(path_template)
 
     def mad_energy_selected(self, name, energy, state):
         path_template = self._data_collection.acquisitions[0].path_template
@@ -113,7 +113,7 @@ class DCParametersWidget(qt_import.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = HWR.beamline.queue_model.get_next_run_number(
+        run_number = HWR.beamline.config.queue_model.get_next_run_number(
             path_template
         )
 

@@ -118,7 +118,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
 
         self.distance_listwidget = self._xray_imaging_parameters_widget._parameters_widget.detector_distance_listwidget
 
-        HWR.beamline.detector.distance.connect(
+        HWR.beamline.config.detector.distance.connect(
             "valueChanged",
             self._xray_imaging_parameters_widget.set_detector_distance,
         )
@@ -148,7 +148,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
                 self._xray_imaging_parameters
             )
             self._xray_imaging_parameters_widget.set_detector_distance(
-                HWR.beamline.detector.distance.get_value()
+                HWR.beamline.config.detector.distance.get_value()
             )
             self.setDisabled(False)
             self._xray_imaging_parameters_widget.enable_distance_tools(True)
@@ -180,12 +180,12 @@ class CreateXrayImagingWidget(CreateTaskBase):
     # a collection. When a data collection group is selected.
     def _create_task(self, sample, shape, comments=None):
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
+            snapshot = HWR.beamline.config.sample_view.get_snapshot(shape=shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.config.sample_view.get_snapshot()
  
         detector_distance_list = []
         dc_list = []
@@ -210,7 +210,7 @@ class CreateXrayImagingWidget(CreateTaskBase):
             if do_it:
                 do_it = False
                 acq.path_template.run_number = \
-                    HWR.beamline.queue_model.get_next_run_number(
+                    HWR.beamline.config.queue_model.get_next_run_number(
                     acq.path_template)
                 acq.path_template.run_number = self._path_template.run_number 
 

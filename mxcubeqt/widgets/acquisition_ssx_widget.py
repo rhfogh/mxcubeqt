@@ -144,7 +144,7 @@ class AcquisitionSsxWidget(qt_import.QWidget):
             1, 9999999, self.acq_widget_layout.hare_num_ledit
         )
 
-        limits_dict = HWR.beamline.acquisition_limit_values
+        limits_dict = HWR.beamline.config.acquisition_limit_values
 
         tpl = limits_dict.get("exposure_time")
         if tpl:
@@ -387,7 +387,7 @@ class AcquisitionSsxWidget(qt_import.QWidget):
         Initiates detetor ROI modes. Available modes are added to the combobox
         :return: None
         """
-        roi_modes = HWR.beamline.detector.get_roi_modes()
+        roi_modes = HWR.beamline.config.detector.get_roi_modes()
         if (
             len(roi_modes) > 0
             and self.acq_widget_layout.detector_roi_mode_combo.count() == 0
@@ -421,7 +421,7 @@ class AcquisitionSsxWidget(qt_import.QWidget):
         :param roi_mode_index: int
         :return:
         """
-        HWR.beamline.detector.set_roi_mode(roi_mode_index)
+        HWR.beamline.config.detector.set_roi_mode(roi_mode_index)
 
     def update_osc_range_per_frame_limits(self):
         """
@@ -432,7 +432,7 @@ class AcquisitionSsxWidget(qt_import.QWidget):
 
     def update_exp_time_limits(self):
         self.update_detector_exp_time_limits(
-            HWR.beamline.detector.get_exposure_time_limits()
+            HWR.beamline.config.detector.get_exposure_time_limits()
         )
 
     def update_osc_start(self, value):

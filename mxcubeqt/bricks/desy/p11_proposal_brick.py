@@ -29,9 +29,9 @@ class P11ProposalBrick(ProposalBrick):
         super(P11ProposalBrick, self).__init__(*args)
 
     def run(self):
-        self.setEnabled(HWR.beamline.session is not None)
+        self.setEnabled(HWR.beamline.config.session is not None)
 
-        self.login_as_user = HWR.beamline.lims.get_login_type() == "user"
+        self.login_as_user = HWR.beamline.config.lims.get_login_type() == "user"
 
         if self.login_as_user:
             self.login_as_user_widget.show()
@@ -41,9 +41,9 @@ class P11ProposalBrick(ProposalBrick):
             self.login_as_proposal_widget.show()
 
         # find if we are using dbconnection, etc. or not
-        proposal_code = HWR.beamline.session.get_current_proposal_code()
+        proposal_code = HWR.beamline.config.session.get_current_proposal_code()
 
-        if not HWR.beamline.lims or proposal_code is None:
+        if not HWR.beamline.config.lims or proposal_code is None:
             self.message_widget.setText("not connected")
             self.message_widget.show()
             self.login_as_proposal_widget.hide()
@@ -51,10 +51,10 @@ class P11ProposalBrick(ProposalBrick):
             # self.title_label.setText("<nobr><b>%s</b></nobr>" % os.environ["USER"])
             # self.title_label.show()
             self.user_group_widget.show()
-            HWR.beamline.session.proposal_code = ""
-            HWR.beamline.session.session_id = 1
-            HWR.beamline.session.proposal_id = ""
-            HWR.beamline.session.proposal_number = ""
+            HWR.beamline.config.session.proposal_code = ""
+            HWR.beamline.config.session.session_id = 1
+            HWR.beamline.config.session.proposal_id = ""
+            HWR.beamline.config.session.proposal_number = ""
 
             self.setWindowTitle.emit(self["titlePrefix"])
             self.proposal_number_ledit.setText("no ispyb")
@@ -63,9 +63,9 @@ class P11ProposalBrick(ProposalBrick):
             # self.sessionSelected.emit(None, None, None, None, None, None, None)
             self.loggedIn.emit(True)
             self.sessionSelected.emit(
-                HWR.beamline.session.session_id,
+                HWR.beamline.config.session.session_id,
                 str(os.environ["USER"]),
-                str(HWR.beamline.session.session_id),
+                str(HWR.beamline.config.session.session_id),
                 0,
                 "",
                 "",
@@ -90,12 +90,12 @@ class P11ProposalBrick(ProposalBrick):
 
     def p11_login_as_proposal(self):
 
-        if HWR.beamline.lims.simulated_proposal == 1:
-            proposal_code = HWR.beamline.lims.simulated_prop_code
-            proposal_number = HWR.beamline.lims.simulated_prop_number
+        if HWR.beamline.config.lims.simulated_proposal == 1:
+            proposal_code = HWR.beamline.config.lims.simulated_prop_code
+            proposal_number = HWR.beamline.config.lims.simulated_prop_number
         else:
-            proposal_code = HWR.beamline.session.get_current_proposal_code()
-            proposal_number = HWR.beamline.session.get_current_proposal_number()
+            proposal_code = HWR.beamline.config.session.get_current_proposal_code()
+            proposal_number = HWR.beamline.config.session.get_current_proposal_number()
 
         logging.getLogger("HWR").debug(" PROPOSAL BRICK - code is %s" % proposal_code)
         logging.getLogger("HWR").debug(
@@ -103,12 +103,12 @@ class P11ProposalBrick(ProposalBrick):
         )
 
         self._do_login_as_proposal(
-            proposal_code, proposal_number, None, HWR.beamline.lims.beamline_name,
+            proposal_code, proposal_number, None, HWR.beamline.config.lims.beamline_name,
         )
 
     def show_selected_proposal(self, proposal):
 
-        beamtime_id = HWR.beamline.session.get_current_beamtime_id()
+        beamtime_id = HWR.beamline.config.session.get_current_beamtime_id()
         prop_number = str(proposal["number"])
         prop_code = str(proposal["code"])
 

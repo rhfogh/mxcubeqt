@@ -104,16 +104,16 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
         try:
             self._periodic_table_widget.set_elements(
-                HWR.beamline.energy_scan.get_elements()
+                HWR.beamline.config.energy_scan.get_elements()
             )
 
             max_transmission_value = (
-                HWR.beamline.energy_scan.get_max_transmission_value()
+                HWR.beamline.config.energy_scan.get_max_transmission_value()
             )
 
             self._adjust_transmission_cbox.setEnabled(True)
             self._adjust_transmission_cbox.setChecked(True)
-            HWR.beamline.energy_scan.adjust_transmission(True)
+            HWR.beamline.config.energy_scan.adjust_transmission(True)
 
             if max_transmission_value:
                 self._max_transmission_ledit.setText("%.2f" % max_transmission_value)
@@ -180,12 +180,12 @@ class CreateEnergyScanWidget(CreateTaskBase):
         if selected_element:
             if not shape:
                 cpos = queue_model_objects.CentredPosition()
-                cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
+                cpos.snapshot_image = HWR.beamline.config.sample_view.get_snapshot()
             else:
                 # Shapes selected and sample is mounted, get the
                 # centred positions for the shapes
                 if isinstance(shape, GraphicsItemPoint):
-                    snapshot = HWR.beamline.sample_view.get_snapshot(shape=shape)
+                    snapshot = HWR.beamline.config.sample_view.get_snapshot(shape=shape)
 
                     cpos = copy.deepcopy(shape.get_centred_position())
                     cpos.snapshot_image = snapshot
@@ -216,11 +216,11 @@ class CreateEnergyScanWidget(CreateTaskBase):
 
     def adjust_transmission_state_changed(self, state):
         self._max_transmission_ledit.setEnabled(state)
-        HWR.beamline.energy_scan.adjust_transmission(state)
+        HWR.beamline.config.energy_scan.adjust_transmission(state)
 
     def max_transmission_value_changed(self, value):
         try:
             max_transmission = float(value)
-            HWR.beamline.energy_scan.set_max_transmission(max_transmission)
+            HWR.beamline.config.energy_scan.set_max_transmission(max_transmission)
         except BaseException:
             pass

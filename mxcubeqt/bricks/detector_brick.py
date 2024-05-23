@@ -105,12 +105,12 @@ class DetectorBrick(BaseWidget):
         self.frame_rate_label.setMinimumHeight(20)
 
         self.connect(
-            HWR.beamline.detector, "temperatureChanged", self.temperature_changed
+            HWR.beamline.config.detector, "temperatureChanged", self.temperature_changed
         )
-        self.connect(HWR.beamline.detector, "humidityChanged", self.humidity_changed)
-        self.connect(HWR.beamline.detector, "statusChanged", self.status_changed)
+        self.connect(HWR.beamline.config.detector, "humidityChanged", self.humidity_changed)
+        self.connect(HWR.beamline.config.detector, "statusChanged", self.status_changed)
         self.connect(
-            HWR.beamline.detector, "frameRateChanged", self.frame_rate_changed
+            HWR.beamline.config.detector, "frameRateChanged", self.frame_rate_changed
         )
 
     def status_changed(self, status, status_message):

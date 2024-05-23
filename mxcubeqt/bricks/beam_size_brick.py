@@ -120,11 +120,11 @@ class BeamSizeBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        self.connect(HWR.beamline.beam, "beamInfoChanged", self.beam_info_changed)
-        self.connect(HWR.beamline.beam, "stateChanged", self.beam_info_state_changed)
+        self.connect(HWR.beamline.config.beam, "beamInfoChanged", self.beam_info_changed)
+        self.connect(HWR.beamline.config.beam, "stateChanged", self.beam_info_state_changed)
 
         log.debug(f"  BEAM INFO connected")
-        log.debug(f"     current size is: {HWR.beamline.beam.get_beam_size()}")
+        log.debug(f"     current size is: {HWR.beamline.config.beam.get_beam_size()}")
         self.beam_info_changed()
         self.beam_info_state_changed()
 
@@ -133,9 +133,9 @@ class BeamSizeBrick(BaseWidget):
         beam size is in mm. It is displayed in microns
         """
         if beam_info is None:
-            beam_info = HWR.beamline.beam.get_beam_info_dict()
+            beam_info = HWR.beamline.config.beam.get_beam_info_dict()
 
-        log.debug(f"     current size is: {HWR.beamline.beam.get_beam_size()}")
+        log.debug(f"     current size is: {HWR.beamline.config.beam.get_beam_size()}")
         log.debug(f"  BEAM INFO updated on beam_info brick: {beam_info}")
         hor_size = beam_info.get("size_x", None)
         ver_size = beam_info.get("size_y", None)
@@ -155,7 +155,7 @@ class BeamSizeBrick(BaseWidget):
     def beam_info_state_changed(self, state=None):
         if state is None:
             try:
-                state = HWR.beamline.beam.get_beam_info_state()
+                state = HWR.beamline.config.beam.get_beam_info_state()
             except AttributeError:
                 return
 

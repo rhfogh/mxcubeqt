@@ -81,11 +81,11 @@ class PlateNavigatorWidget(qt_import.QWidget):
         self.plate_navigator_cell.setVerticalScrollBarPolicy(
             qt_import.Qt.ScrollBarAlwaysOff)
     
-        if HWR.beamline.plate_manipulator is not None:
+        if HWR.beamline.config.plate_manipulator is not None:
             self.init_plate_view()
 
     def refresh_plate_location(self):
-        new_location = HWR.beamline.plate_manipulator.get_plate_location()
+        new_location = HWR.beamline.config.plate_manipulator.get_plate_location()
         self.plate_navigator_cell.setEnabled(True)
  
         if new_location:
@@ -111,7 +111,7 @@ class PlateNavigatorWidget(qt_import.QWidget):
         cell_width = 25
         cell_height = 23
 
-        plate_info = HWR.beamline.plate_manipulator.get_plate_info()
+        plate_info = HWR.beamline.config.plate_manipulator.get_plate_info()
 
         self.num_cols = plate_info.get("num_cols", 12)
         self.num_rows = plate_info.get("num_rows", 8)
@@ -153,7 +153,7 @@ class PlateNavigatorWidget(qt_import.QWidget):
 
     def navigation_item_double_clicked(self, pos_x, pos_y):
         drop = int(pos_y * self.num_drops) + 1
-        HWR.beamline.plate_manipulator.load_sample(
+        HWR.beamline.config.plate_manipulator.load_sample(
             (int(self.__current_location[0] + 1),
              int((self.__current_location[1]) * self.num_drops + drop)),
             pos_x, pos_y, wait=False)
@@ -161,7 +161,7 @@ class PlateNavigatorWidget(qt_import.QWidget):
     def navigation_table_double_clicked(self, table_item):
         """Moves to the col/row double clicked by user
         """
-        HWR.beamline.plate_manipulator.load_sample(
+        HWR.beamline.config.plate_manipulator.load_sample(
             (table_item.row() + 1, table_item.column() * self.num_drops + 1),
             wait=False)
 
