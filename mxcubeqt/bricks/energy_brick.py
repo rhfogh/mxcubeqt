@@ -122,17 +122,17 @@ class EnergyBrick(BaseWidget):
         self.status_ledit.setEnabled(False)
 
         self.set_new_value_limits()
-        self.connect(HWR.beamline.config.energy, "energyChanged", self.energy_changed)
-        self.connect(HWR.beamline.config.energy, "stateChanged", self.state_changed)
+        self.connect(HWR.beamline.energy, "energyChanged", self.energy_changed)
+        self.connect(HWR.beamline.energy, "stateChanged", self.state_changed)
         self.connect(
-            HWR.beamline.config.energy, "statusInfoChanged", self.status_info_changed
+            HWR.beamline.energy, "statusInfoChanged", self.status_info_changed
         )
 
-        if hasattr(HWR.beamline.config.energy, "set_do_beam_alignment"):
-            HWR.beamline.config.energy.set_do_beam_alignment(self["doBeamAlignment"])
+        if hasattr(HWR.beamline.energy, "set_do_beam_alignment"):
+            HWR.beamline.energy.set_do_beam_alignment(self["doBeamAlignment"])
 
-        if HWR.beamline.config.energy.is_ready():
-            tunable_energy = HWR.beamline.config.energy.is_tunable
+        if HWR.beamline.energy.is_ready():
+            tunable_energy = HWR.beamline.energy.is_tunable
             if tunable_energy is None:
                 tunable_energy = False
             self.set_to_label.setEnabled(tunable_energy)
@@ -147,7 +147,7 @@ class EnergyBrick(BaseWidget):
         
         self.instance_synchronize("energy_ledit", "new_value_ledit")
 
-        HWR.beamline.config.energy.re_emit_values()
+        HWR.beamline.energy.re_emit_values()
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "defaultMode":
@@ -166,8 +166,8 @@ class EnergyBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def do_beam_align_changed(self, state):
-        if HWR.beamline.config.energy is not None:
-            HWR.beamline.config.energy.set_do_beam_alignment(
+        if HWR.beamline.energy is not None:
+            HWR.beamline.energy.set_do_beam_alignment(
                 self.beam_align_cbox.isChecked()
             )
 
@@ -179,7 +179,7 @@ class EnergyBrick(BaseWidget):
         self.wavelength_ledit.setText("%s %s" % (wavelength_value_str, u"\u212B"))
 
     def state_changed(self, state):
-        self.setEnabled(HWR.beamline.config.energy.is_ready())
+        self.setEnabled(HWR.beamline.energy.is_ready())
         BaseWidget.set_status_info("status", "", "")
 
     def status_info_changed(self, status_info):
@@ -194,9 +194,9 @@ class EnergyBrick(BaseWidget):
         ):
             if self.units_combobox.currentIndex() == 0:
                 BaseWidget.set_status_info("status", "Setting energy...", "running")
-                HWR.beamline.config.energy.set_value(float(input_field_text))
+                HWR.beamline.energy.set_value(float(input_field_text))
             else:
-                HWR.beamline.config.energy.set_wavelength(float(input_field_text))
+                HWR.beamline.energy.set_wavelength(float(input_field_text))
             self.new_value_ledit.setText("")
             colors.set_widget_color(
                 self.new_value_ledit, colors.LINE_EDIT_ACTIVE, qt_import.QPalette.Base
@@ -220,13 +220,13 @@ class EnergyBrick(BaseWidget):
 
     def set_new_value_limits(self):
         if self.units_combobox.currentIndex() == 0:
-            value_limits = HWR.beamline.config.energy.get_limits()
+            value_limits = HWR.beamline.energy.get_limits()
             self.group_box.setTitle("Energy")
             self.new_value_ledit.setToolTip(
                 "Energy limits %.4f : %.4f keV" % (value_limits[0], value_limits[1])
             )
         else:
-            value_limits = HWR.beamline.config.energy.get_wavelength_limits()
+            value_limits = HWR.beamline.energy.get_wavelength_limits()
             self.group_box.setTitle("Wavelength")
             self.new_value_ledit.setToolTip(
                 "Wavelength limits %.4f : %.4f %s"
@@ -235,4 +235,4 @@ class EnergyBrick(BaseWidget):
         self.new_value_validator.setRange(value_limits[0], value_limits[1], 4)
 
     def stop_clicked(self):
-        HWR.beamline.config.energy.stop()
+        HWR.beamline.energy.stop()

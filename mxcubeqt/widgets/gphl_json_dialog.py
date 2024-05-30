@@ -112,16 +112,16 @@ class GphlJsonDialog(qt_import.QDialog):
         result.update(self.params_widget.get_values_map())
         self.accept()
         responses: list = dispatcher.send(
-            HWR.beamline.config.gphl_workflow.PARAMETER_RETURN_SIGNAL,
+            HWR.beamline.gphl_workflow.PARAMETER_RETURN_SIGNAL,
             self,
-            HWR.beamline.config.gphl_workflow.PARAMETERS_READY,
+            HWR.beamline.gphl_workflow.PARAMETERS_READY,
             result,
         )
         if not responses:
             self._return_parameters.set_exception(
                 RuntimeError(
                     "Signal %s is not connected"
-                    % HWR.beamline.config.gphl_workflow.PARAMETER_RETURN_SIGNAL
+                    % HWR.beamline.gphl_workflow.PARAMETER_RETURN_SIGNAL
                 )
             )
 
@@ -132,11 +132,11 @@ class GphlJsonDialog(qt_import.QDialog):
         result = {}
         result.update(self.params_widget.get_values_map())
         self.reject()
-        return_signal = HWR.beamline.config.gphl_workflow.PARAMETER_RETURN_SIGNAL
+        return_signal = HWR.beamline.gphl_workflow.PARAMETER_RETURN_SIGNAL
         responses = dispatcher.send(
             return_signal,
             self,
-            HWR.beamline.config.gphl_workflow.PARAMETERS_CANCELLED,
+            HWR.beamline.gphl_workflow.PARAMETERS_CANCELLED,
             result,
         )
         if not responses:

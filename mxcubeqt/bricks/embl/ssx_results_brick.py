@@ -158,24 +158,24 @@ class SsxResultsBrick(BaseWidget):
         for score_type in ("Score", "Resolution", "Number of spots"):
             self.score_type_combo.addItem(score_type)
 
-        HWR.beamline.config.online_processing.connect(
+        HWR.beamline.online_processing.connect(
             "processingStarted", self.processing_started
         )
-        HWR.beamline.config.online_processing.connect(
+        HWR.beamline.online_processing.connect(
             "processingFinished", self.processing_finished
         )
-        HWR.beamline.config.online_processing.connect(
+        HWR.beamline.online_processing.connect(
             "processingFailed", self.processing_failed
         )
-        HWR.beamline.config.online_processing.connect(
+        HWR.beamline.online_processing.connect(
             "processingFrame", self.processing_frame_changed
         )
         self.current_grid_properties = (
-            HWR.beamline.config.online_processing.get_current_grid_properties()
+            HWR.beamline.online_processing.get_current_grid_properties()
         )
 
         self.grid_properties_combo.blockSignals(True)
-        for prop in HWR.beamline.config.online_processing.get_available_grid_properties():
+        for prop in HWR.beamline.online_processing.get_available_grid_properties():
             self.grid_properties_combo.addItem(str(prop))
         self.grid_properties_combo.setCurrentIndex(0)
         self.grid_properties_combo.blockSignals(False)
@@ -348,7 +348,7 @@ class SsxResultsBrick(BaseWidget):
                         index + self.params_dict["first_image_num"],
                     )
                     try:
-                        HWR.beamline.config.image_tracking.load_image(filename)
+                        HWR.beamline.image_tracking.load_image(filename)
                     except BaseException:
                         pass
 
@@ -415,7 +415,7 @@ class SsxResultsBrick(BaseWidget):
                             index + self.params_dict["first_image_num"],
                         )
                         try:
-                            HWR.beamline.config.image_tracking.load_image(filename)
+                            HWR.beamline.image_tracking.load_image(filename)
                         except BaseException:
                             pass
 
@@ -425,9 +425,9 @@ class SsxResultsBrick(BaseWidget):
         :param index: int
         :return: None
         """
-        HWR.beamline.config.online_processing.set_current_grid_index(index)
+        HWR.beamline.online_processing.set_current_grid_index(index)
         self.current_grid_properties = (
-            HWR.beamline.config.online_processing.get_current_grid_properties()
+            HWR.beamline.online_processing.get_current_grid_properties()
         )
         self.init_gui()
         self.grid_graphics_base.init_item(self.current_chip_config)
@@ -454,7 +454,7 @@ class SsxResultsBrick(BaseWidget):
                 int(pos_x),
             )
             try:
-                HWR.beamline.config.image_tracking.load_image(filename)
+                HWR.beamline.image_tracking.load_image(filename)
             except BaseException:
                 pass
 

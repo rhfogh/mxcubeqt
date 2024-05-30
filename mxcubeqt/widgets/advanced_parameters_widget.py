@@ -86,7 +86,7 @@ class AdvancedParametersWidget(qt_import.QWidget):
         else:
             path_template.mad_prefix = ""
 
-        run_number = HWR.beamline.config.queue_model.get_next_run_number(path_template)
+        run_number = HWR.beamline.queue_model.get_next_run_number(path_template)
 
         self._data_path_widget.set_run_number(run_number)
         self._data_path_widget.set_prefix(path_template.base_prefix)

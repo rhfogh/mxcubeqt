@@ -173,14 +173,14 @@ class SoleilProposalBrick(ProposalBrick):
                 #return self.accept_login(prop_dict, pers_dict, lab_dict, ses_dict, cont_dict)
                 return self.accept_login(prop_dict, ses_dict)
 
-            if HWR.beamline.config.lims == None:
+            if HWR.beamline.lims == None:
                 return self.refuse_login(False,'Not connected to the ISPyB database, unable to get proposal.')
 
             try:
                 if project_id != None:
-                    self._do_login_as_proposal(prop_type, project_id, prop_password, HWR.beamline.config.lims.beamline_name)
+                    self._do_login_as_proposal(prop_type, project_id, prop_password, HWR.beamline.lims.beamline_name)
                 else:
-                    self._do_login_as_proposal(prop_type, prop_number, prop_password, HWR.beamline.config.lims.beamline_name)
+                    self._do_login_as_proposal(prop_type, prop_number, prop_password, HWR.beamline.lims.beamline_name)
                 self.login_successful(proposal_number=prop_number)
             except:
                 import traceback
@@ -293,13 +293,13 @@ class SoleilProposalBrick(ProposalBrick):
             return None
         
     def set_proposal(self, proposal, session):
-        HWR.beamline.config.lims.enable()
-        HWR.beamline.config.session.proposal_code = proposal["code"]
-        HWR.beamline.config.session.session_id = session["sessionId"]
-        HWR.beamline.config.session.proposal_id = proposal["proposalId"]
-        HWR.beamline.config.session.proposal_number = proposal["number"]
+        HWR.beamline.lims.enable()
+        HWR.beamline.session.proposal_code = proposal["code"]
+        HWR.beamline.session.session_id = session["sessionId"]
+        HWR.beamline.session.proposal_id = proposal["proposalId"]
+        HWR.beamline.session.proposal_number = proposal["number"]
 
-        HWR.beamline.config.session.set_proposal(code=proposal['code'],
+        HWR.beamline.session.set_proposal(code=proposal['code'],
                                           number=proposal['number'], 
                                           proposal_id=proposal['proposalId'], 
                                           session_id=session['sessionId'],
@@ -324,7 +324,7 @@ class SoleilProposalBrick(ProposalBrick):
             self.root_log.warning(
                 "Using local login: the data collected won't be stored in the database"
             )
-            HWR.beamline.config.lims.disable()
+            HWR.beamline.lims.disable()
             self.loggedIn.emit(False)
         else:
             msg = "Results in ISPyB will be stored under proposal %s%s - '%s'" % (

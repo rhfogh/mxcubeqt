@@ -61,11 +61,11 @@ class OnlineProcessingBrick(BaseWidget):
 
         # Other ---------------------------------------------------------------
 
-        if HWR.beamline.config.online_processing is not None:
-            HWR.beamline.config.online_processing.connect(
+        if HWR.beamline.online_processing is not None:
+            HWR.beamline.online_processing.connect(
                "processingStarted", self.processing_started
             )
-            HWR.beamline.config.online_processing.connect(
+            HWR.beamline.online_processing.connect(
                "processingResultsUpdate", self.update_processing_results
             )
         else:

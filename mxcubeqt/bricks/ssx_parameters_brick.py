@@ -74,10 +74,10 @@ class SsxParametersBrick(BaseWidget):
 
     def populate_ssx_parameter_widget(self, item):
         self.parameters_widget._data_path_widget.set_base_image_directory(
-            HWR.beamline.config.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.parameters_widget._data_path_widget.set_base_process_directory(
-            HWR.beamline.config.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
 
         data_collection = item.get_model()

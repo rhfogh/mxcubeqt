@@ -117,7 +117,7 @@ class CatsSimpleBrick(SampleChangerBrick):
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "mnemonic":
-            if HWR.beamline.config.sample_changer is not None:
+            if HWR.beamline.sample_changer is not None:
                 self.disconnect(
                     self.device, "runningStateChanged", self._updatePathRunning
                 )
@@ -130,20 +130,20 @@ class CatsSimpleBrick(SampleChangerBrick):
         if property_name == "mnemonic":
             # load the new hardware object
 
-            if HWR.beamline.config.sample_changer is not None:
+            if HWR.beamline.sample_changer is not None:
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     "runningStateChanged",
                     self._updatePathRunning,
                 )
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     "powerStateChanged",
                     self._updatePowerState,
                 )
 
-                self._poweredOn = HWR.beamline.config.sample_changer.isPowered()
-                self._pathRunning = HWR.beamline.config.sample_changer.isPathRunning()
+                self._poweredOn = HWR.beamline.sample_changer.isPowered()
+                self._pathRunning = HWR.beamline.sample_changer.isPathRunning()
                 self._updateButtons()
 
         elif property_name == "basketCount":
@@ -250,7 +250,7 @@ class CatsSimpleBrick(SampleChangerBrick):
         elif ready:
             logging.getLogger().info("CatsSimpleBrick update buttons (ready)")
             self.load_button.setEnabled(True)
-            if HWR.beamline.config.sample_changer.hasLoadedSample():
+            if HWR.beamline.sample_changer.hasLoadedSample():
                 self.unload_button.setEnabled(True)
             else:
                 self.unload_button.setEnabled(False)
@@ -275,19 +275,19 @@ class CatsSimpleBrick(SampleChangerBrick):
         if basket is not None and vial is not None:
             if basket != 100:
                 sample_loc = "%d:%02d" % (basket + 1, vial)
-                HWR.beamline.config.sample_changer.load(sample_loc, wait=False)
+                HWR.beamline.sample_changer.load(sample_loc, wait=False)
             else:
-                HWR.beamline.config.sample_changer.load_ht(vial, wait=False)
+                HWR.beamline.sample_changer.load_ht(vial, wait=False)
                 logging.getLogger("GUI").info(
                     "Is an HT sample: idx=%s (not implemented yet)" % (vial)
                 )
 
     def unload_selected_sample(self):
         logging.getLogger("GUI").info("Unloading sample")
-        HWR.beamline.config.sample_changer.unload()
+        HWR.beamline.sample_changer.unload()
 
     def abort_mounting(self):
-        HWR.beamline.config.sample_changer._doAbort()
+        HWR.beamline.sample_changer._doAbort()
 
 
 def test_brick(brick):

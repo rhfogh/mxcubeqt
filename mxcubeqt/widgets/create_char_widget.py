@@ -189,7 +189,7 @@ class CreateCharWidget(CreateTaskBase):
         )
 
         self._char_params = (
-            HWR.beamline.config.characterisation.get_default_characterisation_parameters()
+            HWR.beamline.characterisation.get_default_characterisation_parameters()
         )
         self._path_template.reference_image_prefix = "ref"
         # The num images drop down default value is 1
@@ -239,7 +239,7 @@ class CreateCharWidget(CreateTaskBase):
             # self.get_acquisition_widget().use_osc_start(True)
 
             if len(data_collection.acquisitions) == 1:
-                HWR.beamline.config.sample_view.select_shape_with_cpos(
+                HWR.beamline.sample_view.select_shape_with_cpos(
                     self._acquisition_parameters.centred_position
                 )
 
@@ -259,7 +259,7 @@ class CreateCharWidget(CreateTaskBase):
 
     def approve_creation(self):
         result = CreateTaskBase.approve_creation(self)
-        selected_shapes = HWR.beamline.config.sample_view.get_selected_shapes()
+        selected_shapes = HWR.beamline.sample_view.get_selected_shapes()
 
         for shape in selected_shapes:
             if isinstance(shape, GraphicsItemPoint):
@@ -273,11 +273,11 @@ class CreateCharWidget(CreateTaskBase):
 
         if not shape or not isinstance(shape, GraphicsItemPoint):
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.config.sample_view.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
         else:
             # Shapes selected and sample is mounted, get the
             # centred positions for the shapes
-            snapshot = HWR.beamline.config.sample_view.get_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
 
@@ -310,7 +310,7 @@ class CreateCharWidget(CreateTaskBase):
         tasks.append(char)
         self._path_template.run_number += 1
 
-        if HWR.beamline.config.flux.get_value() < 1e9:
+        if HWR.beamline.flux.get_value() < 1e9:
             logging.getLogger("GUI").error(
                 "No flux reading is available! "
                 + "Characterisation result may be wrong. "

@@ -97,15 +97,15 @@ class SampleChangerViewBrick(BaseWidget):
         # Qt signal/slot connections ------------------------------------------
         self.camera_live_cbx.stateChanged.connect(self.camera_live_state_changed)
 
-        if HWR.beamline.config.sample_changer is not None:  
+        if HWR.beamline.sample_changer is not None:  
             self.connect(
-                HWR.beamline.config.sample_changer,
+                HWR.beamline.sample_changer,
                 SampleChanger.STATUS_CHANGED_EVENT,
                 self.sample_changer_status_changed,
             )
-            self.connect(HWR.beamline.config.sample_changer, "progressInit", self.init_progress)
-            self.connect(HWR.beamline.config.sample_changer, "progressStep", self.step_progress)
-            self.connect(HWR.beamline.config.sample_changer, "progressStop", self.stop_progress)
+            self.connect(HWR.beamline.sample_changer, "progressInit", self.init_progress)
+            self.connect(HWR.beamline.sample_changer, "progressStep", self.step_progress)
+            self.connect(HWR.beamline.sample_changer, "progressStop", self.stop_progress)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "hwobj_axis_camera":

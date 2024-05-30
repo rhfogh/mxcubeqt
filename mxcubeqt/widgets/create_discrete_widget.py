@@ -101,7 +101,7 @@ class CreateDiscreteWidget(CreateTaskBase):
         CreateTaskBase.init_models(self)
         self._processing_parameters = queue_model_objects.ProcessingParameters()
 
-        has_shutter_less = HWR.beamline.config.detector.has_shutterless()
+        has_shutter_less = HWR.beamline.detector.has_shutterless()
         self._acquisition_parameters.shutterless = has_shutter_less
 
         self._acquisition_parameters = \
@@ -147,7 +147,7 @@ class CreateDiscreteWidget(CreateTaskBase):
                 )
                 # self.get_acquisition_widget().use_osc_start(True)
                 if len(dc_model.acquisitions) == 1:
-                    HWR.beamline.config.sample_view.select_shape_with_cpos(
+                    HWR.beamline.sample_view.select_shape_with_cpos(
                         self._acquisition_parameters.centred_position
                     )
 
@@ -173,12 +173,12 @@ class CreateDiscreteWidget(CreateTaskBase):
         tasks = []
 
         if isinstance(shape, GraphicsItemPoint):
-            snapshot = HWR.beamline.config.sample_view.get_snapshot(shape)
+            snapshot = HWR.beamline.sample_view.get_snapshot(shape)
             cpos = copy.deepcopy(shape.get_centred_position())
             cpos.snapshot_image = snapshot
         else:
             cpos = queue_model_objects.CentredPosition()
-            cpos.snapshot_image = HWR.beamline.config.sample_view.get_snapshot()
+            cpos.snapshot_image = HWR.beamline.sample_view.get_snapshot()
 
         tasks.extend(self.create_dc(sample, cpos=cpos, comments=comments))
         self._path_template.run_number += 1
@@ -249,16 +249,16 @@ class CreateDiscreteWidget(CreateTaskBase):
             "sessionId": api.session.session_id,
             "experimentType": "OSC",
         }
-        gid = HWR.beamline.config.lims._store_data_collection_group(group_data)
+        gid = HWR.beamline.lims._store_data_collection_group(group_data)
         sample.lims_group_id = gid
 
         task_list = self._create_task(sample, None)
         task_list[0].lims_group_id = gid
 
         param_list = queue_model_objects.to_collect_dict(
-            task_list[0], HWR.beamline.config.session, sample, None
+            task_list[0], HWR.beamline.session, sample, None
         )
 
-        HWR.beamline.config.collect.collect(
+        HWR.beamline.collect.collect(
             queue_model_enumerables.COLLECTION_ORIGIN_STR.MXCUBE, param_list
         )

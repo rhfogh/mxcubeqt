@@ -73,44 +73,44 @@ class CreateTaskBase(qt_import.QWidget):
         self._path_template = None
         self._enable_compression = None
 
-        self._in_plate_mode = HWR.beamline.config.diffractometer.in_plate_mode()
+        self._in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
         
-        HWR.beamline.config.energy.connect(
+        HWR.beamline.energy.connect(
             "valueChanged", self.set_energy
         )
-        HWR.beamline.config.energy.connect(
+        HWR.beamline.energy.connect(
             "limitsChanged", self.set_energy_limits
         )
-        HWR.beamline.config.transmission.connect(
+        HWR.beamline.transmission.connect(
             "valueChanged", self.set_transmission
         )
-        HWR.beamline.config.transmission.connect(
+        HWR.beamline.transmission.connect(
             "limitsChanged", self.set_transmission_limits
         )
-        HWR.beamline.config.resolution.connect(
+        HWR.beamline.resolution.connect(
             "valueChanged", self.set_resolution
         )
-        HWR.beamline.config.resolution.connect(
+        HWR.beamline.resolution.connect(
             "limitsChanged", self.set_resolution_limits
         )
-        HWR.beamline.config.diffractometer.omega.connect(
+        HWR.beamline.diffractometer.omega.connect(
             "valueChanged", self.set_osc_start
         )
-        HWR.beamline.config.detector.connect(
+        HWR.beamline.detector.connect(
             "detectorRoiModeChanged", self.set_detector_roi_mode
         )
-        HWR.beamline.config.detector.connect(
+        HWR.beamline.detector.connect(
             "expTimeLimitsChanged", self.set_detector_exp_time_limits
         )
-        HWR.beamline.config.beam.connect(
+        HWR.beamline.beam.connect(
             "beamInfoChanged", self.set_beam_info
         )
-        if hasattr(HWR.beamline.config.diffractometer, 'kappa'):
-            HWR.beamline.config.diffractometer.kappa.connect(
+        if hasattr(HWR.beamline.diffractometer, 'kappa'):
+            HWR.beamline.diffractometer.kappa.connect(
                 "valueChanged", self.set_kappa
             )
-        if hasattr(HWR.beamline.config.diffractometer, 'kappa_phi'):
-            HWR.beamline.config.diffractometer.kappa_phi.connect(
+        if hasattr(HWR.beamline.diffractometer, 'kappa_phi'):
+            HWR.beamline.diffractometer.kappa_phi.connect(
                 "valueChanged", self.set_kappa_phi
             )
 
@@ -147,7 +147,7 @@ class CreateTaskBase(qt_import.QWidget):
         if self._acq_widget:
             def_acq_parameters = HWR.beamline.get_default_acquisition_parameters()
             self._acquisition_parameters.set_from_dict(def_acq_parameters.as_dict())
-            if HWR.beamline.config.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode():
                 self._acq_widget.use_kappa(False)
                 self._acq_widget.use_max_osc_range(True)
             else:
@@ -162,10 +162,10 @@ class CreateTaskBase(qt_import.QWidget):
         # values read from the beamline setup
         if self._data_path_widget:
             self._data_path_widget.set_base_image_directory(
-                HWR.beamline.config.session.get_base_image_directory()
+                HWR.beamline.session.get_base_image_directory()
             )
             self._data_path_widget.set_base_process_directory(
-                HWR.beamline.config.session.get_base_process_directory()
+                HWR.beamline.session.get_base_process_directory()
             )
 
             (data_directory, proc_directory) = self.get_default_directory()
@@ -173,7 +173,7 @@ class CreateTaskBase(qt_import.QWidget):
             self._path_template.directory = data_directory
             self._path_template.process_directory = proc_directory
             self._path_template.base_prefix = self.get_default_prefix()
-            self._path_template.run_number = HWR.beamline.config.queue_model.get_next_run_number(
+            self._path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
                   self._path_template
             )
             self._path_template.compression = self._enable_compression
@@ -183,7 +183,7 @@ class CreateTaskBase(qt_import.QWidget):
     def tab_changed(self, tab_index, tab):
         # Update the selection if in the main tab and logged in to
         # ISPyB
-        if tab_index == 0 and HWR.beamline.config.session.proposal_code:
+        if tab_index == 0 and HWR.beamline.session.proposal_code:
             self.update_selection()
 
     def set_osc_start(self, new_value):
@@ -209,7 +209,7 @@ class CreateTaskBase(qt_import.QWidget):
         self._data_path_widget.update_file_name()
         if self._tree_brick is not None:
             self._tree_brick.dc_tree_widget.check_for_path_collisions()
-            path_conflict = HWR.beamline.config.queue_model.check_for_path_collisions(
+            path_conflict = HWR.beamline.queue_model.check_for_path_collisions(
                 self._path_template
             )
             self._data_path_widget.indicate_path_conflict(path_conflict)
@@ -346,13 +346,13 @@ class CreateTaskBase(qt_import.QWidget):
         pass
 
     def get_default_prefix(self, sample_data_node=None, generic_name=False):
-        prefix = HWR.beamline.config.session.get_default_prefix(
+        prefix = HWR.beamline.session.get_default_prefix(
             sample_data_node, generic_name
         )
         return prefix
 
     def get_default_directory(self, tree_item=None, sub_dir=""):
-        group_name = HWR.beamline.config.session.get_group_name()
+        group_name = HWR.beamline.session.get_group_name()
 
         if group_name:
             sub_dir = group_name + "/" + sub_dir
@@ -366,9 +366,9 @@ class CreateTaskBase(qt_import.QWidget):
                     if item.get_model().lims_id == -1:
                         sub_dir += ""
 
-        data_directory = HWR.beamline.config.session.get_image_directory(sub_dir)
+        data_directory = HWR.beamline.session.get_image_directory(sub_dir)
 
-        proc_directory = HWR.beamline.config.session.get_process_directory(sub_dir)
+        proc_directory = HWR.beamline.session.get_process_directory(sub_dir)
 
         return (data_directory, proc_directory)
 
@@ -377,7 +377,7 @@ class CreateTaskBase(qt_import.QWidget):
         self.update_selection()
 
     def select_shape_with_cpos(self, cpos):
-        HWR.beamline.config.sample_view.select_shape_with_cpos(cpos)
+        HWR.beamline.sample_view.select_shape_with_cpos(cpos)
 
     def selection_changed(self, items):
         if items:
@@ -414,7 +414,7 @@ class CreateTaskBase(qt_import.QWidget):
             self._acquisition_parameters.centred_position.snapshot_image = None
             self._acquisition_parameters = deepcopy(self._acquisition_parameters)
             self._acquisition_parameters.centred_position.snapshot_image = (
-                HWR.beamline.config.sample_view.get_snapshot()
+                HWR.beamline.sample_view.get_snapshot()
             )
 
             # Sample with lims information, use values from lims
@@ -429,8 +429,8 @@ class CreateTaskBase(qt_import.QWidget):
                 # self._path_template.directory = data_directory
                 # self._path_template.process_directory = proc_directory
                 self._path_template.base_prefix = prefix
-            elif HWR.beamline.config.session.get_group_name() != "":
-                base_dir = HWR.beamline.config.session.get_base_image_directory()
+            elif HWR.beamline.session.get_group_name() != "":
+                base_dir = HWR.beamline.session.get_base_image_directory()
                 # Update with group name as long as user didn't specify
                 # differnt path.
 
@@ -453,7 +453,7 @@ class CreateTaskBase(qt_import.QWidget):
 
             # Get the next available run number at this level of the model.
             self._path_template.run_number = (
-                HWR.beamline.config.queue_model.get_next_run_number(self._path_template)
+                HWR.beamline.queue_model.get_next_run_number(self._path_template)
             )
 
             # Update energy transmission and resolution
@@ -535,7 +535,7 @@ class CreateTaskBase(qt_import.QWidget):
             self._path_template.base_prefix = self.get_default_prefix(generic_name = True)
 
             # Get the next available run number at this level of the model.
-            self._path_template.run_number = HWR.beamline.config.queue_model.\
+            self._path_template.run_number = HWR.beamline.queue_model.\
                 get_next_run_number(self._path_template)
 
             #Update energy transmission and resolution
@@ -581,15 +581,15 @@ class CreateTaskBase(qt_import.QWidget):
                     if hasattr(cpos, "kappa_phi"):
                         kappa_phi = cpos.kappa_phi
                     if isinstance(item, queue_item.TaskQueueItem):
-                        snapshot = HWR.beamline.config.sample_view.get_snapshot(
+                        snapshot = HWR.beamline.sample_view.get_snapshot(
                             shape=position
                         )
                         cpos.snapshot_image = snapshot
                         self._acquisition_parameters.centred_position = cpos
             else:
                 self._acq_widget.use_kappa(True)
-                kappa = HWR.beamline.config.diffractometer.kappa.get_value()
-                kappa_phi =  HWR.beamline.config.diffractometer.kappa_phi.get_value()
+                kappa = HWR.beamline.diffractometer.kappa.get_value()
+                kappa_phi =  HWR.beamline.diffractometer.kappa_phi.get_value()
 
             if kappa:
                 self.set_kappa(kappa)
@@ -601,7 +601,7 @@ class CreateTaskBase(qt_import.QWidget):
     def approve_creation(self):
         result = True
 
-        path_conflict = HWR.beamline.config.queue_model.check_for_path_collisions(
+        path_conflict = HWR.beamline.queue_model.check_for_path_collisions(
             self._path_template
         )
 
@@ -634,12 +634,12 @@ class CreateTaskBase(qt_import.QWidget):
     def create_task(self, sample, shape, comments):
         (tasks, sc) = ([], None)
 
-        dm = HWR.beamline.config.diffractometer
+        dm = HWR.beamline.diffractometer
         sample_is_mounted = False
         if self._in_plate_mode:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.config.plate_manipulator.get_loaded_sample().get_coords()
+                    HWR.beamline.plate_manipulator.get_loaded_sample().get_coords()
                     == sample.location
                 )
             except BaseException:
@@ -647,7 +647,7 @@ class CreateTaskBase(qt_import.QWidget):
         else:
             try:
                 sample_is_mounted = (
-                    HWR.beamline.config.sample_changer.get_loaded_sample().get_coords()
+                    HWR.beamline.sample_changer.get_loaded_sample().get_coords()
                     == sample.location
                 )
 
@@ -763,7 +763,7 @@ class CreateTaskBase(qt_import.QWidget):
 
         if "<acronym>-<name>" in acq_path_template.base_prefix:
             acq_path_template.base_prefix = self.get_default_prefix(sample)
-            acq_path_template.run_number = HWR.beamline.config.queue_model.get_next_run_number(
+            acq_path_template.run_number = HWR.beamline.queue_model.get_next_run_number(
                 acq_path_template
             )
 
@@ -825,7 +825,7 @@ class CreateTaskBase(qt_import.QWidget):
         parameters.centred_position.snapshot_image = None
         acq.acquisition_parameters = deepcopy(parameters)
         self._acquisition_parameters.centred_position.snapshot_image = (
-            HWR.beamline.config.sample_view.get_snapshot()
+            HWR.beamline.sample_view.get_snapshot()
         )
         acq.acquisition_parameters.collect_agent = (
             queue_model_enumerables.COLLECTION_ORIGIN.MXCUBE
@@ -840,9 +840,9 @@ class CreateTaskBase(qt_import.QWidget):
 
     def _create_dc_from_grid(self, sample, grid=None):
         if grid is None:
-            grid = HWR.beamline.config.sample_view.create_auto_grid()
+            grid = HWR.beamline.sample_view.create_auto_grid()
 
-        grid.set_snapshot(HWR.beamline.config.sample_view.get_snapshot(grid))
+        grid.set_snapshot(HWR.beamline.sample_view.get_snapshot(grid))
 
         grid_properties = grid.get_properties()
 
@@ -892,7 +892,7 @@ class CreateTaskBase(qt_import.QWidget):
         else:
             self._path_template.mad_prefix = ""
 
-        run_number = HWR.beamline.config.queue_model.get_next_run_number(
+        run_number = HWR.beamline.queue_model.get_next_run_number(
             self._path_template
         )
 
@@ -926,7 +926,7 @@ class CreateTaskBase(qt_import.QWidget):
            - For mesh osc_range is defined by number of images per line
              and osc in the middle of mesh
         """
-        if HWR.beamline.config.diffractometer.in_plate_mode() and self._acq_widget:
+        if HWR.beamline.diffractometer.in_plate_mode() and self._acq_widget:
             set_max_range = False
 
             if num_images is None:
@@ -948,7 +948,7 @@ class CreateTaskBase(qt_import.QWidget):
             exp_time = None
             exp_time = float(self._acq_widget.acq_widget_layout.exp_time_ledit.text())
 
-            scan_limits = HWR.beamline.config.diffractometer.get_scan_limits(
+            scan_limits = HWR.beamline.diffractometer.get_scan_limits(
                 num_images, exp_time
             )
 

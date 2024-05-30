@@ -75,10 +75,10 @@ class CharParametersBrick(BaseWidget):
 
     def populate_char_parameter_widget(self, item):
         self.parameters_widget.path_widget.set_base_image_directory(
-            HWR.beamline.config.session.get_base_image_directory()
+            HWR.beamline.session.get_base_image_directory()
         )
         self.parameters_widget.path_widget.set_base_process_directory(
-            HWR.beamline.config.session.get_base_process_directory()
+            HWR.beamline.session.get_base_process_directory()
         )
 
         char = item.get_model()

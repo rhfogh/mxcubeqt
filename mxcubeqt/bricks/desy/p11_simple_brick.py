@@ -142,19 +142,19 @@ class P11SimpleBrick(SampleChangerBrick):
         self.current_basket_view.hide()
         #self.current_sample_view.hide()
 
-        if HWR.beamline.config.sample_changer is not None:
+        if HWR.beamline.sample_changer is not None:
             #self.connect(
-                #HWR.beamline.config.sample_changer,
+                #HWR.beamline.sample_changer,
                 #"runningStateChanged",
                 #self._updatePathRunning,
             #)
             self.connect(
-                HWR.beamline.config.sample_changer,
+                HWR.beamline.sample_changer,
                 "powerStateChanged",
                 self._update_power_state
             )
 
-            self._powered_on = HWR.beamline.config.sample_changer.is_powered()
+            self._powered_on = HWR.beamline.sample_changer.is_powered()
             self._update_buttons()
 
     def build_status_view(self, container):
@@ -221,7 +221,7 @@ class P11SimpleBrick(SampleChangerBrick):
             abort_color = colors.LIGHT_GRAY
         elif ready:
             self.load_button.setEnabled(True)
-            if HWR.beamline.config.sample_changer.has_loaded_sample():
+            if HWR.beamline.sample_changer.has_loaded_sample():
                 self.unload_button.setEnabled(True)
                 self.wash_button.setEnabled(True)
             else:
@@ -246,19 +246,19 @@ class P11SimpleBrick(SampleChangerBrick):
 
         if basket is not None and vial is not None:
              sample_loc = "%d:%d" % (basket, vial)
-             HWR.beamline.config.sample_changer.load(sample_loc, wait=False)
+             HWR.beamline.sample_changer.load(sample_loc, wait=False)
 
     def unload_sample(self):
         logging.getLogger("GUI").info("Unloading sample")
-        HWR.beamline.config.sample_changer.unload()
+        HWR.beamline.sample_changer.unload()
 
     def wash_sample(self):
         logging.getLogger("GUI").info("Washing sample")
-        HWR.beamline.config.sample_changer.wash()
+        HWR.beamline.sample_changer.wash()
 
 
     def abort_mounting(self):
-        HWR.beamline.config.sample_changer._do_abort()
+        HWR.beamline.sample_changer._do_abort()
 
 
 def test_brick(brick):

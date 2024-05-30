@@ -1055,37 +1055,37 @@ class SampleChangerBrick(BaseWidget):
                 self.build_basket_view()
 
         elif property_name == "mnemonic":
-             if HWR.beamline.config.sample_changer is not None:
+             if HWR.beamline.sample_changer is not None:
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     sc_helper.SampleChanger.STATUS_CHANGED_EVENT,
                     self.sc_status_changed,
                 )
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     sc_helper.SampleChanger.STATE_CHANGED_EVENT,
                     self.sc_state_changed,
                 )
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     sc_helper.SampleChanger.INFO_CHANGED_EVENT,
                     self.infoChanged,
                 )
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     sc_helper.SampleChanger.SELECTION_CHANGED_EVENT,
                     self.selectionChanged,
                 )
                 self.connect(
-                    HWR.beamline.config.sample_changer,
+                    HWR.beamline.sample_changer,
                     sc_helper.SampleChanger.LOADED_SAMPLE_CHANGED_EVENT,
                     self.loadedSampleChanged,
                 )
-                self.sc_status_changed(HWR.beamline.config.sample_changer.get_status())
-                self.sc_state_changed(HWR.beamline.config.sample_changer.get_state())
+                self.sc_status_changed(HWR.beamline.sample_changer.get_status())
+                self.sc_state_changed(HWR.beamline.sample_changer.get_state())
                 self.infoChanged()
                 self.selectionChanged()
-                self.loadedSampleChanged(HWR.beamline.config.sample_changer.get_loaded_sample())
+                self.loadedSampleChanged(HWR.beamline.sample_changer.get_loaded_sample())
         elif property_name == "showSelectButton":
             self.scan_baskets_view.showSelectButton(new_value)
             for basket in self.baskets:
@@ -1144,8 +1144,8 @@ class SampleChangerBrick(BaseWidget):
         self.statusMsgChangedSignal.emit(msg, color)
 
     def selectionChanged(self):
-        sample = HWR.beamline.config.sample_changer.get_selected_sample()
-        basket = HWR.beamline.config.sample_changer.get_selected_component()
+        sample = HWR.beamline.sample_changer.get_selected_sample()
+        basket = HWR.beamline.sample_changer.get_selected_component()
         if sample is None:
             self.current_sample_view.setSelected(0)
         else:
@@ -1163,14 +1163,14 @@ class SampleChangerBrick(BaseWidget):
         self.switch_to_sample_transfer_button.setEnabled(basket_transfer)
 
     def switchToSampleTransferMode(self):
-        HWR.beamline.config.sample_changer.change_mode(
+        HWR.beamline.sample_changer.change_mode(
             sc_helper.SampleChangerMode.Normal, wait=False
         )
 
     def loadedSampleChanged(self, sample):
         if sample is None:
             # get current location in SC
-            sample = HWR.beamline.config.sample_changer.get_selected_sample()
+            sample = HWR.beamline.sample_changer.get_selected_sample()
             loaded = False
         else:
             loaded = True
@@ -1199,21 +1199,21 @@ class SampleChangerBrick(BaseWidget):
         return self.resetSampleChanger()
 
     def resetSampleChanger(self):
-        HWR.beamline.config.sample_changer.reset()
+        HWR.beamline.sample_changer.reset()
 
     def resetBasketsSamplesInfo(self):
-        HWR.beamline.config.sample_changer.clear_info()
+        HWR.beamline.sample_changer.clear_info()
 
     def set_expert_mode(self, state):
         self.in_expert_mode = state
-        if HWR.beamline.config.sample_changer is not None:
+        if HWR.beamline.sample_changer is not None:
             self.status.set_expert_mode(state)
 
     def run(self):
         if self.in_expert_mode is not None:
             self.set_expert_mode(self.in_expert_mode)
         try:
-            self.matrixCodesChanged(HWR.beamline.config.sample_changer.get_matrix_codes())
+            self.matrixCodesChanged(HWR.beamline.sample_changer.get_matrix_codes())
         except BaseException:
             pass
 
@@ -1254,24 +1254,24 @@ class SampleChangerBrick(BaseWidget):
         self.status.setMinidiffStatus(can_move)
 
     def sampleChangerToLoadingPosition(self):
-        if not HWR.beamline.config.sample_changer.sample_changer_to_loading_position():
+        if not HWR.beamline.sample_changer.sample_changer_to_loading_position():
             self.status.setSampleChangerLoadStatus(
-                HWR.beamline.config.sample_changer.sample_changer_can_load()
+                HWR.beamline.sample_changer.sample_changer_can_load()
             )
 
     def minidiffGetControl(self):
-        if not HWR.beamline.config.sample_changer.minidiffGetControl():
-            self.status.setMinidiffStatus(HWR.beamline.config.sample_changer.minidiffCanMove())
+        if not HWR.beamline.sample_changer.minidiffGetControl():
+            self.status.setMinidiffStatus(HWR.beamline.sample_changer.minidiffCanMove())
 
     def changeBasket(self, basket_number):
         address = Container.Basket.get_basket_address(basket_number)
-        HWR.beamline.config.sample_changer.select(address, wait=False)
+        HWR.beamline.sample_changer.select(address, wait=False)
 
     def changeSample(self, sample_number):
-        basket_index = HWR.beamline.config.sample_changer.getSelectedComponent().get_index()
+        basket_index = HWR.beamline.sample_changer.getSelectedComponent().get_index()
         basket_number = basket_index + 1
         address = Container.Pin.get_sample_address(basket_number, sample_number)
-        HWR.beamline.config.sample_changer.select(address, wait=False)
+        HWR.beamline.sample_changer.select(address, wait=False)
 
     def user_select_this_sample(self, basket_index, vial_index):
         if self.single_click_selection:
@@ -1290,10 +1290,10 @@ class SampleChangerBrick(BaseWidget):
     def load_this_sample(self, basket_index, vial_index):
         if self.double_click_loads_cbox.isChecked():
             # holder_len = self.current_sample_view.getHolderLength()
-            HWR.beamline.config.sample_changer.load((basket_index, vial_index), wait=False)
+            HWR.beamline.sample_changer.load((basket_index, vial_index), wait=False)
 
     def loadSample(self, holder_len):
-        HWR.beamline.config.sample_changer.load(
+        HWR.beamline.sample_changer.load(
             holder_len,
             None,
             None,
@@ -1305,7 +1305,7 @@ class SampleChangerBrick(BaseWidget):
     def unloadSample(self, holder_len, matrix_code, location):
         if matrix_code:
             location = None
-        HWR.beamline.config.sample_changer.unload(
+        HWR.beamline.sample_changer.unload(
             holder_len,
             matrix_code,
             location,
@@ -1332,8 +1332,8 @@ class SampleChangerBrick(BaseWidget):
     def scanBasket(self):
         if not self["showSelectButton"]:
             self.baskets[self.current_basket_view.selected.value() - 1].setChecked(True)
-        HWR.beamline.config.sample_changer.scan(
-            HWR.beamline.config.sample_changer.getSelectedComponent(),
+        HWR.beamline.sample_changer.scan(
+            HWR.beamline.sample_changer.getSelectedComponent(),
             recursive=True,
             wait=False
         )
@@ -1346,12 +1346,12 @@ class SampleChangerBrick(BaseWidget):
                 if basket_checkbox.isChecked()
                 else None
             )
-        HWR.beamline.config.sample_changer.scan(
+        HWR.beamline.sample_changer.scan(
             filter(None, baskets_to_scan), recursive=True, wait=False
         )
 
     def infoChanged(self):
-        baskets_at_sc = HWR.beamline.config.sample_changer.get_components()
+        baskets_at_sc = HWR.beamline.sample_changer.get_components()
         presences = []
 
         for basket in baskets_at_sc:
@@ -1361,7 +1361,7 @@ class SampleChangerBrick(BaseWidget):
                 else [[VialView.VIAL_NONE]] * self.vials_per_basket
             )
 
-        for sample in HWR.beamline.config.sample_changer.get_sample_list():
+        for sample in HWR.beamline.sample_changer.get_sample_list():
             matrix = sample.get_id() or ""
             basket_index = sample.get_container().get_index()
             vial_index = sample.get_index()
@@ -1403,7 +1403,7 @@ class SampleChangerBrick(BaseWidget):
         retval = self.basketsSamplesSelectionDialog.exec_loop()
 
         if retval == qt_import.QDialog.Accepted:
-            HWR.beamline.config.sample_changer.reset_baskets_information()
+            HWR.beamline.sample_changer.reset_baskets_information()
 
             for (basket, samples) in self.basketsSamplesSelectionDialog.result.items():
                 for index in range(self.vials_per_basket):
@@ -1411,7 +1411,7 @@ class SampleChangerBrick(BaseWidget):
                 for sample in samples:
                     basket_input[1] = sample
                     basket_input[2] = 1
-                    HWR.beamline.config.sample_changer.set_basket_sample_information(basket_input)
+                    HWR.beamline.sample_changer.set_basket_sample_information(basket_input)
 
     def test_sample_changer(self):
-        HWR.beamline.config.sample_changer.run_test()
+        HWR.beamline.sample_changer.run_test()

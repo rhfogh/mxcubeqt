@@ -292,7 +292,7 @@ class EsrfExportDataBrick(BaseWidget):
 
         # take snapshots
         file_full_path_no_extension = file_full_path[0:file_full_path.rfind('.')]
-        if HWR.beamline.config.sample_view is not None:
+        if HWR.beamline.sample_view is not None:
             file_full_path_no_extension_no_index = file_full_path_no_extension[0:-4]
             raw_snapshot_file_path = (
                 file_full_path_no_extension_no_index +
@@ -307,15 +307,15 @@ class EsrfExportDataBrick(BaseWidget):
                 ".png"
             )
             
-            HWR.beamline.config.sample_view.save_scene_snapshot(snapshot_file_path)
-            HWR.beamline.config.sample_view.save_raw_scene_snapshot(raw_snapshot_file_path)
+            HWR.beamline.sample_view.save_scene_snapshot(snapshot_file_path)
+            HWR.beamline.sample_view.save_raw_scene_snapshot(raw_snapshot_file_path)
 
         # update GUI
         if self.ui_widgets_manager.clean_comment_cbox.isChecked():
             self.ui_widgets_manager.comment_text_edit.clear()
 
         if self.ui_widgets_manager.delete_items_cbox.isChecked():
-            HWR.beamline.config.sample_view.clear_all_shapes()
+            HWR.beamline.sample_view.clear_all_shapes()
 
         file_index = int(self.ui_widgets_manager.file_index_tbox.text())
         file_index += 1
@@ -336,13 +336,13 @@ class EsrfExportDataBrick(BaseWidget):
         position_dict = {}
         shapes_dict = {}
 
-        if HWR.beamline.config.sample_view is not None:
-            data['image_size'] = HWR.beamline.config.sample_view.get_image_size()
+        if HWR.beamline.sample_view is not None:
+            data['image_size'] = HWR.beamline.sample_view.get_image_size()
 
-        if HWR.beamline.config.diffractometer is not None:
+        if HWR.beamline.diffractometer is not None:
 
-            motors_dict = HWR.beamline.config.diffractometer.get_motors_dict()
-            position_dict = HWR.beamline.config.diffractometer.get_diffractometer_status()
+            motors_dict = HWR.beamline.diffractometer.get_motors_dict()
+            position_dict = HWR.beamline.diffractometer.get_diffractometer_status()
 
             data['beam_pos_x'] = position_dict['beam_pos_x']
             data['beam_pos_y'] = position_dict['beam_pos_y']
@@ -351,7 +351,7 @@ class EsrfExportDataBrick(BaseWidget):
             data['zoom_tag'] = position_dict['zoom_tag']
             data['zoom_value'] = position_dict['zoom']
 
-            for shape in HWR.beamline.config.sample_view.get_shapes():
+            for shape in HWR.beamline.sample_view.get_shapes():
                 
                 display_name = shape.get_display_name()
                 operation_mode = shape.get_operation_mode()

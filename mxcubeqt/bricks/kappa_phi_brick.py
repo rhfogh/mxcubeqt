@@ -115,9 +115,9 @@ class KappaPhiBrick(BaseWidget):
         self.stop_button.setEnabled(False)
         self.stop_button.setFixedSize(27, 27)
 
-        self.connect(HWR.beamline.config.diffractometer, "kappaMotorMoved", self.kappa_motor_moved)
-        self.connect(HWR.beamline.config.diffractometer, "kappaPhiMotorMoved", self.kappaphi_motor_moved)
-        self.connect(HWR.beamline.config.diffractometer, "minidiffStatusChanged", self.diffractometer_state_changed)
+        self.connect(HWR.beamline.diffractometer, "kappaMotorMoved", self.kappa_motor_moved)
+        self.connect(HWR.beamline.diffractometer, "kappaPhiMotorMoved", self.kappaphi_motor_moved)
+        self.connect(HWR.beamline.diffractometer, "minidiffStatusChanged", self.diffractometer_state_changed)
 
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "showStop":
@@ -133,13 +133,13 @@ class KappaPhiBrick(BaseWidget):
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
     def stop_clicked(self):
-        HWR.beamline.config.diffractometer.stop_kappa_phi_move()
+        HWR.beamline.diffractometer.stop_kappa_phi_move()
 
     def close_clicked(self):
-        HWR.beamline.config.diffractometer.close_kappa()
+        HWR.beamline.diffractometer.close_kappa()
 
     def change_position(self):
-        HWR.beamline.config.diffractometer.move_kappa_and_phi(
+        HWR.beamline.diffractometer.move_kappa_and_phi(
             self.kappa_dspinbox.value(), self.kappaphi_dspinbox.value()
         )
 
@@ -158,7 +158,7 @@ class KappaPhiBrick(BaseWidget):
         )
 
     def kappa_value_accepted(self):
-        HWR.beamline.config.diffractometer.move_kappa_and_phi(
+        HWR.beamline.diffractometer.move_kappa_and_phi(
             self.kappa_dspinbox.value(), self.kappaphi_dspinbox.value()
         )
 
@@ -177,11 +177,11 @@ class KappaPhiBrick(BaseWidget):
         self.kappaphi_dspinbox.blockSignals(False)
 
     def diffractometer_state_changed(self, state):
-        self.setDisabled(HWR.beamline.config.diffractometer.in_plate_mode())
-        self.kappa_dspinbox.setEnabled(HWR.beamline.config.diffractometer.is_ready())
-        self.kappaphi_dspinbox.setEnabled(HWR.beamline.config.diffractometer.is_ready())
-        self.close_button.setEnabled(HWR.beamline.config.diffractometer.is_ready())
-        self.stop_button.setEnabled(not HWR.beamline.config.diffractometer.is_ready())
+        self.setDisabled(HWR.beamline.diffractometer.in_plate_mode())
+        self.kappa_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.kappaphi_dspinbox.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.close_button.setEnabled(HWR.beamline.diffractometer.is_ready())
+        self.stop_button.setEnabled(not HWR.beamline.diffractometer.is_ready())
 
         colors.set_widget_color_by_state(
             self.kappa_dspinbox.lineEdit(),

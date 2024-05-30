@@ -67,9 +67,9 @@ class MachineInfoBrick(BaseWidget):
 
     def run(self):
         """Method called when user changes a property in the gui builder"""
-        if HWR.beamline.config.machine_info is not None:
+        if HWR.beamline.machine_info is not None:
             self.setEnabled(True)
-            self.connect(HWR.beamline.config.machine_info, "valuesChanged", self.set_value)
+            self.connect(HWR.beamline.machine_info, "valuesChanged", self.set_value)
         else:
             self.setEnabled(False)
 
