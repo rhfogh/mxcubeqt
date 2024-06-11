@@ -408,8 +408,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             )
             wf.set_relative_rad_sensitivity(val)
             wf.set_characterisation_budget_fraction(
-                api.gphl_workflow.getProperty("characterisation_budget_percent", 5.0)
-                / 100.0
+                api.gphl_workflow.getProperty("characterisation_budget_fraction", 0.05)
             )
             if  api.gphl_workflow.getProperty("advanced_mode", False):
                 val = self._gphl_acq_param_widget.get_parameter_value(
