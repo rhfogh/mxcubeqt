@@ -236,9 +236,12 @@ class GphlDataDialog(QtImport.QDialog):
 
         # parameters widget
         if self.params_widget is not None:
-            self.params_widget.parametersValidSignal.disconnect(
-                self.continue_button.setEnabled
-            )
+            try:
+                self.params_widget.parametersValidSignal.disconnect(
+                    self.continue_button.setEnabled
+                )
+            except:
+                pass
             self.params_widget.close()
             self.params_widget = None
         if parameters:
