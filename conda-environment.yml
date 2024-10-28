@@ -4,8 +4,12 @@ channels:
 dependencies:
   - python=3.8,<3.11
 #  - python=3.8  # For development only - we must support down to Python 3.8
-  - openldap
-  - pip
-  - poetry
-  - pyqtgraph
+  - python-ldap=3.4.3
   - openjdk=11
+  - pyqtgraph=0.13
+  - pip
+# Put paths to mxcubecore, mxcubeqt, and PyQt and uncomment:
+#  - pip:
+#    - --editable /home/rhfogh/pycharm/mxcubecore
+#    - --editable /home/rhfogh/pycharm/mxcubeqt
+#    - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.8-cp37-abi3-manylinux_2_17_x86_64.whl
