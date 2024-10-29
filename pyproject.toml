@@ -5,9 +5,10 @@ license = "LGPL-3.0-or-later"
 description = "PyQt interface for the MXCuBE application"
 authors = ["The MXCuBE collaboration <mxcube@esrf.fr>"]
 maintainers = [
-    "Andrey Gruzinov <andrey.gruzinov@desy.de>",
+    "Marcus Oscarsson <marcus.oscarsson@esrf.fr>",
     "Rasmus H. Fogh <rhfogh@globalphasing.com>",
     "Martin Savko <martin.savko@synchrotron-soleil.fr>",
+    "Andrey Gruzinov <andrey.gruzinov@desy.de>",
 ]
 readme = "README.md"
 homepage = "http://github.com/mxcube/mxcubeqt"
