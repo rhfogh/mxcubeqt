@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "mxcubeqt"
+version = "0.0.1"
+license = "LGPL-3.0-or-later"
+description = "PyQt interface for the MXCuBE application"
+authors = ["The MXCuBE collaboration <mxcube@esrf.fr>"]
+maintainers = [
+    "Marcus Oscarsson <marcus.oscarsson@esrf.fr>",
+    "Rasmus H. Fogh <rhfogh@globalphasing.com>",
+    "Martin Savko <martin.savko@synchrotron-soleil.fr>",
+    "Andrey Gruzinov <andrey.gruzinov@desy.de>",
+]
+readme = "README.md"
+homepage = "http://github.com/mxcube/mxcubeqt"
+repository = "http://github.com/mxcube/mxcubeqt"
+documentation = "https://github.com/mxcube/mxcubeqt/tree/develop/docs/"
+keywords = ["mxcube", "mxcubeqt", "mxcubecore"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
