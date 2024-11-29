@@ -625,9 +625,8 @@ class TreeBrick(BaseWidget):
         """
         log = logging.getLogger("user_level_log")
 
-        self.lims_samples = HWR.beamline.lims.get_samples(
-            HWR.beamline.session.proposal_id, HWR.beamline.session.session_id
-        )
+        lims_name = HWR.beamline.lims.get_lims_name()
+        self.lims_samples = HWR.beamline.lims.get_samples(lims_name)
 
         basket_list = []
         sample_list = []
