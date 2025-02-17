@@ -36,7 +36,6 @@ from gui.widgets.gphl_data_dialog import GphlDataDialog
 
 from HardwareRepository import ConvertUtils
 from HardwareRepository.HardwareObjects import queue_model_objects
-from HardwareRepository.HardwareObjects import queue_model_enumerables
 from HardwareRepository.HardwareObjects.Gphl import crystal_symmetry
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
@@ -268,7 +267,7 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             space_group = ""
             if crystals:
                 spg = crystals[0].space_group
-                if spg in queue_model_enumerables.XTAL_SPACEGROUPS:
+                if spg in crystal_symmetry.XTAL_SPACEGROUPS:
                     space_group = spg
             self._gphl_acq_param_widget.set_parameter_value("crystal_lattice", "")
             self._gphl_acq_param_widget._refresh_interface("crystal_lattice", None)

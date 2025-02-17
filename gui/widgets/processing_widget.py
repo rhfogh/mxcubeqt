@@ -20,10 +20,8 @@
 from gui.utils import QtImport
 from gui.utils.widget_utils import DataModelInputBinder
 
-from HardwareRepository.HardwareObjects import (
-    queue_model_objects,
-    queue_model_enumerables,
-)
+from HardwareRepository.HardwareObjects import queue_model_objects
+from HardwareRepository.HardwareObjects.Gphl.crystal_symmetry import XTAL_SPACEGROUPS
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -56,9 +54,7 @@ class ProcessingWidget(QtImport.QWidget):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.processing_widget.space_group_combo.addItems(
-            queue_model_enumerables.XTAL_SPACEGROUPS
-        )
+        self.processing_widget.space_group_combo.addItems(XTAL_SPACEGROUPS)
 
         self._model_mib.bind_value_update(
             "cell_a", self.processing_widget.a_ledit, float, None
@@ -99,13 +95,13 @@ class ProcessingWidget(QtImport.QWidget):
         )
 
     def _space_group_change(self, index):
-        self._model.space_group = queue_model_enumerables.XTAL_SPACEGROUPS[index]
+        self._model.space_group = XTAL_SPACEGROUPS[index]
 
     def _set_space_group(self, space_group):
         index = 0
 
-        if space_group in queue_model_enumerables.XTAL_SPACEGROUPS:
-            index = queue_model_enumerables.XTAL_SPACEGROUPS.index(space_group)
+        if space_group in XTAL_SPACEGROUPS:
+            index = XTAL_SPACEGROUPS.index(space_group)
 
         self._space_group_change(index)
         self.processing_widget.space_group_combo.setCurrentIndex(index)
