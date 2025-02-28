@@ -213,16 +213,6 @@ class UrlWidget(TextEdit):
         """UI update function triggered by field value changes"""
         valid = self.is_valid()
         if valid:
-            if (
-                self.update_function is not None
-                and not self.parameters_widget.block_updates
-            ):
-                try:
-                    self.parameters_widget.block_updates = True
-                    self.update_function(self.parameters_widget)
-                finally:
-                    self.parameters_widget.block_updates = False
-
             Colors.set_widget_color(
                 self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
             )
