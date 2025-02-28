@@ -142,7 +142,6 @@ class TextEdit(QtImport.QTextEdit):
         self.__name = options["variableName"]
         if "defaultValue" in options:
             self.set_value(options["defaultValue"])
-        self.setAlignment(QtImport.Qt.AlignRight)
         if options.get("readOnly"):
             self.setReadOnly(True)
             self.setEnabled(False)
@@ -157,7 +156,7 @@ class TextEdit(QtImport.QTextEdit):
         return self.__name
 
     def get_value(self):
-        return ConvertUtils.text_type(self.text())
+        return ConvertUtils.text_type(self.toPlainText())
 
 
 class Combo(QtImport.QComboBox):

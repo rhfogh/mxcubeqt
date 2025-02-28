@@ -28,7 +28,7 @@ import logging
 from HardwareRepository import ConvertUtils
 
 from gui.utils import Colors, QtImport
-from gui.utils.paramsgui import FieldsWidget
+from gui.utils.paramsgui import FieldsWidget, TextEdit
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -166,6 +166,16 @@ class GphlDataDialog(QtImport.QDialog):
         )
         self.params_widget = None
 
+        # Footer paramter box
+        self.footer_gbox = QtImport.QGroupBox("Reference MTZ file Urls, one per line", self)
+        footer_vbox = QtImport.QVBoxLayout()
+        self.footer_gbox.setLayout(footer_vbox)
+        main_layout.addWidget(self.footer_gbox, stretch=2)
+        self.footer_gbox.setSizePolicy(
+            QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+        )
+        self.footer_widget = None
+
         # Button bar
         self.button_widget = QtImport.QWidget(self)
         button_layout = QtImport.QHBoxLayout(None)
@@ -203,6 +213,8 @@ class GphlDataDialog(QtImport.QDialog):
             result.update(self.params_widget.get_parameters_map())
         if self.cplx_gbox.isVisible():
             result["_cplx"] = self.cplx_widget.get_value()
+        if self.footer_gbox.isVisible():
+            result["_footer"] = self.footer_widget.get_value()
         self.accept()
         self._async_result.set(result)
         self._async_result = None
@@ -224,6 +236,7 @@ class GphlDataDialog(QtImport.QDialog):
         parameters = []
         info = None
         cplx = None
+        footer = None
         for dd0 in field_list:
             if info is None and dd0.get("variableName") == "_info":
                 # Info text - goes to info_gbox
@@ -231,6 +244,9 @@ class GphlDataDialog(QtImport.QDialog):
             elif cplx is None and dd0.get("variableName") == "_cplx":
                 # Complex parameter - goes to cplx_gbox
                 cplx = dd0
+            elif footer is None and dd0.get("variableName") == "_footer":
+                # Footer parameter - goes to footer_gbox
+                footer = dd0
             else:
                 parameters.append(dd0)
 
@@ -311,6 +327,27 @@ class GphlDataDialog(QtImport.QDialog):
                     % repr(cplx.get("type"))
                 )
 
+        # Footer box
+        if self.footer_widget:
+            self.footer_widget.close()
+        if footer is None:
+            self.footer_gbox.hide()
+        else:
+            if footer.get("type") == "textarea":
+                self.footer_widget = TextEdit(self.footer_gbox, footer)
+                self.footer_gbox.layout().addWidget(self.footer_widget)
+                self.footer_gbox.setTitle(footer.get("uiLabel"))
+                self.footer_gbox.show()
+                update_function = footer.get("update_function")
+                if update_function:
+                    self.footer_widget.update_function = update_function
+                    self.footer_widget.parameters_widget = params_widget
+
+            else:
+                raise NotImplementedError(
+                    "GPhL complex widget type %s not recognised for parameter _footer"
+                    % repr(footer.get("type"))
+                )
         self.show()
         self.setEnabled(True)
         self.update()
