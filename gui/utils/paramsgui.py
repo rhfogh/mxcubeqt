@@ -31,6 +31,10 @@ import sys
 from HardwareRepository import ConvertUtils
 
 from gui.utils import QtImport, Colors
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 __credits__ = ["MXCuBE collaboration"]
@@ -157,6 +161,81 @@ class TextEdit(QtImport.QTextEdit):
 
     def get_value(self):
         return ConvertUtils.text_type(self.toPlainText())
+
+
+class UrlWidget(TextEdit):
+
+    def __init__(self, parent, options):
+        TextEdit.__init__(self, parent, options)
+        self.textChanged.connect(self.input_field_changed)
+        self.parameters_widget = options.pop("parameters_widget")
+
+    def color_by_error(self, warning=False):
+        if self.is_valid():
+            if warning:
+                Colors.set_widget_color(
+                    self, Colors.LIGHT_YELLOW, QtImport.QPalette.Base
+                )
+            else:
+                Colors.set_widget_color(
+                    self, Colors.WHITE, QtImport.QPalette.Base
+                )
+        else:
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_ERROR, QtImport.QPalette.Base
+            )
+
+    def is_valid(self):
+        # Validate Urls.
+        # NB Urls supported are
+        # - a path starting with "/" optionally preceded by "file:"
+        # - a string starting with "http://" or "https://"
+        # containing a hostname, an optional port,
+        # a path starting with "/" and nothing else
+        value = self.get_value()
+        ll1 = []
+        for line in value.splitlines():
+            tpl = urlparse(line)
+            scheme = tpl.scheme
+            if not tpl.path.startswith("/"):
+                return False
+            if tpl.query or tpl.fragment or tpl.username or tpl.password:
+                return False
+            if not tpl.netloc and (not scheme or scheme == "file"):
+                continue
+            elif scheme in ("http", "https")  and tpl.hostname:
+                continue
+            else:
+                return False
+        return True
+
+    def input_field_changed(self):
+        """UI update function triggered by field value changes"""
+        valid = self.is_valid()
+        if valid:
+            if (
+                self.update_function is not None
+                and not self.parameters_widget.block_updates
+            ):
+                try:
+                    self.parameters_widget.block_updates = True
+                    self.update_function(self.parameters_widget)
+                finally:
+                    self.parameters_widget.block_updates = False
+
+            Colors.set_widget_color(
+                self, Colors.LINE_EDIT_CHANGED, QtImport.QPalette.Base
+            )
+        self.color_by_error()
+        # NBNB TODO This is not qquite correct.
+        # If this field AND anotehr is in error you get correct behaviour
+        # If you fix this field first, but if you fix the other field first
+        # The entire Popup is treated as valid.
+        # Should be fixed, but not worth the hassle in a side branch
+        if valid:
+            self.parameters_widget.validate_fields()
+        else:
+            self.parameters_widget.parametersValidSignal.emit(False)
 
 
 class Combo(QtImport.QComboBox):
@@ -415,6 +494,7 @@ WIDGET_CLASSES = {
     "boolean": CheckBox,
     "float": DoubleSpinBox,
     "textarea": TextEdit,
+    "urltextarea": UrlWidget,
 }
 
 

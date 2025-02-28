@@ -28,7 +28,7 @@ import logging
 from HardwareRepository import ConvertUtils
 
 from gui.utils import Colors, QtImport
-from gui.utils.paramsgui import FieldsWidget, TextEdit
+from gui.utils.paramsgui import FieldsWidget, UrlWidget
 
 __copyright__ = """ Copyright © 2016 - 2019 by Global Phasing Ltd. """
 __license__ = "LGPLv3+"
@@ -298,56 +298,55 @@ class GphlDataDialog(QtImport.QDialog):
             self.cplx_widget.close()
         if cplx is None:
             self.cplx_gbox.hide()
-        else:
-            if cplx.get("type") == "selection_table":
-                self.cplx_widget = SelectionTable(
-                    self.cplx_gbox, "cplx_widget", cplx["header"]
+        elif cplx.get("type") == "selection_table":
+            self.cplx_widget = SelectionTable(
+                self.cplx_gbox, "cplx_widget", cplx["header"]
+            )
+            self.cplx_widget.setSizePolicy(
+                QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
+            )
+            self.cplx_gbox.layout().addWidget(self.cplx_widget, stretch=8)
+            self.cplx_gbox.setTitle(cplx.get("uiLabel"))
+            for ii, values in enumerate(cplx["defaultValue"]):
+                self.cplx_widget.populateColumn(
+                    ii,
+                    values,
+                    colours=cplx.get("colours"),
+                    selectRow = cplx.get("selectRow")
                 )
-                self.cplx_widget.setSizePolicy(
-                    QtImport.QSizePolicy.Expanding, QtImport.QSizePolicy.Expanding
-                )
-                self.cplx_gbox.layout().addWidget(self.cplx_widget, stretch=8)
-                self.cplx_gbox.setTitle(cplx.get("uiLabel"))
-                for ii, values in enumerate(cplx["defaultValue"]):
-                    self.cplx_widget.populateColumn(
-                        ii,
-                        values,
-                        colours=cplx.get("colours"),
-                        selectRow = cplx.get("selectRow")
-                    )
-                self.cplx_gbox.show()
-                update_function = cplx.get("update_function")
-                if update_function:
-                    self.cplx_widget.update_function = update_function
-                    self.cplx_widget.parameters_widget = params_widget
+            self.cplx_gbox.show()
+            update_function = cplx.get("update_function")
+            if update_function:
+                self.cplx_widget.update_function = update_function
+                self.cplx_widget.parameters_widget = params_widget
 
-            else:
-                raise NotImplementedError(
-                    "GPhL complex widget type %s not recognised for parameter _cplx"
-                    % repr(cplx.get("type"))
-                )
+        else:
+            raise NotImplementedError(
+                "GPhL complex widget type %s not recognised for parameter _cplx"
+                % repr(cplx.get("type"))
+            )
 
         # Footer box
         if self.footer_widget:
             self.footer_widget.close()
         if footer is None:
             self.footer_gbox.hide()
-        else:
-            if footer.get("type") == "textarea":
-                self.footer_widget = TextEdit(self.footer_gbox, footer)
-                self.footer_gbox.layout().addWidget(self.footer_widget)
-                self.footer_gbox.setTitle(footer.get("uiLabel"))
-                self.footer_gbox.show()
-                update_function = footer.get("update_function")
-                if update_function:
-                    self.footer_widget.update_function = update_function
-                    self.footer_widget.parameters_widget = params_widget
+        elif footer.get("type") == "urltextarea":
+            footer["parameters_widget"] = params_widget
+            self.footer_widget = UrlWidget(self.footer_gbox, footer)
+            self.footer_gbox.layout().addWidget(self.footer_widget)
+            self.footer_gbox.setTitle(footer.get("uiLabel"))
+            self.footer_gbox.show()
+            update_function = footer.get("update_function")
+            if update_function:
+                self.footer_widget.update_function = update_function
+                # self.footer_widget.parameters_widget = params_widget
 
-            else:
-                raise NotImplementedError(
-                    "GPhL complex widget type %s not recognised for parameter _footer"
-                    % repr(footer.get("type"))
-                )
+        else:
+            raise NotImplementedError(
+                "GPhL complex widget type %s not recognised for parameter _footer"
+                % repr(footer.get("type"))
+            )
         self.show()
         self.setEnabled(True)
         self.update()
