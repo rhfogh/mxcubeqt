@@ -125,6 +125,8 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
         self.gphl_data_dialog = GphlDataDialog(self, "GPhL Workflow Data")
         self.gphl_data_dialog.setModal(True)
 
+        self.enable_compression(True)
+
     def initialise_workflows(self):
 
         workflow_hwobj = api.gphl_workflow
@@ -259,9 +261,11 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
             if not model.has_lims_data() and not api.session.get_group_name():
                 # When noprefix is set, override prefix setting;
                 # globally we cannot set location as name, apparently, but here we can
+                """GB this creates corrupt prefixes
                 self._path_template.base_prefix = (
                     model.get_name() or api.session.get_proposal()
                 )
+                """
                 self._data_path_widget.update_data_model(self._path_template)
             crystals = model.crystals
             space_group = ""
@@ -414,6 +418,25 @@ class CreateGphlWorkflowWidget(CreateTaskBase):
                     "decay_limit"
                 )
                 wf.set_decay_limit(val)
+                val = self._gphl_acq_param_widget.get_parameter_value(
+                    "reference_reflection_file"
+                ) or None
+                if val:
+                    if not ":" in val:
+                        val = "file:" + val
+                    if val.startswith("file:"):
+                        fpath = val[5:]
+                        if not os.path.isabs(fpath):
+                            logging.getLogger("user_level_log").warning(
+                                "Reference file path is not absolute: %s "
+                                % fpath
+                            )
+                        elif not os.path.isfile(fpath):
+                            logging.getLogger("user_level_log").warning(
+                                "Reference file path not found on this computer: %s "
+                                % fpath
+                            )
+                wf.set_reference_reflection_file(val)
         beam_energy_tags = wf_parameters.get("beam_energy_tags")
         if beam_energy_tags:
             wf.set_beam_energy_tags(beam_energy_tags)
