@@ -459,7 +459,7 @@ class TreeBrick(BaseWidget):
 
             if (
                     HWR.beamline.plate_manipulator is not None
-                    and HWR.beamline.diffractometer.in_plate_mode()
+                    and HWR.beamline.diffractometer.in_plate_mode
             ):
                 if self["usePlateNavigator"]:
                     self.dc_tree_widget.plate_navigator_cbox.setVisible(True)
@@ -814,7 +814,7 @@ class TreeBrick(BaseWidget):
             self.sample_changer_widget.details_button, qt_import.QColor(s_color)
         )
         self.dc_tree_widget.scroll_to_item()
-        if HWR.beamline.diffractometer.in_plate_mode():
+        if HWR.beamline.diffractometer.in_plate_mode:
             self.dc_tree_widget.plate_navigator_widget.refresh_plate_location()
 
     def sample_selection_changed(self):

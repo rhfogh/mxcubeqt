@@ -143,7 +143,7 @@ class TaskToolBoxWidget(qt_import.QWidget):
             )
 
         # Other ---------------------------------------------------------------
-        in_plate_mode = HWR.beamline.diffractometer.in_plate_mode()
+        in_plate_mode = HWR.beamline.diffractometer.in_plate_mode
 
         if (
             HWR.beamline.energy_scan is None

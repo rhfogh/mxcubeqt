@@ -292,7 +292,7 @@ class DataCollectTree(qt_import.QWidget):
                 paste_action.setEnabled(self.item_copy is not None)
                 self.item_menu.addSeparator()
                 if not item.get_model().free_pin_mode:
-                    if HWR.beamline.diffractometer.in_plate_mode():
+                    if HWR.beamline.diffractometer.in_plate_mode:
                         self.plate_sample_to_mount = item
                         self.item_menu.addAction("Move", self.mount_sample)
                     else:
@@ -854,7 +854,7 @@ class DataCollectTree(qt_import.QWidget):
         elif option == SC_FILTER_OPTIONS.MOUNTED_SAMPLE:
             loaded_sample_loc = None
 
-            if HWR.beamline.diffractometer.in_plate_mode():
+            if HWR.beamline.diffractometer.in_plate_mode:
                 try:
                     loaded_sample = HWR.beamline.plate_manipulator.getLoadedSample()
                     loaded_sample_loc = loaded_sample.getCoords()
@@ -981,7 +981,7 @@ class DataCollectTree(qt_import.QWidget):
         if isinstance(item, queue_item.SampleQueueItem):
             if item.get_model().free_pin_mode == True:
                 result = True
-            elif HWR.beamline.diffractometer.in_plate_mode():
+            elif HWR.beamline.diffractometer.in_plate_mode:
                 if HWR.beamline.plate_manipulator is not None:
                     if not HWR.beamline.plate_manipulator.has_loaded_sample():
                         result = False

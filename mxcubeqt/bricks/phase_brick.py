@@ -122,7 +122,7 @@ class PhaseBrick(BaseWidget):
             except AttributeError:
                 return
 
-        if phase.lower() != "unknown" and self.phase_combobox.count() > 0:
+        if phase and phase.lower() != "unknown" and self.phase_combobox.count() > 0:
             # index = self.phase_combobox.findText(phase)
             # self.phase_combobox.setEditText(phase)
             self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
