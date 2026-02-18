@@ -893,17 +893,6 @@ class DataCollectTree(qt_import.QWidget):
         """Sets centring method"""
         self.centring_method = method_number
 
-        try:
-            dm = HWR.beamline.diffractometer
-
-            if self.centring_method == queue_model_enumerables.CENTRING_METHOD.FULLY_AUTOMATIC:
-                dm.user_confirms_centring = False
-            else:
-                dm.user_confirms_centring = True
-        except AttributeError:
-            # beamline_setup_hwobj not set when method called
-            pass
-
     def continue_button_click(self):
         """Sets or resets pause event"""
         if HWR.beamline.queue_manager.is_executing():

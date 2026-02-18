@@ -442,7 +442,8 @@ class TreeBrick(BaseWidget):
 
             if (
                 HWR.beamline.sample_changer is not None
-                and HWR.beamline.diffractometer.use_sample_changer()
+                # TODO NBNB BROKEN since 20260217. must be replaced, temporarily removed
+                # and HWR.beamline.diffractometer.use_sample_changer()
             ):
                 sc_basket_content, sc_sample_content = self.get_sc_content()
                 if sc_basket_content and sc_sample_content:

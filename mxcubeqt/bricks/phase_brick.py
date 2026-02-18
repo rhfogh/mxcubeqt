@@ -89,7 +89,11 @@ class PhaseBrick(BaseWidget):
             for phase in phase_list:
                 self.phase_combobox.addItem(phase)
             self.setEnabled(True)
-            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(HWR.beamline.diffractometer.current_phase))
+            self.phase_combobox.setCurrentIndex(
+                self.phase_combobox.findText(
+                    HWR.beamline.diffractometer.current_phase.value
+                )
+            )
         else:
             self.setEnabled(False)
 
@@ -122,10 +126,9 @@ class PhaseBrick(BaseWidget):
             except AttributeError:
                 return
 
-        if phase and phase.lower() != "unknown" and self.phase_combobox.count() > 0:
-            # index = self.phase_combobox.findText(phase)
-            # self.phase_combobox.setEditText(phase)
-            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase))
+        phaseval = phase.value
+        if phaseval and phaseval.lower() != "unknown" and self.phase_combobox.count() > 0:
+            self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phaseval))
         else:
             self.phase_combobox.setCurrentIndex(-1)
 

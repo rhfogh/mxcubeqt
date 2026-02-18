@@ -654,8 +654,6 @@ class CreateTaskBase(qt_import.QWidget):
             except AttributeError:
                 sample_is_mounted = False
 
-        fully_automatic = not dm.user_confirms_centring
-
         free_pin_mode = sample.free_pin_mode
         temp_tasks = self._create_task(sample, shape, comments)
 
