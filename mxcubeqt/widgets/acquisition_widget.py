@@ -700,30 +700,7 @@ class AcquisitionWidget(qt_import.QWidget):
     def update_num_images_limits(self, num_images_limits=None):
         """Updates number of images limit. Method used if plate mode.
         """
-
         self._acquisition_mib.validate_all()
-
-        return
-        if HWR.beamline.diffractometer.in_plate_mode:
-            if num_images_limits is None:
-                try:
-                    osc_start = float(self.acq_widget_layout.osc_start_ledit.text())
-                    osc_range = float(self.acq_widget_layout.osc_range_ledit.text())
-                except ValueError:
-                    return
-
-                if osc_range == 0:
-                    return
-
-                num_images_limits = int(
-                    (self.osc_start_validator.top() - osc_start) / osc_range
-                )
-
-            self.num_img_validator.setTop(num_images_limits)
-            self.acq_widget_layout.num_images_ledit.setToolTip(
-                "Number of images limits : %d" % num_images_limits
-            )
-            self._acquisition_mib.validate_all()
 
     def init_detector_roi_modes(self):
         roi_modes = HWR.beamline.detector.get_roi_modes()
