@@ -16,4 +16,5 @@ dependencies:
 #      - yamllint
 #      - --editable /home/rhfogh/pycharm/mxcubecore
 #      - --editable /home/rhfogh/pycharm/mxcubeqt
+#      - --editable /home/rhfogh/pycharm/mxlims_data_model
 #      - /home/rhfogh/Software/PyQt/PyQt5_commercial-5.15.11-cp38-abi3-manylinux_2_17_x86_64.whl
