@@ -266,11 +266,11 @@ class TreeBrick(BaseWidget):
         )
         self.connect(
             HWR.beamline.diffractometer,
-            "minidiffPhaseChanged",
+            "phaseChanged",
             self.diffractometer_phase_changed,
         )
         self.diffractometer_phase_changed(
-            HWR.beamline.diffractometer.get_current_phase()
+            HWR.beamline.diffractometer.get_phase()
         )
 
         self.connect(
@@ -1149,12 +1149,13 @@ class TreeBrick(BaseWidget):
 
         # Do not allow to start xray imaging from BeamLocation and DataCollection phase
         self.enable_collect_conditions["imaging"] = True
+        diffr = HWR.beamline.diffractometer
         for item in self.get_selected_items():
             if isinstance(
                 item, queue_item.XrayImagingQueueItem
-            ) and HWR.beamline.diffractometer.get_current_phase() in (
-                "BeamLocation",
-                "DataCollection",
+            ) and diffr.get_phase() in (
+                diffr.PHASE_ENUM.SEE_BEAM,
+                diffr.PHASE_ENUM.COLLECT,
             ):
                 self.enable_collect_conditions["imaging"] = False
 

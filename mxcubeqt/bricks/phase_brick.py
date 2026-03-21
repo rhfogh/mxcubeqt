@@ -74,7 +74,7 @@ class PhaseBrick(BaseWidget):
         self.init_phase_list()
 
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer, "phaseChanged", self.phase_changed
         )
         self.connect(
             HWR.beamline.diffractometer, "minidiffPhaseStateChanged", self.phase_state_changed
@@ -120,8 +120,6 @@ class PhaseBrick(BaseWidget):
     def phase_changed(self, phase=None):
         if phase is None:
             try:
-                # NB get_phase is only defined in P11-specific code, so this is no good.
-                # What should be here??
                 phase = HWR.beamline.diffractometer.get_phase()
             except AttributeError:
                 return

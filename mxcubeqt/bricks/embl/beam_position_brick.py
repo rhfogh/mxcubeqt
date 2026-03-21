@@ -133,7 +133,7 @@ class BeamPositionBrick(BaseWidget):
         self.measure_flux_button.setIcon(icons.load_icon("Sun"))
 
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer, "phaseChanged", self.phase_changed
         )
         if HWR.beamline.beam.definer is not None:
             self.connect(
@@ -308,7 +308,9 @@ class BeamPositionBrick(BaseWidget):
         :param phase:
         :return:
         """
-        self.is_beam_location_phase = phase == HWR.beamline.diffractometer.PHASE_BEAM
+        self.is_beam_location_phase = (
+                phase == HWR.beamline.diffractometer.PHASE_ENUM.SEE_BEAM
+        )
         self.update_gui()
 
     def measure_flux_clicked(self):

@@ -575,7 +575,7 @@ class HitMapWidget(qt_import.QWidget):
 
     def rotate_and_create_helical_line_clicked(self):
         self.move_to_selected_position()
-        HWR.beamline.diffractometer.move_omega_relative(90)
+        HWR.beamline.diffractometer.omega.set_value_relative(90)
         HWR.beamline.sample_view.create_auto_line()
 
     def move_to_selected_position(self):
