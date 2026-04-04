@@ -521,8 +521,8 @@ class CreateAdvancedWidget(CreateTaskBase):
         grid = self.get_selected_shapes()[0]
 
         if grid:
-            HWR.beamline.diffractometer.move_to_centred_position(
-                grid.get_centred_position()
+            HWR.beamline.diffractometer.set_value_motors(
+                grid.get_centred_position().as_dict()
             )
 
     def method_combo_activated(self, index):
