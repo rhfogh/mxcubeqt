@@ -96,6 +96,7 @@ class CreateTaskBase(QtImport.QWidget):
             self._enable_compression = state
             self._data_path_widget.data_path_layout.compression_cbox.setChecked(state)
             self._data_path_widget.data_path_layout.compression_cbox.setVisible(state)
+            self._data_path_widget.data_path_layout.compression_cbox.setDisabled(True)
             self._data_path_widget.update_file_name()
 
     def init_models(self):
@@ -404,6 +405,7 @@ class CreateTaskBase(QtImport.QWidget):
 
     def single_item_selection(self, tree_item):
         sample_data_model = self.get_sample_item(tree_item).get_model()
+        #sample_item = self.get_sample_item(tree_item)
         if self._data_path_widget:
             self._data_path_widget.enable_macros = False
 
@@ -436,7 +438,6 @@ class CreateTaskBase(QtImport.QWidget):
                     self._path_template.directory = data_directory
                     self._path_template.process_directory = proc_directory
                     self._path_template.base_prefix = self.get_default_prefix()
-
             # If no information from lims then add basket/sample info
             # This works if each sample is clicked, but do not work
             # when a task is assigned to the whole puck.
@@ -823,6 +824,36 @@ class CreateTaskBase(QtImport.QWidget):
             user_name = os.getenv("SUDO_USER")
         else:
             user_name = os.getenv("USER")
+
+        #logging.getLogger("GUI").info("user_name: %s %s %s "%(type(user_name),user_name,"p3l-chari" == user_name ))
+
+        _badnames = [None, str(None), str(),"unknown","Unknown","UNKNOWN",0,str(0)]
+        if "molox" in user_name or "ind-merck" in user_name:
+            if sample.lims_code not in _badnames:
+                acq_path_template.directory = acq_path_template.directory.split("RAW_DATA")[0] + "RAW_DATA/" + str(sample.lims_code)
+                if acq_path_template.get_prefix()[0:4] != 'ref-':
+                    acq_path_template.directory = acq_path_template.directory  + "/" + str(sample.name)
+                logging.getLogger("GUI").info("Collection directory: %s"%acq_path_template.directory)
+        elif "p3l-chari" in user_name or "p3l-tittmann" in user_name or "p3l-gleb1" in user_name:
+            if "Kai" in acq_path_template.directory:
+                d = acq_path_template.directory.split("Kai")[0] + "Kai/"
+            else:
+                d = acq_path_template.directory.split("RAW_DATA")[0] + "RAW_DATA/"
+            if sample.container_code not in _badnames:
+                acq_path_template.directory = d + str(sample.container_code)
+            if self._acquisition_parameters.num_images  >= 100:
+                acq_path_template.directory = acq_path_template.directory + "/dts"
+            logging.getLogger("GUI").info("Collection directory: %s"%acq_path_template.directory)
+
+        elif "p3l-ind-crystal1" == user_name:
+            if sample.crystals[0].protein_acronym not in _badnames and sample.name not in _badnames:
+                d = acq_path_template.directory.split("RAW_DATA")[0] + "RAW_DATA/"
+                acq_path_template.directory = d + sample.crystals[0].protein_acronym + "-" + sample.name
+                logging.getLogger("GUI").info("Collection directory: %s"%acq_path_template.directory)
+
+        if self._task_node_name == "GphlWorkflow":
+            acq_path_template.directory = os.path.join(acq_path_template.directory.split("GPhL_WF")[0], "GPhL_WF")
+
 
         # expand macro keywords in the directory path
         acq_path_template.directory = acq_path_template.directory.replace(

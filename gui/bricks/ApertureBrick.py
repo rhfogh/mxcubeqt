@@ -138,6 +138,9 @@ class ApertureBrick(BaseWidget):
         else:
             BaseWidget.property_changed(self, property_name, old_value, new_value)
 
+    def set_expert_mode(self, is_expert_mode):
+        self.setEnabled(is_expert_mode)
+
     def change_diameter(self):
         self.aperture_hwobj.set_diameter_index(
             self.aperture_diameter_combo.currentIndex()

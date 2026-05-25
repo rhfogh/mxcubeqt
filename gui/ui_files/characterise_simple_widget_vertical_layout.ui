@@ -60,7 +60,7 @@
             <string>Single subwedge</string>
            </property>
           </item>
-          <item>
+          <!--item>
            <property name="text">
             <string>Few subwedges</string>
            </property>
@@ -69,7 +69,7 @@
            <property name="text">
             <string>Many subwedges</string>
            </property>
-          </item>
+          </item-->
          </widget>
         </item>
         <item row="0" column="0">

@@ -58,9 +58,12 @@ class ImageTrackingStatusBrick(BaseWidget):
         self.image_tracking_cbox = QtImport.QCheckBox(
             "Enable Adxv image tracking", _main_groupbox
         )
+        #GB: per temporary issues of image server
+        self.image_tracking_cbox.setEnabled(True)
         self.filter_frames_cbox = QtImport.QCheckBox(
             "Filter frames based on Dozor score", _main_groupbox
         )
+        self.filter_frames_cbox.setEnabled(True)
         self.spot_list_cbox = QtImport.QCheckBox(
             "Indicate spots", _main_groupbox
         )

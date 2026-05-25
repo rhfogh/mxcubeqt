@@ -328,6 +328,7 @@ class ProposalBrick(BaseWidget):
         api.session.session_id = None
         api.session.proposal_id = None
         api.session.proposal_number = None
+        api.session.proposal_title = None
 
     # Sets the current session; changes from login mode to logout mode
     def set_proposal(self, proposal, session):
@@ -336,6 +337,7 @@ class ProposalBrick(BaseWidget):
         api.session.session_id = session["sessionId"]
         api.session.proposal_id = proposal["proposalId"]
         api.session.proposal_number = proposal["number"]
+        api.session.proposal_title = proposal["title"]
 
         # Change mode
         if not self.login_as_user:

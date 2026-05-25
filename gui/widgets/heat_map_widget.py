@@ -191,7 +191,7 @@ class HeatMapWidget(QtImport.QWidget):
 
         self._heat_map_plot.contextMenuEvent = self.open_heat_map_popup_menu
 
-        score_types = ["Resolution", "Score", "Spots num"]
+        score_types = ["Resolution", "Score", "Spots num", "Intensity"]
         for score_type in score_types:
             self._score_type_cbox.addItem(score_type)
         self._score_type_cbox.setMaximumWidth(200)
@@ -284,10 +284,19 @@ class HeatMapWidget(QtImport.QWidget):
                 color="b",
                 marker="s",
             )
+            self._heat_map_plot.add_curve(
+                "is",
+                y_array,
+                x_array,
+                label="Intensity",
+                linestyle="None",
+                color="g",
+                marker="s",
+            )
             self._heat_map_plot.hide_all_curves()
             self._heat_map_plot.show_curve(self.__score_key)
-            self._heat_map_plot.set_x_axis_limits((0, acq_parameters.num_images))
-            self._heat_map_plot.set_y_axis_limits((0, 1))
+            self._heat_map_plot.set_x_axis_limits((0, acq_parameters.num_images-1))
+            #self._heat_map_plot.set_y_axis_limits((0, 1))
         else:
             # if self.allow_adjust_size:
             if False:
@@ -342,6 +351,8 @@ class HeatMapWidget(QtImport.QWidget):
             self.__score_key = "score"
         elif score_type_index == 2:
             self.__score_key = "spots_num"
+        elif score_type_index == 3:
+            self.__score_key = "is"
 
         if self.__results_display is not None:
             if self.__results_display[self.__score_key].ndim == 1:
@@ -367,7 +378,14 @@ class HeatMapWidget(QtImport.QWidget):
                 if self.__score_key == "spots_resolution":
                     labels.append("inf")
                     for item in positions[1:]:
+                        if abs(item) > 0: 
                         labels.append("%.2f" % (1.0 / item))
+                else:
+                           labels.append("%.2f" % 1.0)
+                elif self.__score_key == "is":
+                    for item in positions:
+                        labels.append("%.2f" % item)
+ 
                 else:
                     for item in positions:
                         labels.append("%d" % item)
@@ -395,7 +413,10 @@ class HeatMapWidget(QtImport.QWidget):
     def mouse_moved(self, pos_x, pos_y):
         do_update = False
 
+        if self.__associated_grid is not None:
         axis_range = self.__associated_grid.get_col_row_num()
+        else:
+            axis_range=[0,1]
         if pos_x < 1:
             pos_x = pos_x * axis_range[0]
             pos_y = pos_y * axis_range[1]

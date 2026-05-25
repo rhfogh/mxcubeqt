@@ -99,7 +99,7 @@ class AcquisitionWidgetSimple(QtImport.QWidget):
             0, 360, 4, self.acq_widget_layout.kappa_phi_ledit
         )
         self.energy_validator = QtImport.QDoubleValidator(
-            0, 25, 5, self.acq_widget_layout.energy_ledit
+            0, 27, 5, self.acq_widget_layout.energy_ledit
         )
         self.resolution_validator = QtImport.QDoubleValidator(
             0, 15, 3, self.acq_widget_layout.resolution_ledit
