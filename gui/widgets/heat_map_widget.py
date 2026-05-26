@@ -379,9 +379,9 @@ class HeatMapWidget(QtImport.QWidget):
                     labels.append("inf")
                     for item in positions[1:]:
                         if abs(item) > 0: 
-                        labels.append("%.2f" % (1.0 / item))
-                else:
-                           labels.append("%.2f" % 1.0)
+                            labels.append("%.2f" % (1.0 / item))
+                        else:
+                            labels.append("%.2f" % 1.0)
                 elif self.__score_key == "is":
                     for item in positions:
                         labels.append("%.2f" % item)
@@ -414,7 +414,7 @@ class HeatMapWidget(QtImport.QWidget):
         do_update = False
 
         if self.__associated_grid is not None:
-        axis_range = self.__associated_grid.get_col_row_num()
+            axis_range = self.__associated_grid.get_col_row_num()
         else:
             axis_range=[0,1]
         if pos_x < 1:
