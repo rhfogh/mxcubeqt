@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>557</height>
+    <width>795</width>
+    <height>402</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -58,6 +58,9 @@
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_2">
+        <property name="spacing">
+         <number>2</number>
+        </property>
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -122,13 +125,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -149,7 +152,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Range per frame (°):</string>
+           <string>Frame range (°):</string>
           </property>
           <property name="wordWrap">
            <bool>false</bool>
@@ -160,13 +163,13 @@
          <widget class="QLineEdit" name="osc_range_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -190,7 +193,7 @@
            <bool>true</bool>
           </property>
           <property name="text">
-           <string>Number of images:</string>
+           <string># images:</string>
           </property>
           <property name="wordWrap">
            <bool>false</bool>
@@ -201,13 +204,13 @@
          <widget class="QLineEdit" name="num_images_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -242,13 +245,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -286,13 +289,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -336,13 +339,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -376,7 +379,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Exposure time (s):</string>
+           <string>Frame time (s):</string>
           </property>
           <property name="wordWrap">
            <bool>false</bool>
@@ -387,13 +390,13 @@
          <widget class="QLineEdit" name="exp_time_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -402,7 +405,7 @@
         <item row="3" column="2">
          <widget class="QLabel" name="total_exp_time_label">
           <property name="text">
-           <string>Total exp. time (s):</string>
+           <string>Total time (s):</string>
           </property>
          </widget>
         </item>
@@ -410,13 +413,13 @@
          <widget class="QLineEdit" name="exp_time_total_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -448,13 +451,13 @@
          <widget class="QLineEdit" name="kappa_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -486,13 +489,13 @@
          <widget class="QLineEdit" name="kappa_phi_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -524,13 +527,13 @@
          <widget class="QLineEdit" name="energy_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -562,13 +565,13 @@
          <widget class="QComboBox" name="energies_combo">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -603,13 +606,13 @@
          <widget class="QLineEdit" name="resolution_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -630,7 +633,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Detector distance (mm):</string>
+           <string>Distance (mm):</string>
           </property>
          </widget>
         </item>
@@ -638,13 +641,13 @@
          <widget class="QLineEdit" name="detector_distance_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -682,13 +685,13 @@
          <widget class="QLineEdit" name="transmission_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -717,13 +720,13 @@
          <widget class="QLineEdit" name="flux_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -763,7 +766,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Estimated dose (MGy):</string>
+           <string>Dose (MGy):</string>
           </property>
          </widget>
         </item>
@@ -771,13 +774,13 @@
          <widget class="QLineEdit" name="dose_ledit">
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>27</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>27</height>
            </size>
           </property>
@@ -816,13 +819,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>80</width>
+            <width>25</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>80</width>
+            <width>50</width>
             <height>16777215</height>
            </size>
           </property>
