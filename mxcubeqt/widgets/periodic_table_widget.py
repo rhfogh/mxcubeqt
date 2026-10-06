@@ -56,32 +56,32 @@ class PeriodicTableWidget(qt_import.QWidget):
             self.periodic_table = CustomPeriodicTable(self)
         else:
             self.periodic_elements_combo = qt_import.QComboBox(self)
-            self.periodic_elements_combo.setFixedWidth(100)
+            self.periodic_elements_combo.setMaximumHeight(37)
 
         self.edge_widget = qt_import.QWidget(self)
         edge_label = qt_import.QLabel("Edge:", self.edge_widget)
         self.edge_combo = qt_import.QComboBox(self.edge_widget)
-
+        
         # Layout --------------------------------------------------------------
-        _edge_hlayout = qt_import.QHBoxLayout(self.edge_widget)
+        self._edge_hlayout = qt_import.QHBoxLayout(self.edge_widget)
         if not PYMCA_IMPORTED:
-            _edge_hlayout.addWidget(self.periodic_elements_combo)
-        _edge_hlayout.addWidget(edge_label)
-        _edge_hlayout.addWidget(self.edge_combo)
-        _edge_hlayout.addStretch(0)
-        _edge_hlayout.setSpacing(2)
-        _edge_hlayout.setContentsMargins(0, 0, 0, 0)
+            self._edge_hlayout.addWidget(self.periodic_elements_combo)
+        self._edge_hlayout.addWidget(edge_label)
+        self._edge_hlayout.addWidget(self.edge_combo)
+        self._edge_hlayout.addStretch(2)
+        self._edge_hlayout.setSpacing(2)
+        self._edge_hlayout.setContentsMargins(0, 0, 0, 0)
 
-        _main_vlayout = qt_import.QVBoxLayout(self)
+        self._main_vlayout = qt_import.QVBoxLayout(self)
         if PYMCA_IMPORTED:
-            _main_vlayout.addWidget(self.periodic_table, qt_import.Qt.AlignHCenter)
-        _main_vlayout.addWidget(self.edge_widget)
-        _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(2)
-        _main_vlayout.setContentsMargins(2, 2, 2, 2)
-
+            self._main_vlayout.addWidget(self.periodic_table, qt_import.Qt.AlignHCenter)
+        self._main_vlayout.addWidget(self.edge_widget)
+        self._main_vlayout.addStretch(0)
+        self._main_vlayout.setSpacing(2)
+        self._main_vlayout.setContentsMargins(2, 2, 2, 2)
+        
         # SizePolicies --------------------------------------------------------
-
+        
         # Qt signal/slot connections ------------------------------------------
         if PYMCA_IMPORTED:
             self.periodic_table.edgeSelectedSignal.connect(self.edge_selected)
@@ -141,7 +141,7 @@ if PYMCA_IMPORTED:
 
         def __init__(self, *args):
             QPeriodicTable.QPeriodicTable.__init__(self, *args)
-
+            self.setMaximumWidth(500)
             self.elements_dict = {}
             if PYMCA_IMPORTED == 5:
                 self.sigElementClicked.connect(self.table_element_clicked)
@@ -153,10 +153,12 @@ if PYMCA_IMPORTED:
                 self.eltButton[b].colors[0] = qt_import.QColor(qt_import.Qt.green)
                 self.eltButton[b].colors[1] = qt_import.QColor(qt_import.Qt.darkGreen)
                 self.eltButton[b].setEnabled(False)
+                self.eltButton[b].setMaximumHeight(27)
+                
             for el in QPeriodicTable.Elements:
                 symbol = el[0]
                 self.elements_dict[symbol] = el
-
+    
         def elementEnter(self, symbol, z=None, name=None):
             if isinstance(symbol, tuple) and len(symbol) > 0:
                 symbol = symbol[0]
