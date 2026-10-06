@@ -56,6 +56,41 @@ class SampleControlBrick(BaseWidget):
         # Slots ---------------------------------------------------------------
 
         # Graphic elements ----------------------------------------------------
+        self.create_graphics_elements()
+
+        # Layout --------------------------------------------------------------
+        _main_layout = self.create_layout()
+        
+        # Qt signal/slot connections ------------------------------------------
+        self.create_connections()
+
+        # Other ---------------------------------------------------------------
+        self.centre_button.setToolTip("N-click centring (Ctrl+1)")
+        self.accept_button.setToolTip(
+            "Accept centring or "
+            "create a point\nbased on current position (Ctrl+2)"
+        )
+        self.reject_button.setToolTip("Reject centring")
+        self.create_line_button.setToolTip(
+            "Create helical line between \n" + "two points (Ctrl+L)"
+        )
+        self.draw_grid_button.setToolTip("Create grid with drag and drop (Ctrl+G)")
+        self.select_all_button.setToolTip("Select all centring points (Ctrl+A)")
+        self.clear_all_button.setToolTip("Clear all items (Ctrl+X)")
+        # self.instanceSynchronize("")
+
+        self.connect(HWR.beamline.sample_view, "centringStarted", self.centring_started)
+        self.connect(HWR.beamline.sample_view, "centringFailed", self.centring_failed)
+        self.connect(
+            HWR.beamline.sample_view, "centringSuccessful", self.centring_successful
+        )
+        self.connect(
+            HWR.beamline.sample_view,
+            "diffractometerPhaseChanged",
+            self.diffractometer_phase_changed,
+        )
+
+    def create_graphics_elements(self):
         self.centre_button = DuoStateButton(self, "Centre")
         self.centre_button.set_icons("VCRPlay2", "Delete")
         self.accept_button = MonoStateButton(self, "Save", "ThumbUp")
@@ -76,26 +111,27 @@ class SampleControlBrick(BaseWidget):
         self.auto_center_button.setText("Auto")
         self.realign_button = MonoStateButton(self, "Realign beam", "QuickRealign")
 
-        # Layout --------------------------------------------------------------
-        _main_vlayout = qt_import.QVBoxLayout(self)
-        _main_vlayout.addWidget(self.centre_button)
-        _main_vlayout.addWidget(self.accept_button)
-        _main_vlayout.addWidget(self.reject_button)
-        _main_vlayout.addWidget(self.create_line_button)
-        _main_vlayout.addWidget(self.draw_grid_button)
-        _main_vlayout.addWidget(self.auto_focus_button)
-        _main_vlayout.addWidget(self.snapshot_button)
-        _main_vlayout.addWidget(self.refresh_camera_button)
-        _main_vlayout.addWidget(self.visual_align_button)
-        _main_vlayout.addWidget(self.select_all_button)
-        _main_vlayout.addWidget(self.clear_all_button)
-        _main_vlayout.addWidget(self.auto_center_button)
-        _main_vlayout.addWidget(self.realign_button)
-        _main_vlayout.addStretch(0)
-        _main_vlayout.setSpacing(0)
-        _main_vlayout.setContentsMargins(0, 0, 0, 0)
-
-        # Qt signal/slot connections ------------------------------------------
+    def create_layout(self):
+        _main_layout = qt_import.QVBoxLayout(self)
+        _main_layout.addWidget(self.centre_button)
+        _main_layout.addWidget(self.accept_button)
+        _main_layout.addWidget(self.reject_button)
+        _main_layout.addWidget(self.create_line_button)
+        _main_layout.addWidget(self.draw_grid_button)
+        _main_layout.addWidget(self.auto_focus_button)
+        _main_layout.addWidget(self.snapshot_button)
+        _main_layout.addWidget(self.refresh_camera_button)
+        _main_layout.addWidget(self.visual_align_button)
+        _main_layout.addWidget(self.select_all_button)
+        _main_layout.addWidget(self.clear_all_button)
+        _main_layout.addWidget(self.auto_center_button)
+        _main_layout.addWidget(self.realign_button)
+        _main_layout.addStretch(0)
+        _main_layout.setSpacing(0)
+        _main_layout.setContentsMargins(0, 0, 0, 0)
+        return _main_layout
+    
+    def create_connections(self):
         self.centre_button.commandExecuteSignal.connect(self.centre_button_clicked)
         self.accept_button.clicked.connect(self.accept_clicked)
         self.reject_button.clicked.connect(self.reject_clicked)
@@ -108,33 +144,7 @@ class SampleControlBrick(BaseWidget):
         self.select_all_button.clicked.connect(select_all_clicked)
         self.clear_all_button.clicked.connect(clear_all_clicked)
         self.auto_center_button.clicked.connect(auto_center_clicked)
-
-        # Other ---------------------------------------------------------------
-        self.centre_button.setToolTip("3 click centring")
-        self.accept_button.setToolTip(
-            "Accept 3 click centring or "
-            "create a point\nbased on current position"
-        )
-        self.reject_button.setToolTip("Reject centring")
-        self.create_line_button.setToolTip(
-            "Create helical line between two points"
-        )
-        self.draw_grid_button.setToolTip("Create grid with drag and drop")
-        self.select_all_button.setToolTip("Select all centring points")
-        self.clear_all_button.setToolTip("Clear all items")
-        # self.instanceSynchronize("")
-
-        self.connect(HWR.beamline.sample_view, "centringStarted", self.centring_started)
-        self.connect(HWR.beamline.sample_view, "centringFailed", self.centring_failed)
-        self.connect(
-            HWR.beamline.sample_view, "centringSuccessful", self.centring_successful
-        )
-        self.connect(
-            HWR.beamline.sample_view,
-            "diffractometerPhaseChanged",
-            self.diffractometer_phase_changed,
-        )
-
+        
     def property_changed(self, property_name, old_value, new_value):
         if property_name == "enableAutoFocus":
             self.auto_focus_button.setVisible(new_value)
@@ -233,7 +243,7 @@ class SampleControlBrick(BaseWidget):
 
     def diffractometer_phase_changed(self, phase):
         # TODO connect this to minidiff
-        status = phase != "BeamLocation"
+        status = phase.value != "BeamLocation"
         self.centre_button.setEnabled(status)
         self.accept_button.setEnabled(status)
         self.reject_button.setEnabled(status)
