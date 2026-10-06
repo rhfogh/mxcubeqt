@@ -55,7 +55,7 @@ class SoleilProposalBrick(ProposalBrick):
         self.spacer_combo.setFixedWidth(100)
         self.spacer_combo.hide()
         
-        self.spacer = qt_import.QSpacerItem(300, 10, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum)
+        self.spacer = qt_import.QSpacerItem(550, 10, qt_import.QSizePolicy.Expanding, qt_import.QSizePolicy.Minimum)
         ProposalBrick.__init__(self, *args)
         self.proposal_number_ledit.setFixedWidth(100)
         
@@ -89,7 +89,7 @@ class SoleilProposalBrick(ProposalBrick):
         _login_as_proposal_widget_layout.addWidget(self.logout_button)
         _login_as_proposal_widget_layout.setSpacing(0)
         _login_as_proposal_widget_layout.setContentsMargins(0, 0, 0, 0)
-            
+        
     def login_successful(self, proposal_number=None):
         #self.root_log.info('proposal_dict %s ' % proposal_dict)
         #self.root_log.info('session_dict %s ' % session_dict)
