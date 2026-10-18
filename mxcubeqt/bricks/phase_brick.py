@@ -74,10 +74,10 @@ class PhaseBrick(BaseWidget):
         self.init_phase_list()
 
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict["phase"], "diffractometerPhaseChanged", self.phase_changed
         )
         self.connect(
-            HWR.beamline.diffractometer, "minidiffPhaseStateChanged", self.phase_state_changed
+            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict["phase"], "diffractometerPhaseStateChanged", self.phase_state_changed
         )
         self.phase_changed()
 
@@ -109,10 +109,10 @@ class PhaseBrick(BaseWidget):
                    )
                    == qt_import.QMessageBox.Ok
                 ):
-                   HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
+                   HWR.beamline.diffractometer.set_phase(requested_phase, timeout=0)
             else:
-                HWR.beamline.diffractometer.set_phase(requested_phase, timeout=None)
-
+                HWR.beamline.diffractometer.set_phase(requested_phase, timeout=0)
+        
     def phase_changed(self, phase=None):
         if phase is None:
             try:
@@ -128,17 +128,15 @@ class PhaseBrick(BaseWidget):
             self.phase_combobox.setCurrentIndex(self.phase_combobox.findText(phase.name))
         else:
             self.phase_combobox.setCurrentIndex(-1)
-
+        
     def phase_state_changed(self, state):
-
-        if state.value == "moving":
+        if state.name.lower() == "moving":
             color = colors.LIGHT_YELLOW
-        elif state.value == "ready":
+        elif state.name.lower() == "ready":
             color = colors.LIGHT_GREEN
         else:
             self.phase_combobox.setCurrentText("unknown")
             color = colors.DARK_GRAY
-
         colors.set_widget_color(
             self.phase_combobox, color, qt_import.QPalette.Button
         )
