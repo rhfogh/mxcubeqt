@@ -510,17 +510,17 @@
           </property>
           <item>
            <property name="text">
-            <string>Manual 3-click</string>
+            <string>Auto + n-click</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Optical semi automatic </string>
+            <string>Manual n-click</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Optical fully automatic</string>
+            <string>Auto + refractive</string>
            </property>
           </item>
           <item>
