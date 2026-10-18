@@ -158,7 +158,7 @@ class SoleilSampleControlBrick(SampleControlBrick):
 
     def execute_anneal(self):
         logging.getLogger().info('execute_anneal time %s' % self.anneal_time)
-        HWR.beamline.diffractometer.anneal(time=self.anneal_time)
+        HWR.beamline.diffractometer.anneal(duration=self.anneal_time)
         #os.system('anneal.py -t %f' % self.anneal_time)
 
     def excenter_clicked(self):
