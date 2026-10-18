@@ -131,7 +131,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -169,7 +169,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -210,7 +210,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -238,7 +238,7 @@
         <item row="1" column="3">
          <widget class="QLineEdit" name="osc_total_range_ledit">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -251,7 +251,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -282,7 +282,7 @@
         <item row="2" column="1">
          <widget class="QLineEdit" name="first_image_ledit">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -295,7 +295,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -345,7 +345,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -396,7 +396,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -419,7 +419,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -457,7 +457,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -495,7 +495,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -533,7 +533,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -571,7 +571,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -612,7 +612,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -647,7 +647,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -691,7 +691,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -726,7 +726,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -780,7 +780,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>27</height>
            </size>
           </property>
@@ -812,7 +812,7 @@
            <bool>true</bool>
           </property>
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -825,7 +825,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>75</width>
             <height>16777215</height>
            </size>
           </property>
