@@ -521,7 +521,8 @@ class Configuration:
             try:
                 yaml_dict = self.dump_tree()
                 with open(filename, "w") as outfile:
-                    yaml.dump(yaml_dict, outfile)
+                    y = yaml.YAML(typ='unsafe', pure=True)
+                    y.dump(yaml_dict, outfile)
                 outfile.close()
                 self.has_changed = False
 
