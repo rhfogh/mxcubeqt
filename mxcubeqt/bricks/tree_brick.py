@@ -636,7 +636,7 @@ class TreeBrick(BaseWidget):
         self.sample_changer_widget.sample_combo.clear()
         for sample in self.lims_samples:
             try:
-                if sample.containerSampleChangerLocation:
+                if sample.get("containerSampleChangerLocation"):
                     self.filtered_lims_samples.append(sample)
                     item_text = "%s-%s" % (sample.proteinAcronym, sample.sampleName)
                     self.sample_changer_widget.sample_combo.addItem(item_text)

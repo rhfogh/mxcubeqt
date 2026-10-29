@@ -8,7 +8,7 @@ dependencies:
   - openjdk=11
   - pyqtgraph=0.13
   - pip
-  - poetry ==2.2.1
+  - poetry ==2.4.2
   # Uncomment as appropriate for demo environments
   # Put paths to repositories and PyQt and uncomment:
   - pip:
