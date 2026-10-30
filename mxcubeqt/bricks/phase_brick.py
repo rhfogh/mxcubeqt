@@ -74,10 +74,10 @@ class PhaseBrick(BaseWidget):
         self.init_phase_list()
 
         self.connect(
-            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict["phase"], "diffractometerPhaseChanged", self.phase_changed
+            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict.get("phase"), "diffractometerPhaseChanged", self.phase_changed
         )
         self.connect(
-            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict["phase"], "diffractometerPhaseStateChanged", self.phase_state_changed
+            HWR.beamline.diffractometer.nstate_equipment_hwobj_dict.get("phase"), "diffractometerPhaseStateChanged", self.phase_state_changed
         )
         self.phase_changed()
 
